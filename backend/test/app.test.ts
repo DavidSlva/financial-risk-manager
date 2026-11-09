@@ -31,6 +31,16 @@ describe('app', () => {
     expect(await res.json()).toEqual({ error: 'Not Found', path: '/api/nope' });
   });
 
+  it('POST /api/auth/refresh está registrado y rechaza un token inválido con 401', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ refreshToken: 'basura' }),
+    });
+
+    expect(res.status).toBe(401);
+  });
+
   it('no expone la cabecera x-powered-by', async () => {
     const res = await fetch(`${baseUrl}/api/health`);
 
