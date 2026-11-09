@@ -4,7 +4,7 @@ Spec: [../../specs/007-auth-jwt.md](../../specs/007-auth-jwt.md)
 
 ## Principios y restricciones
 
-- JWT simétrico; la clave son 64 bytes aleatorios de `crypto`.
+- JWT simétrico; la clave son 64 bytes aleatorios de `crypto`; el algoritmo (simétrico) se define en `config/environment.ts`.
 - El access autentica; el refresh no autentica y solo emite un access nuevo.
 - Los tokens deben poder revocarse: la vigencia del usuario (`active`) se consulta en cada validación.
 - La clave y los TTL se configuran en `config/environment.ts`, único lugar que lee `process.env`.

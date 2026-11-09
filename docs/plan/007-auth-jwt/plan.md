@@ -8,17 +8,20 @@ Dos servicios con responsabilidades separadas: `token.service` solo conoce cript
 
 ## Decisiones técnicas
 
-| Decisión                                      | Alternativas                | Motivo                                                                           |
-| --------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------- |
-| `jose` para firmar y verificar                | `jsonwebtoken`, HMAC manual | Sin dependencias, API moderna; no se implementa criptografía propia              |
-| Una sola clave y un claim `typ`               | Dos claves (access/refresh) | Es lo pedido (una key); `typ` se verifica siempre en ambos sentidos              |
-| Clave por variable de entorno (128 hex)       | Generarla en cada arranque  | Generarla al arrancar invalida los tokens al reiniciar y rompe varias instancias |
-| Script `generate-secret` que solo imprime     | Guardarla en un archivo     | La clave no debe quedar en el repositorio ni en disco por defecto                |
-| Vigencia consultada en cada validación        | Solo al emitir el token     | Es lo que permite revocar: el token firmado no cambia, el usuario sí             |
-| Rol tomado de `users.json`, no del token      | Rol dentro del token        | Un cambio de rol rige de inmediato                                               |
-| Refresh devuelve solo access (sin rotación)   | Rotar el refresh            | Lo pedido; rotar exige almacenar `jti`, fuera de alcance                         |
-| `401` genérico con `WWW-Authenticate: Bearer` | Mensajes detallados         | No filtrar si falló firma, expiración o vigencia                                 |
-| `jti` UUID en cada token                      | Sin `jti`                   | Costo nulo; habilita revocación por token en el futuro                           |
+| Decisión                                                                                                                         | Alternativas                | Motivo                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------ |
+| `jose` para firmar y verificar                                                                                                   | `jsonwebtoken`, HMAC manual | Sin dependencias, API moderna; no se implementa criptografía propia                              |
+| Algoritmo en `config` (`JWT_ALGORITHM`, solo HS256/HS384/HS512; por defecto HS256)                                               | Algoritmo fijo en el código | Pedido explícito; se verifica solo con el configurado, lo que evita la confusión de algoritmos   |
+| Fábricas con dependencias inyectables (`createAuthenticate(deps)`, `createAuthRouter(deps)`) y valores por defecto de producción | Dependencias globales       | Se prueban con un almacén temporal y una configuración propia, sin variables de entorno de datos |
+| `JWT_SECRET` de prueba fijo en `vitest.config.ts`                                                                                | Generarla en cada prueba    | `environment` se evalúa al importar; es una clave solo de pruebas                                |
+| Una sola clave y un claim `typ`                                                                                                  | Dos claves (access/refresh) | Es lo pedido (una key); `typ` se verifica siempre en ambos sentidos                              |
+| Clave por variable de entorno (128 hex)                                                                                          | Generarla en cada arranque  | Generarla al arrancar invalida los tokens al reiniciar y rompe varias instancias                 |
+| Script `generate-secret` que solo imprime                                                                                        | Guardarla en un archivo     | La clave no debe quedar en el repositorio ni en disco por defecto                                |
+| Vigencia consultada en cada validación                                                                                           | Solo al emitir el token     | Es lo que permite revocar: el token firmado no cambia, el usuario sí                             |
+| Rol tomado de `users.json`, no del token                                                                                         | Rol dentro del token        | Un cambio de rol rige de inmediato                                                               |
+| Refresh devuelve solo access (sin rotación)                                                                                      | Rotar el refresh            | Lo pedido; rotar exige almacenar `jti`, fuera de alcance                                         |
+| `401` genérico con `WWW-Authenticate: Bearer`                                                                                    | Mensajes detallados         | No filtrar si falló firma, expiración o vigencia                                                 |
+| `jti` UUID en cada token                                                                                                         | Sin `jti`                   | Costo nulo; habilita revocación por token en el futuro                                           |
 
 ## Interfaces
 
@@ -43,4 +46,4 @@ Error de dominio `AuthenticationError`; el middleware y el controlador lo traduc
 
 ## Verificación
 
-Pruebas de servicio: token válido, expirado, firma alterada, `alg: none`, refresh usado como access y access usado como refresh, usuario inexistente, usuario `active: false` (access y refresh). Prueba HTTP del middleware y de `POST /api/auth/refresh`. Verificación manual: pasar `active` a `false` y comprobar rechazo sin reiniciar.
+Pruebas de configuración (secreto, algoritmo, TTL), de servicio y HTTP, escritas antes del código: token válido, expirado, firma alterada, otro algoritmo, `alg: none`, refresh usado como access y access usado como refresh, usuario inexistente, usuario `active: false` (access y refresh). Prueba HTTP del middleware y de `POST /api/auth/refresh`. Verificación manual: pasar `active` a `false` y comprobar rechazo sin reiniciar.
