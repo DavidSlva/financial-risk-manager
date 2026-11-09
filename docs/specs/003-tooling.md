@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [001-setup-inicial, 002-flujo-git-agentes]
-related: []
+related: [004-pnpm-ci]
 supersedes: []
 superseded_by: []
 ---
@@ -24,7 +24,7 @@ Fija la versión de Node y configura la calidad de código del monorepo: formate
 ## Requisitos
 
 - RF-1: Node **22.22** fijado en `.nvmrc` y en `engines` de `package.json` (raíz, `backend`, `frontend`): `>=22.22.0 <23`. `engine-strict=true`.
-- RF-2: Monorepo con **npm workspaces** (`backend`, `frontend`).
+- RF-2: Monorepo con workspaces (`backend`, `frontend`). _Gestor actualizado de npm a pnpm en la spec [004](004-pnpm-ci.md)._
 - RF-3: **Prettier** define formato y estilo (`.prettierrc.json`). Los prompts de `docs/prompts` se excluyen para conservarlos textuales.
 - RF-4: **ESLint** (flat config, `typescript-eslint`) con `eslint-config-prettier` al final, para no chocar con Prettier.
 - RF-5: **tsc** `--noEmit` por workspace, con `tsconfig.base.json` en modo `strict`.
@@ -49,6 +49,7 @@ Los commits de merge (promociones) los ignora Commitlint por defecto.
 
 - depende de: [001-setup-inicial](001-setup-inicial.md) — estructura del monorepo.
 - depende de: [002-flujo-git-agentes](002-flujo-git-agentes.md) — flujo Git; la rama es `feature/003-tooling`.
+- relacionada con: [004-pnpm-ci](004-pnpm-ci.md) — migra a pnpm y agrega la política de cadena de suministro y el CI.
 
 ## Estado final (Converge)
 

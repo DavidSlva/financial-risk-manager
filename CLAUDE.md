@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `docs/specs/002-flujo-git-agentes.md` y `docs/specs/003-tooling.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md` y `004-pnpm-ci.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -51,12 +51,21 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 ## Tooling y calidad (spec 003)
 
 - Node **22.22** (`.nvmrc`; `engines` `>=22.22.0 <23` en raíz, `backend` y `frontend`). Usar `nvm use`.
-- npm workspaces: `npm install` en la raíz del workspace.
-- Comandos: `npm run lint`, `npm run format` / `format:check`, `npm run typecheck`.
+- Gestor: **pnpm** (versión en `packageManager`; workspaces en `pnpm-workspace.yaml`). `pnpm install` en la raíz del workspace. No usar npm ni yarn.
+- Comandos: `pnpm run lint`, `pnpm run format` / `format:check`, `pnpm run typecheck`, `pnpm run check:policy`.
 - Prettier manda en estilo; ESLint está alineado con él (`eslint-config-prettier`). No reformatear `docs/prompts`.
 - Hooks (Husky): `pre-commit` = lint-staged (ESLint + Prettier) y `tsc`; `commit-msg` = Commitlint. No saltarse hooks (`--no-verify`).
 - **Commits:** Conventional Commits con el id de la spec como scope: `tipo(NNN): descripción`, ej. `feat(003): agregar tooling`.
 - Workspaces de agentes en `D:\Persona-ws\<NNN-slug>` (`git worktree add ../Persona-ws/<NNN-slug> -b feature/<NNN-slug> develop`).
+
+## Cadena de suministro y CI (spec 004)
+
+- Política en `pnpm-workspace.yaml`, verificada por `scripts/check-pnpm-policy.mjs`:
+  - `allowBuilds` **vacío**: ninguna dependencia ejecuta scripts de ciclo de vida. No agregar entradas sin una spec.
+  - Cuarentena de **7 días** (`minimumReleaseAge: 10080`, `minimumReleaseAgeStrict: true`). Sin `minimumReleaseAgeExclude`.
+  - `blockExoticSubdeps: true` (sin git/tarball por URL en dependencias transitivas).
+- Agregar dependencias solo con `pnpm add` (resuelve versiones maduras). Si la cuarentena bloquea una versión, esperar o elegir otra; no debilitar la política.
+- CI (`.github/workflows/ci.yml`, GitHub Actions): política, `pnpm install --frozen-lockfile`, Prettier **solo valida**, ESLint, `tsc` y Commitlint (en PR). Acciones fijadas por SHA con al menos 7 días de publicadas.
 
 ## Reglas para agentes
 

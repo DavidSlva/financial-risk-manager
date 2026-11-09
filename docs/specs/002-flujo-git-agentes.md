@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [001-setup-inicial]
-related: [003-tooling]
+related: [003-tooling, 004-pnpm-ci]
 supersedes: []
 superseded_by: []
 ---
@@ -74,6 +74,7 @@ graph LR
 
 - depende de: [001-setup-inicial](001-setup-inicial.md) — estructura de `docs/` y metodología.
 - relacionada con: [003-tooling](003-tooling.md) — la convención de commits usa el id de spec como scope.
+- relacionada con: [004-pnpm-ci](004-pnpm-ci.md) — CI sobre las ramas y ambientes definidos aquí.
 
 ## Puntos abiertos
 

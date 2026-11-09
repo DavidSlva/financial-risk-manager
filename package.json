@@ -3,10 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "description": "Monorepo financial-risk-manager (backend Node/TS + frontend React/TS)",
-  "workspaces": [
-    "backend",
-    "frontend"
-  ],
   "engines": {
     "node": ">=22.22.0 <23"
   },
@@ -16,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "check:policy": "node scripts/check-pnpm-policy.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [
@@ -25,6 +22,7 @@
     ],
     "*.{json,md,yml,yaml,css,html}": "prettier --write"
   },
+  "packageManager": "pnpm@12.17.0",
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
@@ -35,7 +33,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.72.2"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1"
   }
 }

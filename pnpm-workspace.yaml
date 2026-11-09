@@ -1,0 +1,18 @@
+packages:
+  - backend
+  - frontend
+
+# --- Política de cadena de suministro (spec 004) ---
+
+# Cuarentena: un paquete/versión debe tener al menos 7 días (10080 min) de publicado.
+minimumReleaseAge: 10080
+# Estricto: si no hay versión madura que cumpla el rango, falla (no cae a una versión más nueva).
+minimumReleaseAgeStrict: true
+
+# Bloquea fuentes ocultas: las dependencias transitivas no pueden venir de git ni de tarballs por URL.
+blockExoticSubdeps: true
+
+# Scripts de ciclo de vida de dependencias: ninguno permitido por ahora.
+# No agregar entradas sin una spec que lo justifique.
+allowBuilds: {}
+strictDepBuilds: true
