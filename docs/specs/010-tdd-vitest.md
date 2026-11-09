@@ -79,7 +79,7 @@ Implementado en `feature/010-tdd-vitest` (workspace `D:\Persona-ws\010-tdd-vites
 Notas:
 
 - Las pruebas del código existente (spec 005) se escribieron **después** del código; son la base. Desde la 006 se aplica TDD estricto.
-- El paso de CI se agregó al workflow pero no se ha ejecutado en GitHub.
+- El paso de CI se ejecutó en GitHub (converge): run 42720950711 en `develop`, "Pruebas (Vitest)" en verde.
 - Esta rama parte de `feature/005-backend-estructura`; las specs 006 y 007 la integran.
 
 **Revisión de documentos relacionados:**
