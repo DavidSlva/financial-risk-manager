@@ -13,4 +13,4 @@ Orden TDD en cada tarea: prueba que falla → código mínimo → refactor.
 - [x] T7 — `roles.json`, `users.example.json`, `scores.example.json` y `.gitignore` de `users.json` y `scores.json`
 - [x] T8 — Verificación: pruebas, lint, tipos, formato; arranque con datos válidos e inválidos; cambio de `active` sin reiniciar
 - [x] T9 — Converge: spec (estado final), `implement.md`, índice, `CLAUDE.md` y `backend/README.md`
-- [ ] T10 — Push y PR (requiere confirmación)
+- [x] T10 — Push (20:29) e integración a `develop` por merge directo, sin PR (20:29)
