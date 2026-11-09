@@ -16,7 +16,7 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['*.{js,mjs,cjs}'],
+    files: ['*.{js,mjs,cjs}', 'scripts/**/*.{js,mjs,cjs}'],
     languageOptions: { globals: globals.node },
   },
   // Siempre al final: desactiva reglas de estilo que chocan con Prettier.
