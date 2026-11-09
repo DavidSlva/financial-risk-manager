@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r --if-present run typecheck",
-    "check:policy": "node scripts/check-pnpm-policy.mjs"
+    "check:policy": "node scripts/check-pnpm-policy.mjs",
+    "test": "pnpm -r --if-present run test"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [

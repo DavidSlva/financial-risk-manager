@@ -5,3 +5,7 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+
+# Datos personales (spec 006): se versionan solo los ejemplos
+backend/data/users.json
+backend/data/scores.json
