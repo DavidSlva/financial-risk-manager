@@ -74,7 +74,7 @@ graph LR
 - **Protección de ramas / CI** en GitHub: fuera de alcance.
 
 ## Estado final (Converge)
-Se creó `CLAUDE.md` con el flujo Git, reglas de workspaces, versionado y metodología. El repositorio local `D:\Persona` aún no está inicializado como git ni conectado al remoto: queda como paso pendiente (requiere confirmación por ser acción hacia GitHub).
+Se creó `CLAUDE.md` con el flujo Git, reglas de workspaces, versionado y metodología. El repositorio quedó inicializado y conectado a `origin`: commit inicial `6cfcdb3` en `main`, con `staging` y `develop` creadas desde él y publicadas. No se crearon tags (aún no hay promoción formal). Las specs 001 y 002 entraron en ese commit inicial sin pasar por `feature/*`.
 
 **Revisión de documentos relacionados:**
 - [x] constitution actualizada

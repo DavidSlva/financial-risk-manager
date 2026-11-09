@@ -5,4 +5,4 @@ Spec: [../../specs/002-flujo-git-agentes.md](../../specs/002-flujo-git-agentes.m
 | Fecha | Tarea | Resultado | Notas |
 |-------|-------|-----------|-------|
 | 2026-11-09 19:13 | T1–T4 | OK | Documentación y `CLAUDE.md` creados |
-| — | T5 | Pendiente | Requiere confirmación: init local, ramas y push al remoto |
+| 2026-11-09 | T5 | OK | `git init -b main`, commit inicial `6cfcdb3`, ramas `staging` y `develop` creadas desde él, push a `origin` |
