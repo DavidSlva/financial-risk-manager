@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md` y `004-pnpm-ci.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md` y `005-backend-estructura.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -66,6 +66,14 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
   - `blockExoticSubdeps: true` (sin git/tarball por URL en dependencias transitivas).
 - Agregar dependencias solo con `pnpm add` (resuelve versiones maduras). Si la cuarentena bloquea una versión, esperar o elegir otra; no debilitar la política.
 - CI (`.github/workflows/ci.yml`, GitHub Actions): política, `pnpm install --frozen-lockfile`, Prettier **solo valida**, ESLint, `tsc` y Commitlint (en PR). Acciones fijadas por SHA con al menos 7 días de publicadas.
+
+## Backend (spec 005)
+
+- Express 5 + TypeScript. Estructura y convenciones en `backend/README.md` (leerlo antes de tocar el backend).
+- `src/`: `config/` (único lugar que lee `process.env`: `environment.ts`), `controllers/`, `middlewares/`, `routes/` (enrutador principal en `index.ts`), `services/`.
+- Nombres **Feature-Driven Separation**: `<recurso>.<capa>.ts` (ej. `health.controller.ts`, `health.routes.ts`, `health.service.ts`).
+- Flujo: route → middlewares → controller → service. Los controladores no llevan negocio; los servicios no importan Express.
+- Imports relativos con extensión `.js` (NodeNext).
 
 ## Reglas para agentes
 
