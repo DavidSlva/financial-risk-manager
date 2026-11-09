@@ -1,7 +1,7 @@
 ---
 id: 006-modelo-datos
 title: Modelo de datos base (roles, users, scores) e integridad referencial
-status: tasked
+status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [005-backend-estructura, 010-tdd-vitest]
@@ -133,7 +133,7 @@ El formato del RUT (dígito verificador, normalización) no se valida aquí: lo 
 - Research (constitution): [../research/006-modelo-datos/constitution.md](../research/006-modelo-datos/constitution.md)
 - Plan: [../plan/006-modelo-datos/plan.md](../plan/006-modelo-datos/plan.md)
 - Tasks: [../implementation/006-modelo-datos/tasks.md](../implementation/006-modelo-datos/tasks.md)
-- Implement: pendiente
+- Implement: [../implementation/006-modelo-datos/implement.md](../implementation/006-modelo-datos/implement.md)
 - Prompts origen: [../prompts/2026-11-09_2002_006-007-modelo-datos-y-auth.md](../prompts/2026-11-09_2002_006-007-modelo-datos-y-auth.md), [../prompts/2026-11-09_2013_010-tdd-vitest.md](../prompts/2026-11-09_2013_010-tdd-vitest.md)
 
 ## Specs relacionadas
@@ -149,8 +149,31 @@ El formato del RUT (dígito verificador, normalización) no se valida aquí: lo 
 - Valores iniciales de `roles` (`admin`, `user`) y rango del score (0–1000): supuestos. Confirmar.
 - Formato canónico del rut → 008.
 - Estructura de `permissions` (clave–valor por rol) → 011.
-- `DATA_DIR` por defecto: `data/` relativo al directorio del backend.
+- `DATA_DIR` por defecto: la carpeta `backend/data`.
 
 ## Estado final (Converge)
 
-Pendiente: la spec está en etapa `tasked`; falta implementar y hacer converge.
+Implementado con TDD en `feature/006-modelo-datos` (workspace `D:\Persona-ws\006-modelo-datos`): las pruebas se escribieron primero y se confirmó que fallaban antes de implementar. Resultado: 65 pruebas en verde (52 nuevas), `eslint`, `tsc` y `prettier --check` sin errores.
+
+Verificado a mano con el backend compilado: con datos válidos arranca y `GET /api/health` responde 200; con un `scores.json` inválido el proceso aborta con código 1 e informa IR-8 e IR-9; cambiar `active` en `users.json` se refleja en la siguiente lectura sin reiniciar.
+
+Implementado:
+
+- `DATA_DIR` en `config/environment.ts`; tipos en `models/data.types.ts` (carpeta nueva respecto a la spec 005, documentada en `backend/README.md`).
+- `data-integrity.service.ts` (reglas IR-1…IR-9; no genera violaciones de clave foránea en cascada si la tabla padre es inutilizable), `data-store.service.ts` (caché por fecha de modificación y tamaño, falla cerrado, datos congelados) y servicios `roles`, `users` y `scores`.
+- Carga y validación al arranque en `index.ts`; `roles.json` versionado y ejemplos de `users` y `scores`; datos personales en `.gitignore`.
+
+Notas:
+
+- No existe aún un script de compilación del backend. Para la verificación manual se compiló con `tsc --outDir dist --rootDir .` y se ejecutó con `DATA_DIR`; los scripts `build` y `start` siguen pendientes (spec posterior).
+- Los servicios aceptan un almacén por parámetro (por defecto el de la aplicación) para poder probarse con carpetas temporales.
+- Pendiente en specs derivadas: formato del rut ([008](008-validador-rut.md)) y permisos por rol ([011](011-rbac.md)).
+
+**Revisión de documentos relacionados:**
+
+- [x] constitution actualizada
+- [x] plan actualizado
+- [x] tasks actualizadas
+- [x] implement actualizado
+- [x] specs relacionadas revisadas (007 consume `active`; 008 y 011 siguen pendientes)
+- [x] índice `specs/README.md` actualizado

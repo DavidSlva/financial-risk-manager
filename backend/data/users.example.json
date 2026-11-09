@@ -1,0 +1,4 @@
+[
+  { "rut": "11111111-1", "role": "admin", "active": true },
+  { "rut": "22222222-2", "role": "user", "active": false }
+]

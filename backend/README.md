@@ -14,6 +14,7 @@ backend/
     ├── config/
     ├── controllers/
     ├── middlewares/
+    ├── models/
     ├── routes/
     └── services/
 ```
@@ -24,6 +25,7 @@ backend/
 | `config/`      | Configuración y validación de variables de entorno (`environment.ts`). Es el único lugar que lee `process.env`.           |
 | `controllers/` | Capa que recibe las peticiones HTTP y extrae los datos de la request. Delegan en `services/` y responden. Sin negocio.    |
 | `middlewares/` | Funciones que actúan en cualquier punto del ciclo de vida de la petición (validación, errores, 404, autenticación, etc.). |
+| `models/`      | Tipos del modelo de datos (`Role`, `User`, `Score`, `Violation`). Solo tipos, sin lógica.                                 |
 | `routes/`      | Definición de rutas. Un enrutador principal (`index.ts`) une los enrutadores de cada recurso.                             |
 | `services/`    | Capa de negocio. No conoce Express (`Request`/`Response`).                                                                |
 
@@ -64,12 +66,27 @@ Excepciones:
 
 ## Variables de entorno
 
-| Variable   | Valores                             | Por defecto   |
-| ---------- | ----------------------------------- | ------------- |
-| `NODE_ENV` | `development`, `test`, `production` | `development` |
-| `PORT`     | entero entre 1 y 65535              | `3000`        |
+| Variable   | Valores                             | Por defecto    |
+| ---------- | ----------------------------------- | -------------- |
+| `NODE_ENV` | `development`, `test`, `production` | `development`  |
+| `PORT`     | entero entre 1 y 65535              | `3000`         |
+| `DATA_DIR` | carpeta con los archivos de datos   | `backend/data` |
 
 El proceso falla al arrancar si alguna es inválida.
+
+## Datos
+
+Sin base de datos: tres archivos JSON en `backend/data/` (spec [006-modelo-datos](../docs/specs/006-modelo-datos.md)).
+
+| Archivo       | Contenido                                                 | En git                              |
+| ------------- | --------------------------------------------------------- | ----------------------------------- |
+| `roles.json`  | Catálogo de roles (nivel de privilegios), extensible      | sí                                  |
+| `users.json`  | Usuarios: `rut`, `role` (FK a roles), `active` (vigencia) | no (ejemplo: `users.example.json`)  |
+| `scores.json` | Score por rut: `rut` (PK y FK a users), `score` (0–1000)  | no (ejemplo: `scores.example.json`) |
+
+Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json` a `scores.json`.
+
+La integridad referencial se valida al arrancar (el proceso aborta e informa todas las violaciones) y se revalida cuando cambia un archivo. Si los datos dejan de ser íntegros, se rechazan las operaciones que dependan de ellos. Poner `active: false` a un usuario lo revoca sin reiniciar. La función de cada columna está en la spec.
 
 ## Endpoints
 
