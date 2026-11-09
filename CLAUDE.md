@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md` y `010-tdd-vitest.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md` y `006-modelo-datos.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -83,6 +83,14 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Imports desde las pruebas: `../src/...js` (con extensión `.js`). Sin globales de Vitest: importar `describe`, `it`, `expect`.
 - Pruebas HTTP: `createApp()` en un puerto efímero con `fetch`; sin librerías adicionales.
 - El CI ejecuta las pruebas; un PR con pruebas en rojo no se integra.
+
+## Modelo de datos (spec 006)
+
+- Sin base de datos: `backend/data/{roles,users,scores}.json`. Modelo y función de cada columna en `docs/specs/006-modelo-datos.md`.
+- `roles` es una tabla propia (extensible); `users.role` es FK a `roles.name`; `scores.rut` es PK y FK a `users.rut`. `users.active` es la marca de vigencia (revocación).
+- La integridad se valida con `validateIntegrity` (función pura, reglas IR-1…IR-9) al arrancar y al recargar; ante datos inválidos se falla cerrado.
+- `users.json` y `scores.json` contienen datos personales: **nunca** se versionan (solo los `*.example.json`).
+- Se leen los datos solo con `users.service`, `roles.service` y `scores.service`; no leer los archivos directamente.
 
 ## Reglas para agentes
 
