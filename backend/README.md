@@ -74,3 +74,14 @@ El proceso falla al arrancar si alguna es inválida.
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
+
+## Pruebas
+
+TDD con Vitest (spec [010-tdd-vitest](../docs/specs/010-tdd-vitest.md)). `test/` replica la estructura de `src/`:
+
+```
+src/services/health.service.ts  →  test/services/health.service.test.ts
+src/app.ts                      →  test/app.test.ts
+```
+
+Comandos: `pnpm run test` (una vez) y `pnpm run test:watch`.

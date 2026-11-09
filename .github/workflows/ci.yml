@@ -56,6 +56,9 @@ jobs:
       - name: TypeScript
         run: pnpm run typecheck
 
+      - name: Pruebas (Vitest)
+        run: pnpm run test
+
       - name: Commitlint
         if: github.event_name == 'pull_request'
         run: >

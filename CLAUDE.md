@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md` y `005-backend-estructura.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md` y `010-tdd-vitest.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -74,6 +74,15 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Nombres **Feature-Driven Separation**: `<recurso>.<capa>.ts` (ej. `health.controller.ts`, `health.routes.ts`, `health.service.ts`).
 - Flujo: route → middlewares → controller → service. Los controladores no llevan negocio; los servicios no importan Express.
 - Imports relativos con extensión `.js` (NodeNext).
+
+## TDD y pruebas (spec 010)
+
+- Se trabaja con **TDD**: escribir primero la prueba y verla fallar, luego el código mínimo para que pase, luego refactorizar. No se escribe código de producción sin una prueba que lo pida.
+- Ejecutor: **Vitest**. `pnpm run test` (todas), `pnpm --filter <workspace> run test:watch`.
+- Las pruebas viven en `backend/test/` y `frontend/test/`, con la **misma estructura que `src/`** y nombre `<recurso>.<capa>.test.ts` (ej. `src/services/health.service.ts` → `test/services/health.service.test.ts`).
+- Imports desde las pruebas: `../src/...js` (con extensión `.js`). Sin globales de Vitest: importar `describe`, `it`, `expect`.
+- Pruebas HTTP: `createApp()` en un puerto efímero con `fetch`; sin librerías adicionales.
+- El CI ejecuta las pruebas; un PR con pruebas en rojo no se integra.
 
 ## Reglas para agentes
 
