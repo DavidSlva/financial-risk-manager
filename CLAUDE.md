@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md` y `006-modelo-datos.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md` y `007-auth-jwt.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -91,6 +91,17 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - La integridad se valida con `validateIntegrity` (función pura, reglas IR-1…IR-9) al arrancar y al recargar; ante datos inválidos se falla cerrado.
 - `users.json` y `scores.json` contienen datos personales: **nunca** se versionan (solo los `*.example.json`).
 - Se leen los datos solo con `users.service`, `roles.service` y `scores.service`; no leer los archivos directamente.
+
+## Seguridad y autenticación (spec 007)
+
+- JWT **simétrico**. `JWT_SECRET` = 64 bytes de `crypto.randomBytes(64)` en hexadecimal (128 caracteres); se genera con `pnpm --filter @financial-risk-manager/backend run generate-secret`. **Nunca** se escribe en el repositorio, en logs ni en mensajes de error.
+- El **algoritmo**, la clave y los TTL (`JWT_ALGORITHM`, `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_SECONDS`) viven solo en `config/environment.ts`. Solo HS256/HS384/HS512; al verificar se acepta únicamente el configurado.
+- **El access autentica; el refresh no.** Cada token lleva `typ` y se verifica en ambos sentidos: un refresh no pasa por `authenticate.middleware` y un access no refresca.
+- **Revocación:** toda validación pasa por `auth.service` (`authenticateAccess`, `refreshAccess`), que tras verificar el token comprueba en `users.json` que el usuario exista y esté `active`. No validar tokens saltándose `auth.service`.
+- El rol se toma de `users.json` en cada petición, no del token (el token no lleva rol).
+- Rechazos: `401` genérico con `WWW-Authenticate: Bearer`; nunca indicar si falló la firma, la expiración o la vigencia.
+- Rutas protegidas: `router.get(..., authenticate, controller)`; el usuario queda en `req.user`.
+- Emisión del primer par de tokens (login): pendiente, spec 009. La autorización por rol: pendiente, spec 011.
 
 ## Reglas para agentes
 

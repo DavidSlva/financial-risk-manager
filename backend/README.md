@@ -16,7 +16,8 @@ backend/
     ├── middlewares/
     ├── models/
     ├── routes/
-    └── services/
+    ├── services/
+    └── types/          # Extensiones de tipos (p. ej. req.user)
 ```
 
 | Carpeta        | Intención                                                                                                                 |
@@ -28,6 +29,7 @@ backend/
 | `models/`      | Tipos del modelo de datos (`Role`, `User`, `Score`, `Violation`). Solo tipos, sin lógica.                                 |
 | `routes/`      | Definición de rutas. Un enrutador principal (`index.ts`) une los enrutadores de cada recurso.                             |
 | `services/`    | Capa de negocio. No conoce Express (`Request`/`Response`).                                                                |
+| `types/`       | Extensiones de tipos de librerías (p. ej. `req.user` de Express). Solo declaraciones.                                     |
 
 Flujo: `route → middlewares → controller → service`.
 
@@ -66,13 +68,23 @@ Excepciones:
 
 ## Variables de entorno
 
-| Variable   | Valores                             | Por defecto    |
-| ---------- | ----------------------------------- | -------------- |
-| `NODE_ENV` | `development`, `test`, `production` | `development`  |
-| `PORT`     | entero entre 1 y 65535              | `3000`         |
-| `DATA_DIR` | carpeta con los archivos de datos   | `backend/data` |
+| Variable                    | Valores                                  | Por defecto    | Obligatoria |
+| --------------------------- | ---------------------------------------- | -------------- | ----------- |
+| `NODE_ENV`                  | `development`, `test`, `production`      | `development`  | no          |
+| `PORT`                      | entero entre 1 y 65535                   | `3000`         | no          |
+| `DATA_DIR`                  | carpeta con los archivos de datos        | `backend/data` | no          |
+| `JWT_SECRET`                | 128 caracteres hexadecimales (64 bytes)  | —              | **sí**      |
+| `JWT_ALGORITHM`             | `HS256`, `HS384`, `HS512`                | `HS256`        | no          |
+| `ACCESS_TOKEN_TTL_SECONDS`  | entero positivo                          | `900`          | no          |
+| `REFRESH_TOKEN_TTL_SECONDS` | entero positivo, mayor que el del access | `604800`       | no          |
 
-El proceso falla al arrancar si alguna es inválida.
+El proceso falla al arrancar si alguna es inválida o si falta `JWT_SECRET`. Los mensajes de error nunca incluyen el valor de la clave.
+
+Generar la clave (solo imprime; no se guarda en ningún archivo):
+
+```
+pnpm --filter @financial-risk-manager/backend run generate-secret
+```
 
 ## Datos
 
@@ -88,9 +100,20 @@ Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json`
 
 La integridad referencial se valida al arrancar (el proceso aborta e informa todas las violaciones) y se revalida cuando cambia un archivo. Si los datos dejan de ser íntegros, se rechazan las operaciones que dependan de ellos. Poner `active: false` a un usuario lo revoca sin reiniciar. La función de cada columna está en la spec.
 
+## Autenticación
+
+JWT simétrico (spec [007-auth-jwt](../docs/specs/007-auth-jwt.md)); el algoritmo, la clave y los TTL salen de `config/environment.ts`.
+
+- **Access:** autentica. `Authorization: Bearer <access>` + `authenticate.middleware` → `req.user`.
+- **Refresh:** **no autentica**; solo sirve en `POST /api/auth/refresh` para obtener un access nuevo (no rota el refresh).
+- **Revocación:** cada validación consulta al usuario en `users.json`. Con `active: false` (o si no existe) el access deja de autenticar y el refresh deja de generar access, sin reiniciar.
+- Los rechazos son `401` genéricos con `WWW-Authenticate: Bearer`. Si los datos no son íntegros, no se autentica (`500`).
+- Pendiente: cómo se obtiene el primer par de tokens ([009-emision-tokens](../docs/specs/009-emision-tokens.md)).
+
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
+- `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
 
 ## Pruebas
 

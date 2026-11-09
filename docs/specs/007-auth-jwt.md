@@ -1,7 +1,7 @@
 ---
 id: 007-auth-jwt
 title: Autenticación JWT simétrica con access/refresh y revocación por vigencia
-status: tasked
+status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [006-modelo-datos, 010-tdd-vitest]
@@ -73,7 +73,7 @@ Revocar a un usuario = poner `active: false` en `users.json`. Rige desde la sigu
 - Research (constitution): [../research/007-auth-jwt/constitution.md](../research/007-auth-jwt/constitution.md)
 - Plan: [../plan/007-auth-jwt/plan.md](../plan/007-auth-jwt/plan.md)
 - Tasks: [../implementation/007-auth-jwt/tasks.md](../implementation/007-auth-jwt/tasks.md)
-- Implement: pendiente
+- Implement: [../implementation/007-auth-jwt/implement.md](../implementation/007-auth-jwt/implement.md)
 - Prompts origen: [../prompts/2026-11-09_2002_006-007-modelo-datos-y-auth.md](../prompts/2026-11-09_2002_006-007-modelo-datos-y-auth.md), [../prompts/2026-11-09_2013_010-tdd-vitest.md](../prompts/2026-11-09_2013_010-tdd-vitest.md)
 
 ## Specs relacionadas
@@ -93,4 +93,30 @@ Revocar a un usuario = poner `active: false` en `users.json`. Rige desde la sigu
 
 ## Estado final (Converge)
 
-Pendiente: la spec está en etapa `tasked`; falta implementar y hacer converge.
+Implementado con TDD en `feature/007-auth-jwt` (workspace `D:\Persona-ws\007-auth-jwt`): las pruebas se escribieron primero y se confirmó que fallaban (34 pruebas en rojo y 5 archivos sin compilar) antes de implementar. Resultado: 164 pruebas en verde (99 nuevas), `eslint`, `tsc` y `prettier --check` sin errores.
+
+Verificado con el servidor real (compilado, con `JWT_SECRET` generada por el script): un refresh vigente entrega un access; un access usado como refresh recibe 401; tras poner `active: false` en `users.json` el mismo refresh recibe 401 **sin reiniciar**; sin `JWT_SECRET` el proceso no arranca.
+
+Implementado:
+
+- `config/environment.ts`: `JWT_SECRET` (obligatoria, 64 bytes hex), `JWT_ALGORITHM` (HS256/HS384/HS512, por defecto HS256), `ACCESS_TOKEN_TTL_SECONDS` y `REFRESH_TOKEN_TTL_SECONDS` (el refresh debe ser mayor). Los errores nunca incluyen la clave.
+- `token.service.ts` (`generateTokens`, `verifyToken`; solo se acepta el algoritmo configurado; exige `sub`, `jti`, `iat`, `exp` y el `typ` esperado) y `auth.service.ts` (validador con vigencia: `authenticateAccess`, `refreshAccess`, `AuthenticationError`).
+- `authenticate.middleware.ts` (Bearer → `req.user`), `error-handler.middleware.ts` (`AuthenticationError` → 401 genérico con `WWW-Authenticate: Bearer`), `auth.controller.ts`, `auth.routes.ts` (`POST /api/auth/refresh`) y `types/express.d.ts`.
+- `scripts/generate-secret.mjs` y script `generate-secret`; `jose` 6.2.15 como única dependencia nueva (cumple la cuarentena de 7 días).
+
+Notas:
+
+- `authenticate`, el controlador y el enrutador de auth son fábricas con dependencias inyectables (`createAuthenticate(deps)`, `createAuthRouter(deps)`), con las de producción por defecto; así se prueban con un almacén temporal.
+- Si los datos de la spec 006 no son íntegros, no se autentica ni se refresca: se responde 500 genérico (nunca 200).
+- `vitest.config.ts` define una `JWT_SECRET` solo para pruebas.
+- `backend/data/users.json` y `scores.json` deben existir para arrancar (se copian de los `*.example.json`).
+- Sin emisión de tokens (spec 009) el flujo completo por HTTP aún no se puede iniciar; se verificó generando tokens con el servicio.
+
+**Revisión de documentos relacionados:**
+
+- [x] constitution actualizada
+- [x] plan actualizado
+- [x] tasks actualizadas
+- [x] implement actualizado
+- [x] specs relacionadas revisadas (006 provee la vigencia; 009 y 011 siguen pendientes)
+- [x] índice `specs/README.md` actualizado

@@ -8,7 +8,7 @@ Spec: [../../specs/007-auth-jwt.md](../../specs/007-auth-jwt.md)
 - El access autentica; el refresh no autentica y solo emite un access nuevo.
 - Los tokens deben poder revocarse: la vigencia del usuario (`active`) se consulta en cada validación.
 - La clave y los TTL se configuran en `config/environment.ts`, único lugar que lee `process.env`.
-- No se implementa criptografía propia; el algoritmo está fijado y es el único aceptado.
+- No se implementa criptografía propia; solo se acepta el algoritmo configurado.
 - Rechazos genéricos: sin detalle que ayude a un atacante.
 - Toda dependencia nueva entra por `pnpm add` bajo la cuarentena de 7 días (spec 004).
 - La emisión del primer par de tokens queda fuera de alcance (decisión del usuario).
