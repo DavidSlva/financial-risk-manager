@@ -79,13 +79,16 @@ graph LR
 ## Puntos abiertos
 
 - **Primer `y`:** se asume que la primera promoción de una spec es `x.0`.
-- **Promociones con varias specs** (workspace de integración): qué `x` lleva el tag. Pendiente de decidir.
+- **Promociones con varias specs** (workspace de integración): qué `x` lleva el tag. Pendiente de decidir y **ya aplicable**: `develop` contiene las specs 003–007 y 010, así que la próxima promoción a `staging` abarca varias specs.
 - **Hotfix** sobre `main`: no definido; gitflow clásico usaría `hotfix/*`.
-- **Protección de ramas / CI** en GitHub: fuera de alcance.
+- **Protección de ramas / CI** en GitHub: el CI existe (spec [004](004-pnpm-ci.md)); la protección de ramas y los checks requeridos siguen fuera de alcance.
+- **Integración a `develop`:** la regla dice "por PR", pero las specs 003–010 entraron por merge directo `--no-ff` sin PR, a pedido del usuario. Definir si es la práctica habitual o una excepción.
 
 ## Estado final (Converge)
 
 Se creó `CLAUDE.md` con el flujo Git, reglas de workspaces, versionado y metodología. El repositorio quedó inicializado y conectado a `origin`: commit inicial `6cfcdb3` en `main`, con `staging` y `develop` creadas desde él y publicadas. No se crearon tags (aún no hay promoción formal). Las specs 001 y 002 entraron en ese commit inicial sin pasar por `feature/*`.
+
+Converge (2026-11-09 20:32): la spec se **promovió a `staging` con el tag `rc2.0`** (commit de promoción `777ca0c`, merge `--no-ff` de `develop`; push 19:16:38). `main` sigue en `6cfcdb3`: no hay promoción a producción. Después, `develop` incorporó las specs 003–007 y 010 por merge directo; `staging` no las contiene.
 
 **Revisión de documentos relacionados:**
 
