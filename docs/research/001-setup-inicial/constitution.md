@@ -16,4 +16,4 @@ Ninguno; setup inicial sin dependencias externas.
 
 ## Preguntas abiertas
 
-- Gestor de workspaces (npm/pnpm) y tooling compartido → próxima spec.
+- Gestor de workspaces y tooling compartido → resuelto en las specs 003 (tooling) y 004 (pnpm).

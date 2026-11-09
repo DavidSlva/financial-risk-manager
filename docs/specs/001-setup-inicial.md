@@ -50,7 +50,7 @@ Crear el esqueleto del monorepo (backend Node/TS, frontend React/TS con Vite) y 
 
 ## Estado final (Converge)
 
-Estructura creada tal como se especificó. Se añadió `docs/README.md` con la metodología y plantillas en `specs/_templates/`. Pendiente para próximas specs: tooling de backend y frontend.
+Estructura creada tal como se especificó. Se añadió `docs/README.md` con la metodología y plantillas en `specs/_templates/`. El tooling lo definió la spec [003-tooling](003-tooling.md) (y [004-pnpm-ci](004-pnpm-ci.md) migró a pnpm); la estructura del backend, la spec [005-backend-estructura](005-backend-estructura.md).
 
 **Revisión de documentos relacionados:**
 
