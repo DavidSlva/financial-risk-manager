@@ -20,7 +20,7 @@ describe('data-integrity.service', () => {
   });
 
   describe('IR-1: cada archivo es un arreglo de objetos', () => {
-    it.each(['roles', 'users', 'scores'] as const)('%s no es un arreglo', (file) => {
+    it.each(['roles', 'users', 'scores', 'permissions'] as const)('%s no es un arreglo', (file) => {
       const data = validData();
       data[file] = { no: 'arreglo' };
 
@@ -171,10 +171,98 @@ describe('data-integrity.service', () => {
     });
   });
 
+  describe('permissions', () => {
+    it('acepta un rol sin permisos', () => {
+      const data = validData();
+      data.permissions = [];
+
+      expect(validateIntegrity(data)).toEqual([]);
+    });
+
+    it('IR-2: falta una columna, sobra una o el tipo es incorrecto', () => {
+      for (const row of [
+        { role: 'admin', key: 'can_get_score' },
+        { role: 'admin', key: 'can_get_score', value: true, extra: 1 },
+        { role: 'admin', key: 'can_get_score', value: 'true' },
+        { role: 'admin', key: 'can_get_score', value: null },
+      ]) {
+        const data = validData();
+        data.permissions = [row];
+
+        expect(rulesOf(data)).toContain('IR-2');
+      }
+    });
+
+    it('IR-3: role y key no vacíos y sin espacios en los extremos', () => {
+      for (const row of [
+        { role: '', key: 'can_get_score', value: true },
+        { role: 'admin', key: ' can_get_score', value: true },
+      ]) {
+        const data = validData();
+        data.permissions = [row];
+
+        expect(validateIntegrity(data)).toContainEqual(
+          expect.objectContaining({ file: 'permissions.json', rule: 'IR-3' }),
+        );
+      }
+    });
+
+    it('IR-10: (role, key) duplicado', () => {
+      const data = validData();
+      data.permissions = [
+        { role: 'admin', key: 'can_get_score', value: true },
+        { role: 'admin', key: 'can_get_score', value: false },
+      ];
+
+      expect(validateIntegrity(data)).toContainEqual(
+        expect.objectContaining({ file: 'permissions.json', row: 1, rule: 'IR-10' }),
+      );
+    });
+
+    it('IR-10: la misma clave en roles distintos no es duplicado', () => {
+      const data = validData();
+
+      expect(rulesOf(data)).not.toContain('IR-10');
+    });
+
+    it('IR-11: role inexistente en roles', () => {
+      const data = validData();
+      data.permissions = [{ role: 'fantasma', key: 'can_get_score', value: true }];
+
+      expect(validateIntegrity(data)).toContainEqual(
+        expect.objectContaining({ file: 'permissions.json', row: 0, rule: 'IR-11' }),
+      );
+    });
+
+    it('IR-12: key fuera del catálogo de permisos', () => {
+      const data = validData();
+      data.permissions = [{ role: 'admin', key: 'can_delete_everything', value: true }];
+
+      expect(validateIntegrity(data)).toContainEqual(
+        expect.objectContaining({ file: 'permissions.json', row: 0, rule: 'IR-12' }),
+      );
+    });
+
+    it('IR-12: el nombre con espacios no es una clave del catálogo', () => {
+      const data = validData();
+      data.permissions = [{ role: 'admin', key: 'can get score', value: true }];
+
+      expect(rulesOf(data)).toContain('IR-12');
+    });
+
+    it('no genera IR-11 en cascada si roles.json no es un arreglo', () => {
+      const data = validData();
+      data.roles = null;
+
+      expect(rulesOf(data)).toEqual(['IR-1']);
+    });
+  });
+
   it('acumula las violaciones de todos los archivos', () => {
     const data = validData();
     data.roles = [{ name: 'admin', description: 'a' }];
     data.users = [{ rut: '11111111-1', role: 'otro', active: true }];
+    data.permissions = [];
     data.scores = [{ rut: '99999999-9', score: 5000 }];
 
     expect(rulesOf(data).sort()).toEqual(['IR-7', 'IR-8', 'IR-9']);

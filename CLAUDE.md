@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md` `007-auth-jwt.md` y `012-errores-http.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md` y `011-rbac.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -108,6 +108,13 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Los errores HTTP soportados viven en el mapa `backend/src/config/http-errors.ts` (`BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `INTERNAL_SERVER_ERROR`). Rutas, controladores, servicios y middlewares lanzan `throw new HttpError('<TIPO>')`.
 - Hay **un único** `error-handler.middleware`; **no** crear middlewares ni clases de error por tipo. Un tipo nuevo es una entrada nueva en el mapa.
 - Nunca armar `res.status(4xx).json(...)` a mano para errores. El mensaje al cliente sale del mapa, nunca del detalle interno.
+
+## Autorización (spec 011)
+
+- Los permisos son **personalizados**, no endpoints: claves de un catálogo cerrado (`config/permissions.ts`: `can_get_score`, `can_get_all_score`) asignadas a roles en `backend/data/permissions.json`. Solo `value: true` concede; sin fila, denegado.
+- Rutas protegidas: `authenticate` → `authorize(check)` → controlador. `authorize` **exige** un callback; solo concede con `true` estricto. Sin `req.user` → 401; sin permiso → 403 (`HttpError`).
+- El callback de autorización de un recurso se define en el **service de ese recurso** y solo valida si el usuario puede acceder al recurso solicitado (recibe `{ user, params, query }`, sin tipos de Express). Para recursos triviales: `authorize(requirePermission('<clave>'))`.
+- Agregar un permiso: entrada en `config/permissions.ts` y filas en `permissions.json` (IR-12 rechaza claves fuera del catálogo).
 
 ## Reglas para agentes
 

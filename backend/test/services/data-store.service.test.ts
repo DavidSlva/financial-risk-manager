@@ -14,7 +14,7 @@ describe('data-store.service', () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it('carga los tres archivos', () => {
+  it('carga los cuatro archivos', () => {
     writeAll(dir, validData(), 1000);
 
     const snapshot = createDataStore(dir).load();
@@ -22,6 +22,7 @@ describe('data-store.service', () => {
     expect(snapshot.roles).toHaveLength(2);
     expect(snapshot.users).toHaveLength(2);
     expect(snapshot.scores).toHaveLength(1);
+    expect(snapshot.permissions).toHaveLength(3);
   });
 
   it('devuelve los datos congelados (la caché no se puede mutar)', () => {
@@ -31,6 +32,8 @@ describe('data-store.service', () => {
 
     expect(Object.isFrozen(snapshot.users)).toBe(true);
     expect(Object.isFrozen(snapshot.users[0])).toBe(true);
+    expect(Object.isFrozen(snapshot.permissions)).toBe(true);
+    expect(Object.isFrozen(snapshot.permissions[0])).toBe(true);
   });
 
   it('falla con todas las violaciones si los datos no son íntegros', () => {
@@ -49,6 +52,23 @@ describe('data-store.service', () => {
         'IR-9',
       ]);
     }
+  });
+
+  it('falla si falta permissions.json', () => {
+    const data = validData();
+    writeDataFile(dir, 'roles', data.roles, 1000);
+    writeDataFile(dir, 'users', data.users, 1000);
+    writeDataFile(dir, 'scores', data.scores, 1000);
+
+    expect(() => createDataStore(dir).load()).toThrow(/permissions.json/);
+  });
+
+  it('falla si permissions.json viola la integridad (IR-12)', () => {
+    const data = validData();
+    data.permissions = [{ role: 'admin', key: 'inventado', value: true }];
+    writeAll(dir, data, 1000);
+
+    expect(() => createDataStore(dir).load()).toThrow(/IR-12/);
   });
 
   it('falla si falta un archivo', () => {
