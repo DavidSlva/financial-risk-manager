@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { HttpError } from '../config/http-errors.js';
 import { refreshAccess, type AuthDeps } from '../services/auth.service.js';
 
 export function createAuthController(deps: AuthDeps = {}) {
@@ -11,8 +12,7 @@ export function createAuthController(deps: AuthDeps = {}) {
           ? (body as Record<string, unknown>).refreshToken
           : undefined;
       if (typeof refreshToken !== 'string' || refreshToken === '') {
-        res.status(400).json({ error: 'Bad Request' });
-        return;
+        throw new HttpError('BAD_REQUEST');
       }
       res.json(await refreshAccess(refreshToken, deps));
     },

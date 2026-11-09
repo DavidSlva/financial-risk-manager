@@ -1,5 +1,5 @@
-import type { JwtConfig } from '../config/environment.js';
-import { environment } from '../config/environment.js';
+import { environment, type JwtConfig } from '../config/environment.js';
+import { HttpError } from '../config/http-errors.js';
 import type { User } from '../models/data.types.js';
 import { getDataStore, type DataStore } from './data-store.service.js';
 import { generateTokens, verifyToken, type TokenType } from './token.service.js';
@@ -8,14 +8,6 @@ import { findUserByRut } from './users.service.js';
 export interface AuthDeps {
   store?: DataStore;
   jwt?: JwtConfig;
-}
-
-/** Rechazo de autenticación. El mensaje es genérico: no dice por qué falló. */
-export class AuthenticationError extends Error {
-  constructor() {
-    super('No autenticado');
-    this.name = 'AuthenticationError';
-  }
 }
 
 /**
@@ -31,11 +23,11 @@ async function validate(token: string, typ: TokenType, deps: AuthDeps): Promise<
   try {
     ({ sub } = await verifyToken(token, typ, jwt));
   } catch {
-    throw new AuthenticationError();
+    throw new HttpError('UNAUTHORIZED');
   }
 
   const user = findUserByRut(sub, store);
-  if (!user?.active) throw new AuthenticationError();
+  if (!user?.active) throw new HttpError('UNAUTHORIZED');
   return { ...user };
 }
 

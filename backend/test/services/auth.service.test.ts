@@ -1,7 +1,6 @@
 import { rmSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-  AuthenticationError,
   authenticateAccess,
   refreshAccess,
   type AuthDeps,
@@ -46,23 +45,31 @@ describe('auth.service (validador con vigencia)', () => {
     it('el refresh no autentica', async () => {
       const { refreshToken } = await generateTokens(ADMIN, deps.jwt!);
 
-      await expect(authenticateAccess(refreshToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(authenticateAccess(refreshToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('rechaza un token inválido', async () => {
-      await expect(authenticateAccess('basura', deps)).rejects.toThrow(AuthenticationError);
+      await expect(authenticateAccess('basura', deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('rechaza un token de un usuario que no existe', async () => {
       const { accessToken } = await generateTokens({ rut: '99999999-9' }, deps.jwt!);
 
-      await expect(authenticateAccess(accessToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(authenticateAccess(accessToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('rechaza un access firmado válido de un usuario no vigente', async () => {
       const { accessToken } = await generateTokens(REVOKED, deps.jwt!);
 
-      await expect(authenticateAccess(accessToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(authenticateAccess(accessToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('revocación: deja de autenticar al marcar active=false, sin reiniciar', async () => {
@@ -77,12 +84,16 @@ describe('auth.service (validador con vigencia)', () => {
         2000,
       );
 
-      await expect(authenticateAccess(accessToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(authenticateAccess(accessToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('reactivación: vuelve a autenticar al marcar active=true', async () => {
       const { accessToken } = await generateTokens(REVOKED, deps.jwt!);
-      await expect(authenticateAccess(accessToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(authenticateAccess(accessToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
 
       setUsers(
         [
@@ -155,17 +166,21 @@ describe('auth.service (validador con vigencia)', () => {
     it('el access no sirve para refrescar', async () => {
       const { accessToken } = await generateTokens(ADMIN, deps.jwt!);
 
-      await expect(refreshAccess(accessToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(refreshAccess(accessToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('rechaza un refresh inválido', async () => {
-      await expect(refreshAccess('basura', deps)).rejects.toThrow(AuthenticationError);
+      await expect(refreshAccess('basura', deps)).rejects.toMatchObject({ type: 'UNAUTHORIZED' });
     });
 
     it('rechaza un refresh válido de un usuario no vigente', async () => {
       const { refreshToken } = await generateTokens(REVOKED, deps.jwt!);
 
-      await expect(refreshAccess(refreshToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(refreshAccess(refreshToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('revocación: un refresh ya emitido deja de generar access al marcar active=false', async () => {
@@ -180,7 +195,9 @@ describe('auth.service (validador con vigencia)', () => {
         2000,
       );
 
-      await expect(refreshAccess(refreshToken, deps)).rejects.toThrow(AuthenticationError);
+      await expect(refreshAccess(refreshToken, deps)).rejects.toMatchObject({
+        type: 'UNAUTHORIZED',
+      });
     });
 
     it('falla cerrado si los datos no son íntegros (no emite access)', async () => {

@@ -20,16 +20,16 @@ backend/
     └── types/          # Extensiones de tipos (p. ej. req.user)
 ```
 
-| Carpeta        | Intención                                                                                                                 |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `src/`         | Base del código del backend.                                                                                              |
-| `config/`      | Configuración y validación de variables de entorno (`environment.ts`). Es el único lugar que lee `process.env`.           |
-| `controllers/` | Capa que recibe las peticiones HTTP y extrae los datos de la request. Delegan en `services/` y responden. Sin negocio.    |
-| `middlewares/` | Funciones que actúan en cualquier punto del ciclo de vida de la petición (validación, errores, 404, autenticación, etc.). |
-| `models/`      | Tipos del modelo de datos (`Role`, `User`, `Score`, `Violation`). Solo tipos, sin lógica.                                 |
-| `routes/`      | Definición de rutas. Un enrutador principal (`index.ts`) une los enrutadores de cada recurso.                             |
-| `services/`    | Capa de negocio. No conoce Express (`Request`/`Response`).                                                                |
-| `types/`       | Extensiones de tipos de librerías (p. ej. `req.user` de Express). Solo declaraciones.                                     |
+| Carpeta        | Intención                                                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/`         | Base del código del backend.                                                                                                                                                   |
+| `config/`      | Configuración y validación de variables de entorno (`environment.ts`). Es el único lugar que lee `process.env`. También el mapa de errores HTTP soportados (`http-errors.ts`). |
+| `controllers/` | Capa que recibe las peticiones HTTP y extrae los datos de la request. Delegan en `services/` y responden. Sin negocio.                                                         |
+| `middlewares/` | Funciones que actúan en cualquier punto del ciclo de vida de la petición (validación, errores, 404, autenticación, etc.).                                                      |
+| `models/`      | Tipos del modelo de datos (`Role`, `User`, `Score`, `Violation`). Solo tipos, sin lógica.                                                                                      |
+| `routes/`      | Definición de rutas. Un enrutador principal (`index.ts`) une los enrutadores de cada recurso.                                                                                  |
+| `services/`    | Capa de negocio. No conoce Express (`Request`/`Response`).                                                                                                                     |
+| `types/`       | Extensiones de tipos de librerías (p. ej. `req.user` de Express). Solo declaraciones.                                                                                          |
 
 Flujo: `route → middlewares → controller → service`.
 
@@ -109,6 +109,26 @@ JWT simétrico (spec [007-auth-jwt](../docs/specs/007-auth-jwt.md)); el algoritm
 - **Revocación:** cada validación consulta al usuario en `users.json`. Con `active: false` (o si no existe) el access deja de autenticar y el refresh deja de generar access, sin reiniciar.
 - Los rechazos son `401` genéricos con `WWW-Authenticate: Bearer`. Si los datos no son íntegros, no se autentica (`500`).
 - Pendiente: cómo se obtiene el primer par de tokens ([009-emision-tokens](../docs/specs/009-emision-tokens.md)).
+
+## Errores HTTP
+
+Un **único** `error-handler.middleware` traduce todos los errores usando el mapa de `config/http-errors.ts` (spec [012-errores-http](../docs/specs/012-errores-http.md)). Para responder un error, cualquier capa lanza un `HttpError` de un tipo del mapa; nadie arma respuestas de error a mano.
+
+```ts
+import { HttpError } from '../config/http-errors.js';
+
+throw new HttpError('FORBIDDEN');
+```
+
+| Tipo                    | Status | Mensaje                                       |
+| ----------------------- | ------ | --------------------------------------------- |
+| `BAD_REQUEST`           | 400    | `Bad Request`                                 |
+| `UNAUTHORIZED`          | 401    | `Unauthorized` (+ `WWW-Authenticate: Bearer`) |
+| `FORBIDDEN`             | 403    | `Forbidden`                                   |
+| `NOT_FOUND`             | 404    | `Not Found`                                   |
+| `INTERNAL_SERVER_ERROR` | 500    | `Internal Server Error`                       |
+
+Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se registra, sin filtrar detalle); un error de librería con `status` soportado (p. ej. JSON malformado → 400) se traduce al tipo correspondiente. Agregar un tipo es agregar una entrada al mapa.
 
 ## Endpoints
 
