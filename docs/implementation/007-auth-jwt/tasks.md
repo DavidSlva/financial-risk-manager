@@ -13,4 +13,4 @@ Orden TDD en cada tarea: prueba que falla → código mínimo → refactor. Prer
 - [x] T7 — `auth.controller.ts`, `auth.routes.ts` (`POST /refresh`) y registro en `routes/index.ts`
 - [x] T8 — Verificación: pruebas, lint, tipos, formato; revocar con `active: false` sin reiniciar con el servidor real
 - [x] T9 — Converge: spec (estado final), `implement.md`, índice, `CLAUDE.md` (convenciones de seguridad) y `backend/README.md`
-- [ ] T10 — Push y PR (requiere confirmación)
+- [x] T10 — Push (20:29) e integración a `develop` por merge directo, sin PR (20:29)
