@@ -62,7 +62,9 @@ TypeScript se fija en `~6.0.0`: la versión 7 (la que resolvió pnpm) no cumple 
 
 Implementado en `feature/004-pnpm-ci` (workspace `D:\Persona-ws\004-pnpm-ci`). Verificado localmente: instalación limpia con `--frozen-lockfile`, `check:policy`, `format:check`, `eslint .` y `tsc` pasan; el script de política falla con una configuración debilitada (edad menor, `blockExoticSubdeps: false`, `allowBuilds` con entradas). La cuarentena se comprobó en vivo al bloquear versiones recientes.
 
-**No verificado:** el workflow de CI no se ha ejecutado en GitHub (aún no hay push). Puede requerir ajustes en la primera ejecución.
+**Verificado en GitHub (converge):** la primera ejecución del CI fue en `develop` (run 42720950711, 2026-11-09 20:30 -03) y pasó todos los pasos; Commitlint se omite en push y solo corre en PR.
+
+Evolución posterior: `pnpm-lock.yaml` quedó excluido de Prettier (commit `fix(004)`; pnpm lo reescribe con su propio formato) y la spec [010](010-tdd-vitest.md) agregó el paso "Pruebas (Vitest)" al workflow.
 
 Notas:
 
