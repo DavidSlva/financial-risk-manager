@@ -4,14 +4,14 @@ Metodología: **SDD corto** (6 etapas) sobre documentación **RPI**.
 
 ## Etapas
 
-| # | Etapa        | Qué se hace                                                  | Dónde vive                              |
-|---|--------------|--------------------------------------------------------------|-----------------------------------------|
-| 1 | Constitution | Principios, restricciones y contexto investigado             | `research/<spec-id>/constitution.md`    |
-| 2 | Specify      | Qué y por qué. Documento central que conecta todo            | `specs/<spec-id>.md`                    |
-| 3 | Plan         | Cómo: arquitectura, decisiones, diseño técnico               | `plan/<spec-id>/plan.md`                |
-| 4 | Tasks        | Descomposición en tareas verificables                        | `implementation/<spec-id>/tasks.md`     |
-| 5 | Implement    | Registro de ejecución de las tareas                          | `implementation/<spec-id>/implement.md` |
-| 6 | Converge     | Cierre: actualizar la spec y revisar documentos relacionados | `specs/<spec-id>.md` + sus enlaces      |
+| #   | Etapa        | Qué se hace                                                  | Dónde vive                              |
+| --- | ------------ | ------------------------------------------------------------ | --------------------------------------- |
+| 1   | Constitution | Principios, restricciones y contexto investigado             | `research/<spec-id>/constitution.md`    |
+| 2   | Specify      | Qué y por qué. Documento central que conecta todo            | `specs/<spec-id>.md`                    |
+| 3   | Plan         | Cómo: arquitectura, decisiones, diseño técnico               | `plan/<spec-id>/plan.md`                |
+| 4   | Tasks        | Descomposición en tareas verificables                        | `implementation/<spec-id>/tasks.md`     |
+| 5   | Implement    | Registro de ejecución de las tareas                          | `implementation/<spec-id>/implement.md` |
+| 6   | Converge     | Cierre: actualizar la spec y revisar documentos relacionados | `specs/<spec-id>.md` + sus enlaces      |
 
 ## Estructura
 

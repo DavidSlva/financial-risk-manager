@@ -6,18 +6,18 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md` y `docs/specs/002-flujo-git-agentes.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `docs/specs/002-flujo-git-agentes.md` y `docs/specs/003-tooling.md`.
 
 ## Metodología: SDD corto + RPI
 
 Etapas: constitution → specify → plan → tasks → implement → converge.
 
-| Etapa | Archivo |
-|-------|---------|
-| Constitution | `docs/research/<spec-id>/constitution.md` |
-| Specify | `docs/specs/<spec-id>.md` (hub: detalle general, enlaza al resto) |
-| Plan | `docs/plan/<spec-id>/plan.md` |
-| Tasks / Implement | `docs/implementation/<spec-id>/{tasks,implement}.md` |
+| Etapa             | Archivo                                                           |
+| ----------------- | ----------------------------------------------------------------- |
+| Constitution      | `docs/research/<spec-id>/constitution.md`                         |
+| Specify           | `docs/specs/<spec-id>.md` (hub: detalle general, enlaza al resto) |
+| Plan              | `docs/plan/<spec-id>/plan.md`                                     |
+| Tasks / Implement | `docs/implementation/<spec-id>/{tasks,implement}.md`              |
 
 - Ids de spec: `NNN-slug`. Plantillas en `docs/specs/_templates/`.
 - Las specs forman un grafo: declarar `depends_on` / `related` en el front matter y reflejarlo en `docs/specs/README.md`.
@@ -26,12 +26,12 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 
 ## Flujo Git (gitflow)
 
-| Rama | Ambiente | Entra desde |
-|------|----------|-------------|
-| `main` | producción | `staging` |
-| `staging` | certificación | `develop` |
-| `develop` | desarrollo | `feature/*`, `integration/*` |
-| `feature/<NNN-slug>` | trabajo de una spec | `develop` |
+| Rama                 | Ambiente            | Entra desde                  |
+| -------------------- | ------------------- | ---------------------------- |
+| `main`               | producción          | `staging`                    |
+| `staging`            | certificación       | `develop`                    |
+| `develop`            | desarrollo          | `feature/*`, `integration/*` |
+| `feature/<NNN-slug>` | trabajo de una spec | `develop`                    |
 
 - Una rama por spec, nombrada con el id de la spec: `feature/002-flujo-git-agentes`.
 - Los cambios llegan a `develop` por PR. No hacer commits directos en `main`, `staging` ni `develop`.
@@ -47,6 +47,16 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Cada commit de promoción lleva un tag anotado `x.y`: `x` = id numérico de la spec, `y` = actualizaciones sobre esa spec (primera promoción = `x.0`).
 - `develop → staging`: tag `rcx.y` (ej. `rc2.0`).
 - `staging → main`: tag `x.y` sin `rc` (ej. `2.0`).
+
+## Tooling y calidad (spec 003)
+
+- Node **22.22** (`.nvmrc`; `engines` `>=22.22.0 <23` en raíz, `backend` y `frontend`). Usar `nvm use`.
+- npm workspaces: `npm install` en la raíz del workspace.
+- Comandos: `npm run lint`, `npm run format` / `format:check`, `npm run typecheck`.
+- Prettier manda en estilo; ESLint está alineado con él (`eslint-config-prettier`). No reformatear `docs/prompts`.
+- Hooks (Husky): `pre-commit` = lint-staged (ESLint + Prettier) y `tsc`; `commit-msg` = Commitlint. No saltarse hooks (`--no-verify`).
+- **Commits:** Conventional Commits con el id de la spec como scope: `tipo(NNN): descripción`, ej. `feat(003): agregar tooling`.
+- Workspaces de agentes en `D:\Persona-ws\<NNN-slug>` (`git worktree add ../Persona-ws/<NNN-slug> -b feature/<NNN-slug> develop`).
 
 ## Reglas para agentes
 
