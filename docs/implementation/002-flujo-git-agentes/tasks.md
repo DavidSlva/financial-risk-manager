@@ -1,4 +1,5 @@
 # Tasks — 002-flujo-git-agentes
+
 Spec: [../../specs/002-flujo-git-agentes.md](../../specs/002-flujo-git-agentes.md) · Plan: [../../plan/002-flujo-git-agentes/plan.md](../../plan/002-flujo-git-agentes/plan.md)
 
 - [x] T1 — Registrar prompt en `docs/prompts/`

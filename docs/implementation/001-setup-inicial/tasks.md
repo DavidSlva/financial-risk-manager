@@ -1,4 +1,5 @@
 # Tasks — 001-setup-inicial
+
 Spec: [../../specs/001-setup-inicial.md](../../specs/001-setup-inicial.md) · Plan: [../../plan/001-setup-inicial/plan.md](../../plan/001-setup-inicial/plan.md)
 
 - [x] T1 — Crear `backend/` y `frontend/` con README
