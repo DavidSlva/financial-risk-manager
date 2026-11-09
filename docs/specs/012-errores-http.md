@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [005-backend-estructura, 007-auth-jwt, 010-tdd-vitest]
-related: [011-rbac]
+related: [011-rbac, 013-consulta-score]
 supersedes: []
 superseded_by: []
 ---
@@ -62,7 +62,8 @@ throw new HttpError('FORBIDDEN');
 - depende de: [005-backend-estructura](005-backend-estructura.md) — ubicación en `config/` y `middlewares/`.
 - depende de: [007-auth-jwt](007-auth-jwt.md) — reemplaza `AuthenticationError` y el manejo del 401.
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — se implementa con TDD.
-- relacionada con: [011-rbac](011-rbac.md) — el middleware de autorización lanza `FORBIDDEN`; usará 403 y 404 del mapa.
+- relacionada con: [011-rbac](011-rbac.md) — el middleware de autorización lanza `FORBIDDEN`.
+- relacionada con: [013-consulta-score](013-consulta-score.md) — usa 403 y 404 del mapa.
 
 ## Puntos abiertos
 
@@ -86,7 +87,7 @@ Cambios de comportamiento:
 
 Notas:
 
-- La spec [011-rbac](011-rbac.md) (y la consulta de score) usan `FORBIDDEN` y `NOT_FOUND` de este mapa.
+- La spec [011-rbac](011-rbac.md) y [013-consulta-score](013-consulta-score.md) usan `FORBIDDEN` y `NOT_FOUND` de este mapa.
 - Las specs [005](005-backend-estructura.md) y [007](007-auth-jwt.md) quedan actualizadas con una nota de evolución.
 
 **Revisión de documentos relacionados:**

@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md` y `011-rbac.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md` y `013-consulta-score.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -115,6 +115,12 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Rutas protegidas: `authenticate` → `authorize(check)` → controlador. `authorize` **exige** un callback; solo concede con `true` estricto. Sin `req.user` → 401; sin permiso → 403 (`HttpError`).
 - El callback de autorización de un recurso se define en el **service de ese recurso** y solo valida si el usuario puede acceder al recurso solicitado (recibe `{ user, params, query }`, sin tipos de Express). Para recursos triviales: `authorize(requirePermission('<clave>'))`.
 - Agregar un permiso: entrada en `config/permissions.ts` y filas en `permissions.json` (IR-12 rechaza claves fuera del catálogo).
+
+## Consulta de score (spec 013)
+
+- `GET /api/scores/:rut` → `authenticate` → `authorize(canGetScore)` → `getScore`. El callback `canGetScore` está en `scores.service`: `can_get_all_score` ve cualquier rut; `can_get_score` solo el rut del usuario autenticado (`req.user`, nunca el cuerpo ni la query).
+- La autorización se decide **antes** de buscar el score: un no autorizado recibe el mismo 403 exista o no el rut; el 404 es solo para autorizados. No invertir ese orden.
+- Los recursos nuevos siguen este patrón: callback en su service, ruta con `authenticate` y `authorize`, errores con `HttpError`.
 
 ## Reglas para agentes
 
