@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: []
-related: [002-flujo-git-agentes, 003-tooling]
+related: [002-flujo-git-agentes, 003-tooling, 005-backend-estructura]
 supersedes: []
 superseded_by: []
 ---
@@ -46,6 +46,7 @@ Crear el esqueleto del monorepo (backend Node/TS, frontend React/TS con Vite) y 
 
 - relacionada con: [002-flujo-git-agentes](002-flujo-git-agentes.md) — define el flujo Git y `CLAUDE.md` (nodo raíz del grafo).
 - relacionada con: [003-tooling](003-tooling.md) — tooling de calidad.
+- relacionada con: [005-backend-estructura](005-backend-estructura.md) — estructura de la carpeta `backend/`.
 
 ## Estado final (Converge)
 
