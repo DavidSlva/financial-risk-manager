@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [003-tooling]
-related: [002-flujo-git-agentes]
+related: [002-flujo-git-agentes, 010-tdd-vitest]
 supersedes: []
 superseded_by: []
 ---
@@ -50,6 +50,7 @@ TypeScript se fija en `~6.0.0`: la versión 7 (la que resolvió pnpm) no cumple 
 
 - depende de: [003-tooling](003-tooling.md) — herramientas de calidad que este spec migra a pnpm y replica en CI.
 - relacionada con: [002-flujo-git-agentes](002-flujo-git-agentes.md) — ramas y ambientes sobre los que corre el CI.
+- relacionada con: [010-tdd-vitest](010-tdd-vitest.md) — agrega las pruebas al CI.
 
 ## Puntos abiertos
 
