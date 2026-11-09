@@ -12,4 +12,4 @@ Spec: [../../specs/005-backend-estructura.md](../../specs/005-backend-estructura
 - [x] T8 — Verificación (lint, tipos, formato, arranque real)
 - [x] T9 — Corregir `pnpm-lock.yaml` en Prettier (commit `fix(004)` en la rama 004)
 - [x] T10 — Documentación: spec 005, RPI, prompt, índice, `CLAUDE.md`
-- [ ] T11 — Commit, push y PR (requiere confirmación)
+- [x] T11 — Commit, push (20:29) e integración a `develop` por merge directo, sin PR (20:29)
