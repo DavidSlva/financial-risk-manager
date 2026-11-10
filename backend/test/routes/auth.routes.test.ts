@@ -1,4 +1,5 @@
 import express from 'express';
+import { userRow } from '../helpers/user-fixtures.js';
 import { rmSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { errorHandler } from '../../src/middlewares/error-handler.middleware.js';
@@ -90,10 +91,7 @@ describe('POST /api/auth/refresh', () => {
     writeDataFile(
       dir,
       'users',
-      [
-        { rut: '11111111-1', role: 'admin', active: false },
-        { rut: '22222222-2', role: 'user', active: false },
-      ],
+      [userRow('11111111-1', 'admin', false), userRow('22222222-2', 'user', false)],
       Date.now() / 1000 + 5000,
     );
 

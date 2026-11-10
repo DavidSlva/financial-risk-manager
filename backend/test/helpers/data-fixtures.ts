@@ -1,4 +1,5 @@
 import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from 'node:fs';
+import { userRow } from './user-fixtures.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -18,10 +19,7 @@ export function validData(): RawData {
       { name: 'admin', description: 'Administración de la plataforma' },
       { name: 'user', description: 'Consulta de su propio score' },
     ],
-    users: [
-      { rut: '11111111-1', role: 'admin', active: true },
-      { rut: '22222222-2', role: 'user', active: false },
-    ],
+    users: [userRow('11111111-1', 'admin', true), userRow('22222222-2', 'user', false)],
     scores: [{ rut: '11111111-1', score: 780 }],
     permissions: [
       { role: 'admin', key: 'can_get_score', value: true },

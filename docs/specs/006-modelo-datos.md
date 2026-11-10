@@ -168,6 +168,7 @@ Notas:
 - No existe aún un script de compilación del backend. Para la verificación manual se compiló con `tsc --outDir dist --rootDir .` y se ejecutó con `DATA_DIR`; los scripts `build` y `start` siguen pendientes (spec posterior).
 - Los servicios aceptan un almacén por parámetro (por defecto el de la aplicación) para poder probarse con carpetas temporales.
 - Evolución posterior: la spec [011](011-rbac.md) agregó la tabla `permissions` (`role`, `key`, `value`; clave primaria `(role, key)`, clave foránea a `roles`, catálogo cerrado en código) y las reglas IR-10…IR-12; `permissions.json` se versiona y forma parte de los datos validados.
+- Evolución posterior ([009](009-emision-tokens.md)): `users` ganó `password_hash` (hash scrypt) y `failed_attempts` (contador de intentos fallidos), con IR-14 (formato del hash) e IR-15 (entero ≥ 0). **El backend ahora escribe `users.json`** (solo `failed_attempts`), de forma atómica y validada, a través de `data-store.updateUsers`; ya no es cierto que los archivos solo se editen a mano. `users.json` guarda secretos (hashes) y sigue fuera de git.
 - Evolución posterior: la spec [008](008-validador-rut.md) agregó IR-13 (`users.rut` y `scores.rut` con formato canónico `12345678-5` y dígito verificador válido).
 
 **Revisión de documentos relacionados:**

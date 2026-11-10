@@ -9,7 +9,14 @@ export interface User {
   rut: string;
   role: string;
   active: boolean;
+  /** Hash scrypt de la contraseña (spec 009). Nunca sale de la capa de datos. */
+  password_hash: string;
+  /** Intentos de login fallidos desde el último login exitoso (spec 009). */
+  failed_attempts: number;
 }
+
+/** Usuario autenticado tal como lo ve el resto de la app: sin el hash ni el contador. */
+export type AuthenticatedUser = Omit<User, 'password_hash' | 'failed_attempts'>;
 
 export interface Score {
   rut: string;

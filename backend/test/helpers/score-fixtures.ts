@@ -1,4 +1,5 @@
 import type { RawData } from './data-fixtures.js';
+import { userRow } from './user-fixtures.js';
 
 /**
  * Escenario de la consulta de score (spec 013).
@@ -32,13 +33,13 @@ export function scoreScenario(): RawData {
       { name: 'blocked', description: 'Permiso propio negado' },
     ],
     users: [
-      { rut: ADMIN, role: 'admin', active: true },
-      { rut: USER_WITH_SCORE, role: 'user', active: true },
-      { rut: USER_WITHOUT_SCORE, role: 'user', active: true },
-      { rut: GUEST, role: 'guest', active: true },
-      { rut: AUDITOR, role: 'auditor', active: true },
-      { rut: BLOCKED, role: 'blocked', active: true },
-      { rut: REVOKED_ADMIN, role: 'admin', active: false },
+      userRow(ADMIN, 'admin', true),
+      userRow(USER_WITH_SCORE, 'user', true),
+      userRow(USER_WITHOUT_SCORE, 'user', true),
+      userRow(GUEST, 'guest', true),
+      userRow(AUDITOR, 'auditor', true),
+      userRow(BLOCKED, 'blocked', true),
+      userRow(REVOKED_ADMIN, 'admin', false),
     ],
     scores: [
       { rut: ADMIN, score: 780 },

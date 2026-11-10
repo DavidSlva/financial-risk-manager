@@ -12,6 +12,7 @@ const DEFAULT_DATA_DIR = fileURLToPath(new URL('../../data', import.meta.url));
 const JWT_SECRET_BYTES = 64;
 const DEFAULT_ACCESS_TTL_SECONDS = 900;
 const DEFAULT_REFRESH_TTL_SECONDS = 604800;
+const DEFAULT_LOGIN_MAX_ATTEMPTS = 5;
 
 export type NodeEnv = (typeof NODE_ENVS)[number];
 export type JwtAlgorithm = (typeof JWT_ALGORITHMS)[number];
@@ -30,6 +31,8 @@ export interface Environment {
   /** Carpeta con roles.json, users.json y scores.json (ruta absoluta). */
   dataDir: string;
   jwt: JwtConfig;
+  /** Intentos de login fallidos permitidos antes de bloquear al usuario (spec 009). */
+  loginMaxAttempts: number;
 }
 
 function parsePositiveInteger(
@@ -103,6 +106,12 @@ export function parseEnvironment(source: NodeJS.ProcessEnv): Environment {
     DEFAULT_REFRESH_TTL_SECONDS,
     errors,
   );
+  const loginMaxAttempts = parsePositiveInteger(
+    'LOGIN_MAX_ATTEMPTS',
+    source.LOGIN_MAX_ATTEMPTS,
+    DEFAULT_LOGIN_MAX_ATTEMPTS,
+    errors,
+  );
   if (errors.length === 0 && refreshTtlSeconds <= accessTtlSeconds) {
     errors.push('REFRESH_TOKEN_TTL_SECONDS debe ser mayor que ACCESS_TOKEN_TTL_SECONDS');
   }
@@ -121,6 +130,7 @@ export function parseEnvironment(source: NodeJS.ProcessEnv): Environment {
       accessTtlSeconds,
       refreshTtlSeconds,
     },
+    loginMaxAttempts,
   };
 }
 

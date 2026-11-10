@@ -8,6 +8,8 @@ Spec: [../../specs/009-emision-tokens.md](../../specs/009-emision-tokens.md)
 - Contrato estricto y validado **antes** de tocar datos: `rut` (formato canónico, spec 008) y `password` (string de 8 a 128 caracteres).
 - El login no debe revelar si un rut existe, si está vigente o si falló la contraseña: respuestas `401` indistinguibles, incluido el tiempo.
 - El hash nunca sale de la capa de datos hacia `req.user`, el contexto de autorización o las respuestas.
+- Límite de intentos: el contador vive en el modelo de usuario, el máximo en la configuración; el intento se reserva (incrementa) **antes** de verificar para que la concurrencia no eluda el límite; un login exitoso lo reinicia. Un usuario bloqueado recibe el mismo 401.
+- La app escribe `users.json` (solo el contador): escritura atómica, serializada y con integridad validada antes de escribir; si falla, se falla cerrado.
 - Sin dependencias nuevas: el hash usa `scrypt` de `node:crypto` (política de cadena de suministro, spec 004).
 - La verificación usa comparación en tiempo constante y no bloquea el bucle de eventos.
 - Los errores salen del mapa de la spec 012; los servicios no conocen Express.

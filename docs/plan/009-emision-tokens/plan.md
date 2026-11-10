@@ -41,6 +41,35 @@ login(rut: string, password: string, deps?: AuthDeps): Promise<TokenPair>;   // 
 | Hash de ejemplo precalculado en las pruebas, con parámetros bajos   | Calcular el hash en cada prueba   | `N=2^15` hace lentas las pruebas; el formato permite parámetros bajos solo en tests        |
 | `hash-password` lee de la entrada estándar                          | Contraseña como argumento         | Los argumentos quedan en el historial del shell                                            |
 
+## Límite de intentos
+
+```ts
+// config/environment.ts: LOGIN_MAX_ATTEMPTS (entero positivo, por defecto 5)  → Environment.loginMaxAttempts
+
+// services/data-store.service.ts
+updateUsers<T>(fn: (users: readonly User[]) => { users: readonly User[] | null; result: T }): Promise<T>;
+// serializa con una cola; carga y valida; aplica fn; valida el resultado; escribe temp + rename; reinicia la caché
+
+// services/users.service.ts
+reserveLoginAttempt(rut: string, max: number, store?): Promise<boolean>; // existe, vigente y contador < max → incrementa → true
+resetLoginAttempts(rut: string, store?): Promise<void>;                  // pone 0 (escribe solo si era > 0)
+
+// services/auth.service.ts: login
+// 1. reserved = reserveLoginAttempt(rut, max)   2. !reserved → hash señuelo + 401
+// 3. verifyPassword → falla → 401   4. éxito → resetLoginAttempts → generateTokens
+```
+
+| Decisión                                                 | Alternativas                     | Motivo                                                                                     |
+| -------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
+| Reservar el intento **antes** de verificar               | Incrementar solo tras fallar     | Con peticiones concurrentes, verificar y luego incrementar permite eludir el límite        |
+| Cola (mutex) en el almacén para escribir                 | Escribir sin exclusión           | Evita pérdida de actualizaciones del contador dentro del proceso                           |
+| Escritura atómica (temporal + renombrado)                | Sobrescribir el archivo          | Una caída a mitad de escritura no deja `users.json` truncado                               |
+| Validar la integridad antes de escribir                  | Confiar en el cambio             | Nunca dejar el archivo en un estado que impida arrancar                                    |
+| Reiniciar la caché tras escribir                         | Esperar al cambio de `mtime`     | Dos escrituras en el mismo milisegundo darían una caché obsoleta                           |
+| Bloqueado ⇒ el mismo 401                                 | 423 / 429 explícito              | No revelar que el rut existe ni que está bloqueado                                         |
+| Máximo en `config/environment.ts` (`LOGIN_MAX_ATTEMPTS`) | Constante en el servicio         | Pedido: definido en la configuración, igual que los TTL                                    |
+| Desbloqueo manual (operador edita el contador)           | Desbloqueo automático por tiempo | Lo pedido es un contador que solo reinicia un login exitoso; el tiempo es un punto abierto |
+
 ## Riesgos
 
 - **Fuerza bruta** sin límite de intentos (punto abierto): mitigación futura con una spec de limitador de tasa.
