@@ -69,16 +69,17 @@ Excepciones:
 
 ## Variables de entorno
 
-| Variable                    | Valores                                  | Por defecto    | Obligatoria |
-| --------------------------- | ---------------------------------------- | -------------- | ----------- |
-| `NODE_ENV`                  | `development`, `test`, `production`      | `development`  | no          |
-| `PORT`                      | entero entre 1 y 65535                   | `3000`         | no          |
-| `DATA_DIR`                  | carpeta con los archivos de datos        | `backend/data` | no          |
-| `JWT_SECRET`                | 128 caracteres hexadecimales (64 bytes)  | —              | **sí**      |
-| `JWT_ALGORITHM`             | `HS256`, `HS384`, `HS512`                | `HS256`        | no          |
-| `ACCESS_TOKEN_TTL_SECONDS`  | entero positivo                          | `900`          | no          |
-| `REFRESH_TOKEN_TTL_SECONDS` | entero positivo, mayor que el del access | `604800`       | no          |
-| `LOGIN_MAX_ATTEMPTS`        | entero positivo                          | `5`            | no          |
+| Variable                    | Valores                                  | Por defecto                                                 | Obligatoria |
+| --------------------------- | ---------------------------------------- | ----------------------------------------------------------- | ----------- |
+| `NODE_ENV`                  | `development`, `test`, `production`      | `development`                                               | no          |
+| `PORT`                      | entero entre 1 y 65535                   | `8000`                                                      | no          |
+| `CORS_ORIGINS`              | orígenes separados por comas             | `http://localhost:3000` (desarrollo); ninguno en producción | no          |
+| `DATA_DIR`                  | carpeta con los archivos de datos        | `backend/data`                                              | no          |
+| `JWT_SECRET`                | 128 caracteres hexadecimales (64 bytes)  | —                                                           | **sí**      |
+| `JWT_ALGORITHM`             | `HS256`, `HS384`, `HS512`                | `HS256`                                                     | no          |
+| `ACCESS_TOKEN_TTL_SECONDS`  | entero positivo                          | `900`                                                       | no          |
+| `REFRESH_TOKEN_TTL_SECONDS` | entero positivo, mayor que el del access | `604800`                                                    | no          |
+| `LOGIN_MAX_ATTEMPTS`        | entero positivo                          | `5`                                                         | no          |
 
 El proceso falla al arrancar si alguna es inválida o si falta `JWT_SECRET`. Los mensajes de error nunca incluyen el valor de la clave.
 
@@ -102,6 +103,13 @@ Sin base de datos: cuatro archivos JSON en `backend/data/` (spec [006-modelo-dat
 Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json` a `scores.json`.
 
 La integridad referencial se valida al arrancar (el proceso aborta e informa todas las violaciones) y se revalida cuando cambia un archivo. Si los datos dejan de ser íntegros, se rechazan las operaciones que dependan de ellos. Poner `active: false` a un usuario lo revoca sin reiniciar. La función de cada columna está en la spec.
+
+## CORS (desarrollo)
+
+Spec [014-cors-desarrollo](../docs/specs/014-cors-desarrollo.md). En producción frontend y backend comparten dominio y **no hay CORS**. En desarrollo el frontend corre en `http://localhost:3000` y el backend en `http://localhost:8000`: mismo sitio, orígenes distintos. Como la sesión va en cookies, el CORS es **con credenciales**: el backend responde `Access-Control-Allow-Origin: <origen permitido>` (nunca `*`) y `Access-Control-Allow-Credentials: true`, y atiende el preflight (`GET, POST, OPTIONS`; `Content-Type, Authorization`).
+
+- `CORS_ORIGINS` reemplaza la lista (p. ej. Vite en `http://localhost:5173`). Cada origen: `http(s)://host[:puerto]`, sin ruta ni barra final; `*` y `null` se rechazan al arrancar. Vacío: sin CORS.
+- El frontend debe llamar con `credentials: 'include'` y usar `localhost` (no `127.0.0.1`: otro sitio, `SameSite=Strict` no enviaría las cookies).
 
 ## Login y contraseñas
 

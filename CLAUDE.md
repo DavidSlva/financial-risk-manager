@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md`, `013-consulta-score.md`, `008-validador-rut.md` y `009-emision-tokens.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md`, `013-consulta-score.md`, `008-validador-rut.md`, `009-emision-tokens.md` y `014-cors-desarrollo.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -138,6 +138,12 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - El hash y `failed_attempts` **no salen de la capa de datos**: `req.user` y el contexto de autorización usan `AuthenticatedUser`. No usar `User` fuera de los services de datos y de `auth.service`.
 - Límite de intentos: `LOGIN_MAX_ATTEMPTS` (config, por defecto 5). Se reserva (incrementa) el intento **antes** de verificar; un login exitoso reinicia; bloqueado ⇒ 401 aunque la contraseña sea correcta; el desbloqueo es manual (contador en 0 en `users.json`).
 - El backend **escribe** `users.json` solo a través de `store.updateUsers` (cola, integridad validada antes, escritura atómica). No escribir los archivos de datos de otra forma. `users.json` contiene secretos y nunca se versiona.
+
+## CORS (spec 014)
+
+- Puertos de desarrollo: backend `8000` (`PORT`), frontend `http://localhost:3000`. En producción frontend y backend comparten dominio: CORS desactivado.
+- `CORS_ORIGINS` (config) lista los orígenes permitidos; por defecto `http://localhost:3000` salvo en producción. **Nunca** `*` ni reflejar un origen: la sesión va en cookies (CORS con credenciales). El middleware `cors` va **primero** en `createApp`.
+- El frontend usa `credentials: 'include'` y `localhost` (no `127.0.0.1`).
 
 ## Reglas para agentes
 

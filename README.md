@@ -22,4 +22,4 @@ pnpm run typecheck     # tsc en backend y frontend
 pnpm run format:check  # Prettier (solo valida)
 ```
 
-El backend necesita datos y una clave JWT para arrancar: ver [`backend/README.md`](backend/README.md). El flujo de trabajo (gitflow, workspaces, commits `tipo(NNN): ...`, TDD y política de dependencias) está en [`CLAUDE.md`](CLAUDE.md). Las specs y su índice, en [`docs/specs/README.md`](docs/specs/README.md).
+En desarrollo el backend escucha en `http://localhost:8000` y el frontend en `http://localhost:3000` (CORS ya configurado). El backend necesita datos y una clave JWT para arrancar: ver [`backend/README.md`](backend/README.md). El flujo de trabajo (gitflow, workspaces, commits `tipo(NNN): ...`, TDD y política de dependencias) está en [`CLAUDE.md`](CLAUDE.md). Las specs y su índice, en [`docs/specs/README.md`](docs/specs/README.md).

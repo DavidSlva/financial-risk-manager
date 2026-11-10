@@ -13,6 +13,9 @@ const JWT_SECRET_BYTES = 64;
 const DEFAULT_ACCESS_TTL_SECONDS = 900;
 const DEFAULT_REFRESH_TTL_SECONDS = 604800;
 const DEFAULT_LOGIN_MAX_ATTEMPTS = 5;
+const DEFAULT_PORT = '8000';
+/** Frontend de desarrollo (spec 014). En producción frontend y backend comparten dominio: sin CORS. */
+const DEVELOPMENT_CORS_ORIGINS = ['http://localhost:3000'] as const;
 
 export type NodeEnv = (typeof NODE_ENVS)[number];
 export type JwtAlgorithm = (typeof JWT_ALGORITHMS)[number];
@@ -33,6 +36,8 @@ export interface Environment {
   jwt: JwtConfig;
   /** Intentos de login fallidos permitidos antes de bloquear al usuario (spec 009). */
   loginMaxAttempts: number;
+  /** Orígenes permitidos por CORS, con credenciales (spec 014). Vacío: CORS desactivado. */
+  corsOrigins: readonly string[];
 }
 
 function parsePositiveInteger(
@@ -50,6 +55,20 @@ function parsePositiveInteger(
   return value;
 }
 
+/** Origen válido: http(s)://host[:puerto] exacto, sin ruta, barra final, credenciales ni comodines. */
+function isValidOrigin(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      (url.protocol === 'http:' || url.protocol === 'https:') &&
+      url.origin === value &&
+      !value.includes('*')
+    );
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Valida y tipa las variables de entorno. Acumula todos los errores y falla una sola vez.
  * Recibe el origen como parámetro para poder probarse sin tocar `process.env`.
@@ -63,7 +82,7 @@ export function parseEnvironment(source: NodeJS.ProcessEnv): Environment {
     errors.push(`NODE_ENV debe ser uno de: ${NODE_ENVS.join(', ')} (recibido: "${rawNodeEnv}")`);
   }
 
-  const rawPort = source.PORT ?? '3000';
+  const rawPort = source.PORT ?? DEFAULT_PORT;
   const port = Number(rawPort);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     errors.push(`PORT debe ser un entero entre 1 y 65535 (recibido: "${rawPort}")`);
@@ -112,6 +131,20 @@ export function parseEnvironment(source: NodeJS.ProcessEnv): Environment {
     DEFAULT_LOGIN_MAX_ATTEMPTS,
     errors,
   );
+  let corsOrigins: readonly string[] = rawNodeEnv === 'production' ? [] : DEVELOPMENT_CORS_ORIGINS;
+  if (source.CORS_ORIGINS !== undefined) {
+    const listed = source.CORS_ORIGINS.split(',')
+      .map((origin) => origin.trim())
+      .filter((origin) => origin !== '');
+    const invalid = listed.filter((origin) => !isValidOrigin(origin));
+    if (invalid.length > 0) {
+      errors.push(
+        `CORS_ORIGINS tiene orígenes inválidos: ${invalid.map((o) => `"${o}"`).join(', ')} (se espera esquema://host[:puerto], sin ruta, sin barra final ni comodines)`,
+      );
+    }
+    corsOrigins = [...new Set(listed)];
+  }
+
   if (errors.length === 0 && refreshTtlSeconds <= accessTtlSeconds) {
     errors.push('REFRESH_TOKEN_TTL_SECONDS debe ser mayor que ACCESS_TOKEN_TTL_SECONDS');
   }
@@ -131,6 +164,7 @@ export function parseEnvironment(source: NodeJS.ProcessEnv): Environment {
       refreshTtlSeconds,
     },
     loginMaxAttempts,
+    corsOrigins,
   };
 }
 

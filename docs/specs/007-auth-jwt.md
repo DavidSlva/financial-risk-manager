@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [006-modelo-datos, 010-tdd-vitest]
-related: [005-backend-estructura]
+related: [005-backend-estructura, 014-cors-desarrollo]
 supersedes: []
 superseded_by: []
 ---
@@ -81,6 +81,7 @@ Revocar a un usuario = poner `active: false` en `users.json`. Rige desde la sigu
 - depende de: [006-modelo-datos](006-modelo-datos.md) — usuario y marca de vigencia.
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — se implementa con TDD y Vitest.
 - relacionada con: [005-backend-estructura](005-backend-estructura.md) — ubicación en capas y convención de nombres.
+- relacionada con: [014-cors-desarrollo](014-cors-desarrollo.md) — CORS con credenciales para las cookies de sesión en desarrollo.
 - deriva en: [009-emision-tokens](009-emision-tokens.md) — cómo se obtiene el primer par de tokens (pendiente).
 - la autorización por rol ([011-rbac](011-rbac.md)) se apoya en `req.user`.
 
