@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md` y `013-consulta-score.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md`, `013-consulta-score.md` y `008-validador-rut.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -122,6 +122,12 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - `GET /api/score/:rut` → `authenticate` → `authorize(canGetScore)` → `getScore`. El callback `canGetScore` está en `scores.service`: `can_get_all_score` ve cualquier rut; `can_get_score` solo el rut del usuario autenticado (`req.user`, nunca el cuerpo ni la query).
 - La autorización se decide **antes** de buscar el score: un no autorizado recibe el mismo 403 exista o no el rut; el 404 es solo para autorizados. No invertir ese orden.
 - Los recursos nuevos siguen este patrón: callback en su service, ruta con `authenticate` y `authorize`, errores con `HttpError`.
+
+## RUT (spec 008)
+
+- Formato canónico único: `12345678-5` (sin puntos, `K` mayúscula). El frontend lo envía así; el backend **valida, no normaliza**. Usar siempre `isValidRut` (`rut.service.ts`) para validar un rut de entrada; no escribir expresiones regulares propias.
+- En una ruta protegida, validar el rut **después** de `authenticate` y `authorize` (orden 401 → 403 → 400 → 404), para no revelar nada a quien no tiene permiso.
+- Los datos exigen RUT válidos (IR-13): un rut mal escrito en `users.json` o `scores.json` impide arrancar.
 
 ## Reglas para agentes
 

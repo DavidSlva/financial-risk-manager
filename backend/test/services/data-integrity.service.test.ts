@@ -258,6 +258,52 @@ describe('data-integrity.service', () => {
     });
   });
 
+  describe('IR-13: rut con formato canónico y dígito verificador válido', () => {
+    it.each(['12345678-4', '12.345.678-5', '123456785', '1000005-k', '012345678-5'])(
+      'users.rut inválido %j',
+      (rut) => {
+        const data = validData();
+        data.users = [{ rut, role: 'admin', active: true }];
+        data.scores = [];
+
+        expect(validateIntegrity(data)).toContainEqual(
+          expect.objectContaining({ file: 'users.json', row: 0, rule: 'IR-13' }),
+        );
+      },
+    );
+
+    it('scores.rut inválido', () => {
+      const data = validData();
+      data.scores = [{ rut: '11111111-2', score: 500 }];
+
+      expect(validateIntegrity(data)).toContainEqual(
+        expect.objectContaining({ file: 'scores.json', row: 0, rule: 'IR-13' }),
+      );
+    });
+
+    it('acepta RUT con DV K y DV 0', () => {
+      const data = validData();
+      data.users = [
+        { rut: '1000005-K', role: 'admin', active: true },
+        { rut: '1000030-0', role: 'user', active: true },
+      ];
+      data.scores = [{ rut: '1000005-K', score: 700 }];
+
+      expect(validateIntegrity(data)).toEqual([]);
+    });
+
+    it('no duplica la violación cuando la fila ya falla IR-2 o IR-3', () => {
+      const data = validData();
+      data.users = [
+        { rut: 12345678, role: 'admin', active: true },
+        { rut: ' 11111111-1', role: 'admin', active: true },
+      ];
+      data.scores = [];
+
+      expect(rulesOf(data)).not.toContain('IR-13');
+    });
+  });
+
   it('acumula las violaciones de todos los archivos', () => {
     const data = validData();
     data.roles = [{ name: 'admin', description: 'a' }];

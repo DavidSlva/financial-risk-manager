@@ -165,6 +165,36 @@ describe('GET /api/score/:rut', () => {
     });
   });
 
+  describe('orden de decisión: 401 → 403 → 400 → 404', () => {
+    const INVALID_RUT = '12345678-4';
+
+    it('sin token con un rut inválido → 401 (primero autenticar)', async () => {
+      expect((await getScore(undefined, INVALID_RUT)).status).toBe(401);
+    });
+
+    it('sin permiso con un rut inválido → 403 (primero autorizar)', async () => {
+      expect((await getScore(await accessFor(USER_WITH_SCORE), INVALID_RUT)).status).toBe(403);
+    });
+
+    it('autorizado con un rut inválido → 400', async () => {
+      const res = await getScore(await accessFor(ADMIN), INVALID_RUT);
+
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error: 'Bad Request' });
+    });
+
+    it.each(['12.345.678-5', '123456785', '1000005-k', '0123456-7'])(
+      'autorizado con el formato no canónico %j → 400',
+      async (rut) => {
+        expect((await getScore(await accessFor(ADMIN), rut)).status).toBe(400);
+      },
+    );
+
+    it('autorizado con un rut válido pero sin score → 404', async () => {
+      expect((await getScore(await accessFor(ADMIN), UNKNOWN_RUT)).status).toBe(404);
+    });
+  });
+
   describe('cambios sin reiniciar', () => {
     it('revocar al usuario (active=false) → 401 en la siguiente petición', async () => {
       const token = await accessFor(ADMIN);
