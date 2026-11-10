@@ -1,5 +1,4 @@
 import express from 'express';
-import { userRow } from '../helpers/user-fixtures.js';
 import { rmSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { errorHandler } from '../../src/middlewares/error-handler.middleware.js';
@@ -8,10 +7,16 @@ import type { AuthDeps } from '../../src/services/auth.service.js';
 import { createDataStore } from '../../src/services/data-store.service.js';
 import { generateTokens, verifyToken } from '../../src/services/token.service.js';
 import { makeTempDir, validData, writeAll, writeDataFile } from '../helpers/data-fixtures.js';
-import { startServer, type TestServer } from '../helpers/http-fixtures.js';
+import {
+  cookieNamed,
+  setCookiesOf,
+  startServer,
+  type TestServer,
+} from '../helpers/http-fixtures.js';
 import { testJwtConfig } from '../helpers/jwt-fixtures.js';
+import { userRow } from '../helpers/user-fixtures.js';
 
-describe('POST /api/auth/refresh', () => {
+describe('POST /api/auth/refresh (refresh en la cookie refresh_token, spec 009)', () => {
   let dir: string;
   let deps: AuthDeps;
   let server: TestServer;
@@ -36,57 +41,117 @@ describe('POST /api/auth/refresh', () => {
     writeAll(dir, validData(), Date.now() / 1000 + Math.random() * 1000);
   });
 
-  function refresh(body: unknown): Promise<Response> {
-    return fetch(`${server.baseUrl}/api/auth/refresh`, {
+  const refreshWith = (cookie?: string, init: RequestInit = {}) =>
+    fetch(`${server.baseUrl}/api/auth/refresh`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body),
+      ...init,
+      headers: { ...(cookie === undefined ? {} : { cookie }), ...(init.headers as object) },
     });
-  }
 
-  it('devuelve un access nuevo y válido para un refresh vigente', async () => {
-    const { refreshToken } = await generateTokens({ rut: '11111111-1' }, deps.jwt!);
+  const tokens = (rut: string) => generateTokens({ rut }, deps.jwt!);
 
-    const res = await refresh({ refreshToken });
-    const body = (await res.json()) as { accessToken: string; expiresIn: number };
+  it('entrega un access nuevo en la cookie access_token y expiresIn en el cuerpo', async () => {
+    const { refreshToken } = await tokens('11111111-1');
+
+    const res = await refreshWith(`refresh_token=${refreshToken}`);
 
     expect(res.status).toBe(200);
-    expect(body.expiresIn).toBe(900);
-    expect(Object.keys(body).sort()).toEqual(['accessToken', 'expiresIn']);
-    await expect(verifyToken(body.accessToken, 'access', deps.jwt!)).resolves.toBeDefined();
+    expect(await res.json()).toEqual({ expiresIn: 900 });
+    const cookie = cookieNamed(res, 'access_token');
+    expect(cookie?.attributes).toMatchObject({
+      httponly: true,
+      samesite: 'Strict',
+      path: '/',
+      'max-age': '900',
+    });
+    await expect(verifyToken(cookie!.value, 'access', deps.jwt!)).resolves.toMatchObject({
+      sub: '11111111-1',
+    });
   });
 
-  it.each([
-    ['sin cuerpo', {}],
-    ['refreshToken no es texto', { refreshToken: 123 }],
-    ['refreshToken vacío', { refreshToken: '' }],
-  ])('400 si la petición es malformada: %s', async (_label, body) => {
-    expect((await refresh(body)).status).toBe(400);
+  it('no entrega un refresh nuevo (sin rotación) ni tokens en el cuerpo', async () => {
+    const { refreshToken } = await tokens('11111111-1');
+
+    const res = await refreshWith(`refresh_token=${refreshToken}`);
+
+    expect(setCookiesOf(res).map((c) => c.name)).toEqual(['access_token']);
+    expect(await res.text()).not.toContain('eyJ');
   });
 
-  it('401 genérico con un token basura', async () => {
-    const res = await refresh({ refreshToken: 'basura' });
+  it('indica Cache-Control: no-store', async () => {
+    const { refreshToken } = await tokens('11111111-1');
+
+    expect((await refreshWith(`refresh_token=${refreshToken}`)).headers.get('cache-control')).toBe(
+      'no-store',
+    );
+  });
+
+  it('no necesita cuerpo ni Content-Type', async () => {
+    const { refreshToken } = await tokens('11111111-1');
+
+    const res = await refreshWith(`refresh_token=${refreshToken}`, { body: undefined });
+
+    expect(res.status).toBe(200);
+  });
+
+  it('sin cookie → 401 genérico', async () => {
+    const res = await refreshWith();
 
     expect(res.status).toBe(401);
     expect(res.headers.get('www-authenticate')).toBe('Bearer');
     expect(await res.json()).toEqual({ error: 'Unauthorized' });
+    expect(setCookiesOf(res)).toEqual([]);
   });
 
-  it('el access no refresca', async () => {
-    const { accessToken } = await generateTokens({ rut: '11111111-1' }, deps.jwt!);
+  it('un refresh en el cuerpo ya no se acepta (solo la cookie)', async () => {
+    const { refreshToken } = await tokens('11111111-1');
 
-    expect((await refresh({ refreshToken: accessToken })).status).toBe(401);
+    const res = await refreshWith(undefined, {
+      body: JSON.stringify({ refreshToken }),
+      headers: { 'content-type': 'application/json' },
+    });
+
+    expect(res.status).toBe(401);
   });
 
-  it('401 para un usuario no vigente', async () => {
-    const { refreshToken } = await generateTokens({ rut: '22222222-2' }, deps.jwt!);
+  it('un refresh en el encabezado Authorization tampoco', async () => {
+    const { refreshToken } = await tokens('11111111-1');
 
-    expect((await refresh({ refreshToken })).status).toBe(401);
+    const res = await refreshWith(undefined, {
+      headers: { authorization: `Bearer ${refreshToken}` },
+    });
+
+    expect(res.status).toBe(401);
+  });
+
+  it.each(['refresh_token=basura', 'refresh_token=', 'refresh_token=a.b.c', 'otra=1'])(
+    'cookie inválida o ausente (%s) → 401',
+    async (cookie) => {
+      expect((await refreshWith(cookie)).status).toBe(401);
+    },
+  );
+
+  it('el access no sirve como refresh', async () => {
+    const { accessToken } = await tokens('11111111-1');
+
+    expect((await refreshWith(`refresh_token=${accessToken}`)).status).toBe(401);
+  });
+
+  it('un refresh en la cookie access_token no cuenta', async () => {
+    const { refreshToken } = await tokens('11111111-1');
+
+    expect((await refreshWith(`access_token=${refreshToken}`)).status).toBe(401);
+  });
+
+  it('usuario no vigente → 401', async () => {
+    const { refreshToken } = await tokens('22222222-2');
+
+    expect((await refreshWith(`refresh_token=${refreshToken}`)).status).toBe(401);
   });
 
   it('revocación: el mismo refresh deja de funcionar al marcar active=false', async () => {
-    const { refreshToken } = await generateTokens({ rut: '11111111-1' }, deps.jwt!);
-    expect((await refresh({ refreshToken })).status).toBe(200);
+    const { refreshToken } = await tokens('11111111-1');
+    expect((await refreshWith(`refresh_token=${refreshToken}`)).status).toBe(200);
 
     writeDataFile(
       dir,
@@ -95,7 +160,7 @@ describe('POST /api/auth/refresh', () => {
       Date.now() / 1000 + 5000,
     );
 
-    expect((await refresh({ refreshToken })).status).toBe(401);
+    expect((await refreshWith(`refresh_token=${refreshToken}`)).status).toBe(401);
   });
 
   it('solo acepta POST', async () => {

@@ -7,8 +7,14 @@ import { errorHandler } from '../../src/middlewares/error-handler.middleware.js'
 import { createAuthRouter } from '../../src/routes/auth.routes.js';
 import type { AuthDeps } from '../../src/services/auth.service.js';
 import { createDataStore } from '../../src/services/data-store.service.js';
+import { verifyToken } from '../../src/services/token.service.js';
 import { makeTempDir, validData, writeAll, writeDataFile } from '../helpers/data-fixtures.js';
-import { startServer, type TestServer } from '../helpers/http-fixtures.js';
+import {
+  cookieNamed,
+  setCookiesOf,
+  startServer,
+  type TestServer,
+} from '../helpers/http-fixtures.js';
 import { testJwtConfig } from '../helpers/jwt-fixtures.js';
 import { TEST_PASSWORD, userRow } from '../helpers/user-fixtures.js';
 
@@ -66,22 +72,89 @@ describe('POST /api/auth/login', () => {
     ...overrides,
   });
 
-  describe('200: contrato de salida', () => {
-    it('devuelve exactamente accessToken, expiresIn, refreshToken y refreshExpiresIn', async () => {
+  describe('200: contrato de salida (sesión por cookies)', () => {
+    const cookieHeader = (res: Response) =>
+      setCookiesOf(res)
+        .map((c) => `${c.name}=${c.value}`)
+        .join('; ');
+
+    it('el cuerpo trae solo expiresIn y refreshExpiresIn', async () => {
       const res = await login(credentials());
-      const body = (await res.json()) as Record<string, unknown>;
 
       expect(res.status).toBe(200);
-      expect(Object.keys(body).sort()).toEqual([
-        'accessToken',
-        'expiresIn',
-        'refreshExpiresIn',
-        'refreshToken',
-      ]);
-      expect(body.expiresIn).toBe(900);
-      expect(body.refreshExpiresIn).toBe(604800);
-      expect(typeof body.accessToken).toBe('string');
-      expect(typeof body.refreshToken).toBe('string');
+      expect(await res.json()).toEqual({ expiresIn: 900, refreshExpiresIn: 604800 });
+    });
+
+    it('los tokens NO van en el cuerpo (el JavaScript del frontend no los ve)', async () => {
+      const text = await (await login(credentials())).text();
+
+      expect(text).not.toContain('eyJ');
+      expect(text).not.toContain('accessToken');
+      expect(text).not.toContain('refreshToken');
+    });
+
+    it('entrega exactamente access_token y refresh_token en Set-Cookie', async () => {
+      const res = await login(credentials());
+
+      expect(setCookiesOf(res).map((c) => c.name)).toEqual(['access_token', 'refresh_token']);
+    });
+
+    it('access_token: HttpOnly, SameSite=Strict, Path=/, Max-Age=900, sin Secure ni Domain', async () => {
+      const cookie = cookieNamed(await login(credentials()), 'access_token');
+
+      expect(cookie?.attributes).toMatchObject({
+        httponly: true,
+        samesite: 'Strict',
+        path: '/',
+        'max-age': '900',
+      });
+      expect(cookie?.attributes).not.toHaveProperty('secure');
+      expect(cookie?.attributes).not.toHaveProperty('domain');
+    });
+
+    it('refresh_token: HttpOnly, SameSite=Strict, Path=/api/auth, Max-Age=604800', async () => {
+      const cookie = cookieNamed(await login(credentials()), 'refresh_token');
+
+      expect(cookie?.attributes).toMatchObject({
+        httponly: true,
+        samesite: 'Strict',
+        path: '/api/auth',
+        'max-age': '604800',
+      });
+      expect(cookie?.attributes).not.toHaveProperty('domain');
+    });
+
+    it('los valores son un access y un refresh válidos del usuario', async () => {
+      const res = await login(credentials());
+
+      await expect(
+        verifyToken(cookieNamed(res, 'access_token')!.value, 'access', deps.jwt!),
+      ).resolves.toMatchObject({ sub: ACTIVE });
+      await expect(
+        verifyToken(cookieNamed(res, 'refresh_token')!.value, 'refresh', deps.jwt!),
+      ).resolves.toMatchObject({ sub: ACTIVE });
+    });
+
+    it('con cookies seguras (producción) ambas llevan Secure', async () => {
+      const secureApp = express();
+      secureApp.use(express.json());
+      secureApp.use('/api/auth', createAuthRouter({ ...deps, secureCookies: true }));
+      secureApp.use(errorHandler);
+      const secureServer = await startServer(secureApp);
+      try {
+        const res = await fetch(`${secureServer.baseUrl}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(credentials()),
+        });
+
+        expect(res.status).toBe(200);
+        for (const cookie of setCookiesOf(res)) {
+          expect(cookie.attributes).toMatchObject({ secure: true, httponly: true });
+        }
+      } finally {
+        await secureServer.close();
+      }
     });
 
     it('indica Cache-Control: no-store', async () => {
@@ -90,59 +163,62 @@ describe('POST /api/auth/login', () => {
       expect(res.headers.get('cache-control')).toBe('no-store');
     });
 
-    it('no incluye el hash, el contador ni datos del usuario', async () => {
-      const text = await (await login(credentials())).text();
+    it('no incluye el hash, el contador ni datos del usuario (ni en el cuerpo ni en las cookies)', async () => {
+      const res = await login(credentials());
+      const all = (await res.text()) + res.headers.getSetCookie().join(' ');
 
-      expect(text).not.toContain('scrypt');
-      expect(text).not.toContain('password');
-      expect(text).not.toContain('failed_attempts');
-      expect(text).not.toContain('role');
+      expect(all).not.toContain('scrypt');
+      expect(all).not.toContain('password');
+      expect(all).not.toContain('failed_attempts');
+      expect(all).not.toContain('role');
     });
 
-    it('el access emitido autentica y no expone el hash en req.user', async () => {
-      const { accessToken } = (await (await login(credentials())).json()) as {
-        accessToken: string;
-      };
+    it('la cookie access_token emitida autentica y req.user no expone el hash', async () => {
+      const res = await login(credentials());
 
-      const res = await fetch(`${server.baseUrl}/api/protected`, {
-        headers: { authorization: `Bearer ${accessToken}` },
+      const protectedRes = await fetch(`${server.baseUrl}/api/protected`, {
+        headers: { cookie: cookieHeader(res) },
       });
 
-      expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ rut: ACTIVE, keys: ['active', 'role', 'rut'] });
+      expect(protectedRes.status).toBe(200);
+      expect(await protectedRes.json()).toEqual({ rut: ACTIVE, keys: ['active', 'role', 'rut'] });
     });
 
-    it('el refresh emitido sirve en POST /refresh', async () => {
-      const { refreshToken } = (await (await login(credentials())).json()) as {
-        refreshToken: string;
-      };
+    it('la cookie refresh_token emitida sirve en POST /refresh, sin cuerpo', async () => {
+      const res = await login(credentials());
 
-      const res = await fetch(`${server.baseUrl}/api/auth/refresh`, {
+      const refresh = await fetch(`${server.baseUrl}/api/auth/refresh`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        headers: { cookie: cookieHeader(res) },
       });
 
-      expect(res.status).toBe(200);
+      expect(refresh.status).toBe(200);
+      expect(cookieNamed(refresh, 'access_token')).toBeDefined();
     });
 
-    it('el access emitido no sirve como refresh y el refresh no autentica', async () => {
-      const pair = (await (await login(credentials())).json()) as {
-        accessToken: string;
-        refreshToken: string;
-      };
+    it('el refresh no autentica como access_token y el access no sirve como refresh_token', async () => {
+      const res = await login(credentials());
+      const access = cookieNamed(res, 'access_token')!.value;
+      const refresh = cookieNamed(res, 'refresh_token')!.value;
 
+      const asAccess = await fetch(`${server.baseUrl}/api/protected`, {
+        headers: { cookie: `access_token=${refresh}` },
+      });
       const asRefresh = await fetch(`${server.baseUrl}/api/auth/refresh`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ refreshToken: pair.accessToken }),
-      });
-      const asAccess = await fetch(`${server.baseUrl}/api/protected`, {
-        headers: { authorization: `Bearer ${pair.refreshToken}` },
+        headers: { cookie: `refresh_token=${access}` },
       });
 
-      expect(asRefresh.status).toBe(401);
       expect(asAccess.status).toBe(401);
+      expect(asRefresh.status).toBe(401);
+    });
+
+    it('los 400 y 401 no entregan cookies', async () => {
+      const bad = await login({});
+      const wrong = await login(credentials({ password: 'otra-clave-1234' }));
+
+      expect(setCookiesOf(bad)).toEqual([]);
+      expect(setCookiesOf(wrong)).toEqual([]);
     });
   });
 

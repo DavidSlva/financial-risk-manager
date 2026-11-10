@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [006-modelo-datos, 010-tdd-vitest]
-related: [005-backend-estructura]
+related: [005-backend-estructura, 014-cors-desarrollo]
 supersedes: []
 superseded_by: []
 ---
@@ -81,6 +81,7 @@ Revocar a un usuario = poner `active: false` en `users.json`. Rige desde la sigu
 - depende de: [006-modelo-datos](006-modelo-datos.md) — usuario y marca de vigencia.
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — se implementa con TDD y Vitest.
 - relacionada con: [005-backend-estructura](005-backend-estructura.md) — ubicación en capas y convención de nombres.
+- relacionada con: [014-cors-desarrollo](014-cors-desarrollo.md) — CORS con credenciales para las cookies de sesión en desarrollo.
 - deriva en: [009-emision-tokens](009-emision-tokens.md) — cómo se obtiene el primer par de tokens (pendiente).
 - la autorización por rol ([011-rbac](011-rbac.md)) se apoya en `req.user`.
 
@@ -110,6 +111,7 @@ Notas:
 - Si los datos de la spec 006 no son íntegros, no se autentica ni se refresca: se responde 500 genérico (nunca 200).
 - `vitest.config.ts` define una `JWT_SECRET` solo para pruebas.
 - `backend/data/users.json` y `scores.json` deben existir para arrancar (se copian de los `*.example.json`).
+- Evolución (spec [009](009-emision-tokens.md), versión con cookies): `authenticate` lee el access de la cookie `access_token` (o de `Authorization: Bearer`) y `POST /api/auth/refresh` lee el refresh de la cookie `refresh_token`, sin cuerpo; ya no se acepta el refresh en el cuerpo.
 - Evolución (spec [009](009-emision-tokens.md)): se resolvió la emisión del primer par de tokens con `POST /api/auth/login`. `authenticateAccess` devuelve ahora `AuthenticatedUser` (sin `password_hash` ni `failed_attempts`).
 - Evolución (spec [012](012-errores-http.md)): `AuthenticationError` fue reemplazado por `HttpError('UNAUTHORIZED')` del mapa de errores; el comportamiento (401 genérico con `WWW-Authenticate: Bearer`) no cambia.
 - Sin emisión de tokens (spec 009) el flujo completo por HTTP aún no se puede iniciar; se verificó generando tokens con el servicio.

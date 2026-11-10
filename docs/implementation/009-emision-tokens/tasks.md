@@ -17,3 +17,12 @@ Orden TDD en cada tarea: prueba que falla → código mínimo → refactor. Prer
 - [x] T8 — `scripts/hash-password.mjs` (entrada estándar, misma validación de largo) y `users.example.json` con `password_hash`
 - [x] T9 — Verificación: pruebas, lint, tipos, formato; login real con el servidor compilado
 - [x] T10 — Converge: spec (estado final), `implement.md`, índice, specs 006 y 007 (nota de evolución), `CLAUDE.md` y `backend/README.md`
+
+## Cambio: sesión por cookies (versión 9.1)
+
+- [x] T11 — `config/cookies.ts` (nombres y opciones) y `cookie.service.parseCookies`, con sus pruebas
+- [x] T12 — `authenticate`: access desde la cookie `access_token` (alternativa `Bearer`; con ambos, la cookie)
+- [x] T13 — `login`: tokens solo en `Set-Cookie` (`HttpOnly`, `SameSite=Strict`, `Path`, `Max-Age`, `Secure` en producción); cuerpo `{ expiresIn, refreshExpiresIn }`
+- [x] T14 — `refresh`: refresh desde la cookie `refresh_token` (sin cuerpo) y nueva cookie `access_token`; 401 sin cookie
+- [x] T15 — Migrar las pruebas existentes de login, refresh y extremo a extremo al nuevo contrato
+- [x] T16 — Verificación (pruebas, lint, tipos, formato; servidor real con `curl -c/-b`) y converge (spec 009, notas en 007, `backend/README.md`, `CLAUDE.md`)

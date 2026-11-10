@@ -84,6 +84,8 @@ Notas:
 
 Evolución posterior (converge): las specs siguientes extendieron esta estructura sin romperla. La [006](006-modelo-datos.md) agregó `models/` (solo tipos) y que `index.ts` valide los datos al arrancar; la [007](007-auth-jwt.md) agregó `types/`, el recurso `auth` (controlador, rutas, servicios) y un manejador de errores para el 401 (la [012](012-errores-http.md) lo reemplazó por un único `error-handler` basado en el mapa `config/http-errors.ts`); la [010](010-tdd-vitest.md) agregó `test/` espejo de `src/`. `backend/README.md` ya refleja estas carpetas.
 
+Cambio posterior: el puerto por defecto del backend pasó de 3000 a **8000** y se agregó CORS (spec [014](014-cors-desarrollo.md)); `createApp` ahora recibe opciones (`{ corsOrigins }`).
+
 **Revisión de documentos relacionados:**
 
 - [x] constitution actualizada

@@ -7,7 +7,7 @@ const base = { JWT_SECRET: TEST_SECRET_HEX };
 
 describe('config/environment', () => {
   it('aplica valores por defecto', () => {
-    expect(parseEnvironment(base)).toMatchObject({ nodeEnv: 'development', port: 3000 });
+    expect(parseEnvironment(base)).toMatchObject({ nodeEnv: 'development', port: 8000 });
   });
 
   it('lee NODE_ENV y PORT', () => {
@@ -92,6 +92,96 @@ describe('config/environment', () => {
     it.each(['none', 'RS256', 'ES256', 'hs256', ''])('rechaza %j', (algorithm) => {
       expect(() => parseEnvironment({ ...base, JWT_ALGORITHM: algorithm })).toThrow(
         /JWT_ALGORITHM/,
+      );
+    });
+  });
+
+  describe('CORS_ORIGINS (spec 014)', () => {
+    it('por defecto en desarrollo es http://localhost:3000', () => {
+      expect(parseEnvironment({ ...base, NODE_ENV: 'development' }).corsOrigins).toEqual([
+        'http://localhost:3000',
+      ]);
+    });
+
+    it('sin NODE_ENV (desarrollo) también permite el frontend local', () => {
+      expect(parseEnvironment(base).corsOrigins).toEqual(['http://localhost:3000']);
+    });
+
+    it('por defecto en test es http://localhost:3000', () => {
+      expect(parseEnvironment({ ...base, NODE_ENV: 'test' }).corsOrigins).toEqual([
+        'http://localhost:3000',
+      ]);
+    });
+
+    it('por defecto en producción no hay orígenes (mismo dominio, CORS desactivado)', () => {
+      expect(parseEnvironment({ ...base, NODE_ENV: 'production' }).corsOrigins).toEqual([]);
+    });
+
+    it('un valor explícito reemplaza al valor por defecto', () => {
+      expect(
+        parseEnvironment({ ...base, CORS_ORIGINS: 'http://localhost:5173' }).corsOrigins,
+      ).toEqual(['http://localhost:5173']);
+    });
+
+    it('acepta varios orígenes separados por comas, con espacios alrededor', () => {
+      expect(
+        parseEnvironment({
+          ...base,
+          CORS_ORIGINS: ' http://localhost:3000 , https://app.ejemplo.cl ,http://localhost:5173',
+        }).corsOrigins,
+      ).toEqual(['http://localhost:3000', 'https://app.ejemplo.cl', 'http://localhost:5173']);
+    });
+
+    it('elimina los repetidos', () => {
+      expect(
+        parseEnvironment({
+          ...base,
+          CORS_ORIGINS: 'http://localhost:3000,http://localhost:3000',
+        }).corsOrigins,
+      ).toEqual(['http://localhost:3000']);
+    });
+
+    it.each(['', '   ', ' , '])('un valor vacío (%j) significa ningún origen', (value) => {
+      expect(parseEnvironment({ ...base, CORS_ORIGINS: value }).corsOrigins).toEqual([]);
+    });
+
+    it('un valor vacío también desactiva el valor por defecto de desarrollo', () => {
+      expect(
+        parseEnvironment({ ...base, NODE_ENV: 'development', CORS_ORIGINS: '' }).corsOrigins,
+      ).toEqual([]);
+    });
+
+    it.each([
+      ['*', 'comodín'],
+      ['null', 'origen null'],
+      ['localhost:3000', 'sin esquema'],
+      ['http://localhost:3000/', 'barra final'],
+      ['http://localhost:3000/app', 'con ruta'],
+      ['http://localhost:3000?x=1', 'con query'],
+      ['ftp://localhost:3000', 'esquema no http'],
+      ['http://', 'sin host'],
+      ['http://*.ejemplo.cl', 'comodín en el host'],
+      ['HTTP://LOCALHOST:3000', 'sin normalizar (mayúsculas)'],
+      ['http://user:clave@localhost:3000', 'con credenciales'],
+    ])('rechaza %j (%s)', (origin) => {
+      expect(() => parseEnvironment({ ...base, CORS_ORIGINS: origin })).toThrow(/CORS_ORIGINS/);
+    });
+
+    it('un origen inválido entre otros válidos hace fallar todo el arranque', () => {
+      expect(() => parseEnvironment({ ...base, CORS_ORIGINS: 'http://localhost:3000,*' })).toThrow(
+        /CORS_ORIGINS/,
+      );
+    });
+
+    it('el mensaje de error indica cuál origen es inválido', () => {
+      expect(() => parseEnvironment({ ...base, CORS_ORIGINS: 'localhost:3000' })).toThrow(
+        /localhost:3000/,
+      );
+    });
+
+    it('informa junto con los demás errores de configuración', () => {
+      expect(() => parseEnvironment({ ...base, PORT: 'x', CORS_ORIGINS: '*' })).toThrow(
+        /PORT[\s\S]*CORS_ORIGINS/,
       );
     });
   });

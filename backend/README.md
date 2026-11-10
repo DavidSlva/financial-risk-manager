@@ -69,16 +69,17 @@ Excepciones:
 
 ## Variables de entorno
 
-| Variable                    | Valores                                  | Por defecto    | Obligatoria |
-| --------------------------- | ---------------------------------------- | -------------- | ----------- |
-| `NODE_ENV`                  | `development`, `test`, `production`      | `development`  | no          |
-| `PORT`                      | entero entre 1 y 65535                   | `3000`         | no          |
-| `DATA_DIR`                  | carpeta con los archivos de datos        | `backend/data` | no          |
-| `JWT_SECRET`                | 128 caracteres hexadecimales (64 bytes)  | —              | **sí**      |
-| `JWT_ALGORITHM`             | `HS256`, `HS384`, `HS512`                | `HS256`        | no          |
-| `ACCESS_TOKEN_TTL_SECONDS`  | entero positivo                          | `900`          | no          |
-| `REFRESH_TOKEN_TTL_SECONDS` | entero positivo, mayor que el del access | `604800`       | no          |
-| `LOGIN_MAX_ATTEMPTS`        | entero positivo                          | `5`            | no          |
+| Variable                    | Valores                                  | Por defecto                                                 | Obligatoria |
+| --------------------------- | ---------------------------------------- | ----------------------------------------------------------- | ----------- |
+| `NODE_ENV`                  | `development`, `test`, `production`      | `development`                                               | no          |
+| `PORT`                      | entero entre 1 y 65535                   | `8000`                                                      | no          |
+| `CORS_ORIGINS`              | orígenes separados por comas             | `http://localhost:3000` (desarrollo); ninguno en producción | no          |
+| `DATA_DIR`                  | carpeta con los archivos de datos        | `backend/data`                                              | no          |
+| `JWT_SECRET`                | 128 caracteres hexadecimales (64 bytes)  | —                                                           | **sí**      |
+| `JWT_ALGORITHM`             | `HS256`, `HS384`, `HS512`                | `HS256`                                                     | no          |
+| `ACCESS_TOKEN_TTL_SECONDS`  | entero positivo                          | `900`                                                       | no          |
+| `REFRESH_TOKEN_TTL_SECONDS` | entero positivo, mayor que el del access | `604800`                                                    | no          |
+| `LOGIN_MAX_ATTEMPTS`        | entero positivo                          | `5`                                                         | no          |
 
 El proceso falla al arrancar si alguna es inválida o si falta `JWT_SECRET`. Los mensajes de error nunca incluyen el valor de la clave.
 
@@ -103,6 +104,13 @@ Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json`
 
 La integridad referencial se valida al arrancar (el proceso aborta e informa todas las violaciones) y se revalida cuando cambia un archivo. Si los datos dejan de ser íntegros, se rechazan las operaciones que dependan de ellos. Poner `active: false` a un usuario lo revoca sin reiniciar. La función de cada columna está en la spec.
 
+## CORS (desarrollo)
+
+Spec [014-cors-desarrollo](../docs/specs/014-cors-desarrollo.md). En producción frontend y backend comparten dominio y **no hay CORS**. En desarrollo el frontend corre en `http://localhost:3000` y el backend en `http://localhost:8000`: mismo sitio, orígenes distintos. Como la sesión va en cookies, el CORS es **con credenciales**: el backend responde `Access-Control-Allow-Origin: <origen permitido>` (nunca `*`) y `Access-Control-Allow-Credentials: true`, y atiende el preflight (`GET, POST, OPTIONS`; `Content-Type, Authorization`).
+
+- `CORS_ORIGINS` reemplaza la lista (p. ej. Vite en `http://localhost:5173`). Cada origen: `http(s)://host[:puerto]`, sin ruta ni barra final; `*` y `null` se rechazan al arrancar. Vacío: sin CORS.
+- El frontend debe llamar con `credentials: 'include'` y usar `localhost` (no `127.0.0.1`: otro sitio, `SameSite=Strict` no enviaría las cookies).
+
 ## Login y contraseñas
 
 Spec [009-emision-tokens](../docs/specs/009-emision-tokens.md).
@@ -120,12 +128,21 @@ Spec [009-emision-tokens](../docs/specs/009-emision-tokens.md).
 
 Estricto: cualquier otro campo → 400. Respuestas:
 
-| Situación                                                                                   | Respuesta                                                                                        |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Contrato inválido (se valida antes de tocar los datos)                                      | `400`                                                                                            |
-| Rut inexistente, contraseña incorrecta, usuario no vigente o **bloqueado** (aunque acierte) | `401` idéntico en los cuatro casos                                                               |
-| Datos no íntegros o no se pudo registrar el intento                                         | `500` genérico                                                                                   |
-| Correcto                                                                                    | `200` `{ accessToken, expiresIn, refreshToken, refreshExpiresIn }` con `Cache-Control: no-store` |
+| Situación                                                                                   | Respuesta                                                                                                                                              |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Contrato inválido (se valida antes de tocar los datos)                                      | `400`                                                                                                                                                  |
+| Rut inexistente, contraseña incorrecta, usuario no vigente o **bloqueado** (aunque acierte) | `401` idéntico en los cuatro casos                                                                                                                     |
+| Datos no íntegros o no se pudo registrar el intento                                         | `500` genérico                                                                                                                                         |
+| Correcto                                                                                    | `200` con `Set-Cookie` `access_token` y `refresh_token` (`HttpOnly`, `SameSite=Strict`) y `{ expiresIn, refreshExpiresIn }`; `Cache-Control: no-store` |
+
+**Sesión por cookies:** el login **no devuelve los tokens en el cuerpo**: los entrega en cookies `HttpOnly` (el JavaScript del frontend no las lee) y el navegador las reenvía solo. Frontend y backend funcionan bajo el mismo dominio.
+
+| Cookie          | `Path`      | `Max-Age`                   | Notas                                                 |
+| --------------- | ----------- | --------------------------- | ----------------------------------------------------- |
+| `access_token`  | `/`         | `ACCESS_TOKEN_TTL_SECONDS`  | `HttpOnly`, `SameSite=Strict`, `Secure` en producción |
+| `refresh_token` | `/api/auth` | `REFRESH_TOKEN_TTL_SECONDS` | Solo viaja a las rutas de autenticación               |
+
+El frontend usa `credentials: 'include'` (con el mismo dominio basta el valor por defecto). Para renovar el access: `POST /api/auth/refresh` **sin cuerpo** (lee la cookie `refresh_token`). No hay cierre de sesión por API todavía (punto abierto de la spec 009).
 
 **Límite de intentos:** `users.failed_attempts` cuenta los intentos fallidos; con `failed_attempts >= LOGIN_MAX_ATTEMPTS` el usuario está bloqueado. Un login exitoso lo reinicia a 0. Para desbloquear a mano, poner `failed_attempts` en 0 en `users.json`. El backend **escribe** `users.json` (solo ese contador) de forma atómica.
 
@@ -162,8 +179,8 @@ router.get(
 
 JWT simétrico (spec [007-auth-jwt](../docs/specs/007-auth-jwt.md)); el algoritmo, la clave y los TTL salen de `config/environment.ts`.
 
-- **Access:** autentica. `Authorization: Bearer <access>` + `authenticate.middleware` → `req.user`.
-- **Refresh:** **no autentica**; solo sirve en `POST /api/auth/refresh` para obtener un access nuevo (no rota el refresh).
+- **Access:** autentica. Se toma de la cookie `access_token` (o, para clientes sin navegador, de `Authorization: Bearer <access>`; con ambos vale solo la cookie) y `authenticate.middleware` deja `req.user`.
+- **Refresh:** **no autentica**; vive en la cookie `refresh_token` y solo sirve en `POST /api/auth/refresh` (sin cuerpo) para obtener un access nuevo (no rota el refresh).
 - **Revocación:** cada validación consulta al usuario en `users.json`. Con `active: false` (o si no existe) el access deja de autenticar y el refresh deja de generar access, sin reiniciar.
 - Los rechazos son `401` genéricos con `WWW-Authenticate: Bearer`. Si los datos no son íntegros, no se autentica (`500`).
 - Pendiente: cómo se obtiene el primer par de tokens ([009-emision-tokens](../docs/specs/009-emision-tokens.md)).
@@ -195,9 +212,9 @@ Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se regis
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
-- `GET /api/score/:rut`: score de un rut → `{ "rut" (formato 12.345.678-9), "score" (0–100), "consulted_at" (UTC) }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
-- `POST /api/auth/login`: `{ "rut", "password" }` → `{ "accessToken", "expiresIn", "refreshToken", "refreshExpiresIn" }`. Ver _Login y contraseñas_.
-- `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
+- `GET /api/score/:rut`: score de un rut → `{ "rut" (formato 12.345.678-9), "score" (0–100), "consulted_at" (UTC) }`. Requiere la cookie `access_token` (o `Authorization: Bearer <access>`). `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
+- `POST /api/auth/login`: `{ "rut", "password" }` → cookies `access_token` y `refresh_token` + `{ "expiresIn", "refreshExpiresIn" }`. Ver _Login y contraseñas_.
+- `POST /api/auth/refresh`: sin cuerpo; lee la cookie `refresh_token` → nueva cookie `access_token` + `{ "expiresIn" }`.
 
 ## Pruebas
 

@@ -10,6 +10,7 @@ Spec: [../../specs/009-emision-tokens.md](../../specs/009-emision-tokens.md)
 - El hash nunca sale de la capa de datos hacia `req.user`, el contexto de autorización o las respuestas.
 - Límite de intentos: el contador vive en el modelo de usuario, el máximo en la configuración; el intento se reserva (incrementa) **antes** de verificar para que la concurrencia no eluda el límite; un login exitoso lo reinicia. Un usuario bloqueado recibe el mismo 401.
 - La app escribe `users.json` (solo el contador): escritura atómica, serializada y con integridad validada antes de escribir; si falla, se falla cerrado.
+- La sesión viaja en cookies `HttpOnly` (frontend y backend bajo el mismo dominio): los tokens nunca están en el cuerpo ni son legibles por JavaScript; `SameSite=Strict`, `Secure` en producción, el refresh solo en la ruta `/api/auth`.
 - Sin dependencias nuevas: el hash usa `scrypt` de `node:crypto` (política de cadena de suministro, spec 004).
 - La verificación usa comparación en tiempo constante y no bloquea el bucle de eventos.
 - Los errores salen del mapa de la spec 012; los servicios no conocen Express.

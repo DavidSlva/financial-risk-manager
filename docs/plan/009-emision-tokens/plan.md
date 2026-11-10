@@ -41,6 +41,29 @@ login(rut: string, password: string, deps?: AuthDeps): Promise<TokenPair>;   // 
 | Hash de ejemplo precalculado en las pruebas, con parámetros bajos   | Calcular el hash en cada prueba   | `N=2^15` hace lentas las pruebas; el formato permite parámetros bajos solo en tests        |
 | `hash-password` lee de la entrada estándar                          | Contraseña como argumento         | Los argumentos quedan en el historial del shell                                            |
 
+## Sesión por cookies
+
+```ts
+// config/cookies.ts
+export const COOKIE_NAMES = { access: 'access_token', refresh: 'refresh_token' } as const;
+export function cookieOptions(kind: 'access' | 'refresh', maxAgeSeconds: number, secure: boolean): CookieOptions;
+// httpOnly: true, sameSite: 'strict', secure, path: access '/' | refresh '/api/auth', maxAge en ms
+
+// services/cookie.service.ts
+parseCookies(header: string | undefined): Record<string, string>;   // puro; primera ocurrencia; ignora lo mal formado
+```
+
+| Decisión                                                  | Alternativas                     | Motivo                                                                                        |
+| --------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------- |
+| Tokens solo en `Set-Cookie` `HttpOnly`, no en el cuerpo   | Devolverlos también en el cuerpo | Pedido: el frontend espera cookies; el JavaScript no debe poder leer los tokens               |
+| `SameSite=Strict`                                         | `Lax`                            | Mismo dominio: no hace falta enviarlas en navegaciones desde otros sitios; mejor defensa CSRF |
+| Refresh con `Path=/api/auth`                              | `Path=/`                         | El refresh viaja solo a las rutas de autenticación                                            |
+| `Secure` solo en producción                               | Siempre `Secure`                 | `http://localhost` en desarrollo; en producción solo por HTTPS                                |
+| Parseo propio de `Cookie` (función pura)                  | `cookie-parser`                  | Sin dependencias nuevas (spec 004); son pocas líneas                                          |
+| `authenticate`: cookie primero, `Bearer` como alternativa | Solo cookie                      | Herramientas y pruebas sin navegador; con ambos presentes vale solo la cookie (determinista)  |
+| Refresh sin cuerpo (cookie)                               | Aceptar el refresh en el cuerpo  | Un solo canal; el cuerpo ya no transporta credenciales de sesión                              |
+| Sin `Domain` ni prefijo `__Host-`                         | `__Host-`                        | `__Host-` exige `Secure`, que no funciona en `http://localhost` de todos los navegadores      |
+
 ## Límite de intentos
 
 ```ts
