@@ -4,6 +4,7 @@ dist/
 .env
 .env.*
 !.env.example
+!frontend/.env.development
 .DS_Store
 
 # Datos personales (spec 006): se versionan solo los ejemplos

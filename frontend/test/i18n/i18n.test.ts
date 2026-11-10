@@ -12,7 +12,14 @@ const expected: Record<string, string> = {
   'login.submit': 'Continuar',
   'login.submitting': 'Ingresando…',
   'login.errors.invalidCredentials':
-    'RUT o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.',
+    'RUT o contraseña incorrectos. Revisa tus datos; si ya lo intentaste varias veces, tu cuenta puede estar bloqueada.',
+  'login.errors.badRequest': 'Revisa los datos ingresados.',
+  'login.errors.tooManyRequests': 'Demasiados intentos. Espera unos minutos e inténtalo otra vez.',
+  'login.errors.clientError':
+    'No pudimos procesar la solicitud. Revisa los datos e inténtalo de nuevo.',
+  'login.errors.serverError': 'Tenemos un problema de nuestro lado. Inténtalo en unos minutos.',
+  'login.errors.network': 'No pudimos conectar. Revisa tu conexión.',
+  'login.errors.passwordLength': 'La contraseña debe tener entre 8 y 128 caracteres.',
   'login.errors.rutInvalid': 'Ingresa un RUT válido.',
   'login.errors.passwordInvalid': 'Ingresa tu contraseña.',
 };
