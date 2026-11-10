@@ -1,7 +1,7 @@
 ---
 id: 015-login-logica
 title: Lógica del login (validación, /api/auth/login, sesión por cookies, errores por status)
-status: specified
+status: implementing
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [009-emision-tokens, 010-tdd-vitest, 012-errores-http, 014-login-ui]
@@ -53,7 +53,7 @@ La respuesta de éxito **no incluye** datos del usuario: el frontend usa el RUT 
 
 ## Requisitos
 
-- RF-1: **Validación local previa** a cualquier petición, en este orden: RUT (`normalizeRut` → canónico con dígito verificador válido; si no, `login.errors.rutInvalid` en el campo RUT), contraseña vacía (`login.errors.passwordInvalid`), contraseña fuera de límites (`login.errors.passwordLength` con `{{min}}` y `{{max}}`). Un error local no hace petición y enfoca el primer campo con error.
+- RF-1: **Validación local previa** a cualquier petición, en este orden: RUT (`normalizeRut` → canónico con dígito verificador válido; si no, `login.errors.rutInvalid` en el campo RUT), contraseña vacía (`login.errors.passwordInvalid`), contraseña fuera de límites (`login.errors.passwordLength` con `{{passwordMin}}` y `{{passwordMax}}`). Un error local no hace petición y enfoca el primer campo con error.
 - RF-2: Los **límites de tamaño** viven en un único archivo editable, `frontend/src/config/login-limits.ts`: RUT normalizado entre 9 y 10 caracteres; contraseña entre 8 y 128 puntos de código Unicode (`Array.from(value).length`, igual que el backend). Los mensajes y las validaciones leen de ahí; cambiar un valor no toca componentes.
 - RF-3: **Petición:** `fetch` a `${API_BASE_URL}/auth/login` con `method: 'POST'`, `credentials: 'include'`, cabeceras `Content-Type: application/json` y `Accept: application/json`, y cuerpo `JSON.stringify({ rut: <canónico>, password: <tal como se escribió> })`: exactamente esos dos campos.
 - RF-4: **URL base** en `frontend/src/config/api.config.ts`: `API_BASE_URL` sale de `import.meta.env.VITE_API_BASE_URL`, con `/api` por defecto (producción: mismo dominio que el backend). En desarrollo, `.env.development` define `VITE_API_BASE_URL=http://localhost:8000/api` y el servidor de Vite usa el puerto 3000 (origen permitido por `CORS_ORIGINS` de [014-cors-desarrollo](014-cors-desarrollo.md)); hay que usar `localhost` y no `127.0.0.1` (otro sitio: `SameSite=Strict` no enviaría las cookies).
@@ -107,15 +107,26 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 - depende de: [014-login-ui](014-login-ui.md) — interfaz que esta spec conecta.
 - relacionada con: [014-cors-desarrollo](014-cors-desarrollo.md) — origen y cookies en desarrollo; [016-score-consulta](016-score-consulta.md) — destino tras el login; [013-consulta-score](013-consulta-score.md); [008-validador-rut](008-validador-rut.md) — formato canónico del RUT.
 
-## Estado final (completar en Converge)
+## Estado final (parcial)
 
-Pendiente.
+**Implementado** (commits `2e26c34`, `91f6407`): validación local con límites en `login-limits.ts` (RF-1, RF-2), cliente de login con cookies (RF-3), URL base configurable (RF-4), éxito con sesión en memoria (RF-5), mapa de errores por status (RF-6, RF-7), bloqueo de envío doble y cancelación (RF-8), limpieza de contraseña tras `401` (RF-9), navegación sin router y aviso de sesión expirada (RF-10), sin almacenamiento ni consola (RF-11). La spec se alineó con el código: los parámetros del mensaje de largo son `{{passwordMin}}` y `{{passwordMax}}`.
+
+**Diferido:** Playwright e2e del flujo; prueba manual contra el backend real; cierre de sesión; recuperar la sesión al recargar; unificar `lib/rut.ts` con la rama 016; resolver el número 014 duplicado.
+
+**Revisión final: aprobada, con hallazgos menores pendientes:**
+
+- `api.config.ts`: `VITE_API_BASE_URL` definida pero vacía no aplica el valor por defecto (`??`); usar `||` y agregar prueba.
+- `App.tsx`: el `setTimeout` de expiración no tiene tope; acotar a 2147483647 ms (hoy el backend da 900 s).
+- `LoginPage.tsx`: el fallback usa la llave literal `login.errors.network` en vez de `LOGIN_ERROR_KEYS.network`; `login.notices.sessionExpired` en `App.tsx` también es literal.
+- `lib/rut.ts`: `normalizeRut` no recorta espacios exteriores (solo el RUT, nunca la contraseña); acepta puntos en cualquier posición (inofensivo).
+- `login.client.test.ts` y `LoginPage`: faltan casos de `AbortError` lanzado por `response.json()`, cliente por defecto con el `fetch` global, comprobación de que la URL no contiene RUT ni contraseña, y una prueba de Enter para el envío doble.
+- Tag de la spec: se asignará al promover.
 
 **Revisión de documentos relacionados:**
 
 - [ ] constitution actualizada
 - [ ] plan actualizado
-- [ ] tasks actualizadas
-- [ ] implement actualizado
+- [x] tasks actualizadas
+- [x] implement actualizado
 - [ ] specs relacionadas revisadas
-- [ ] índice `specs/README.md` actualizado
+- [x] índice `specs/README.md` actualizado
