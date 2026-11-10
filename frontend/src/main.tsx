@@ -1,2 +1,7 @@
-// Punto de entrada del frontend (placeholder hasta la spec de arquitectura del frontend).
-export {};
+import { createRoot } from 'react-dom/client';
+
+// Montaje provisional; se reemplaza por la aplicación real (login).
+const root = document.getElementById('root');
+if (root) {
+  createRoot(root).render(<div />);
+}
