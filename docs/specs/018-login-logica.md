@@ -111,14 +111,16 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 **Implementado** (commits `2e26c34`, `91f6407`): validación local con límites en `login-limits.ts` (RF-1, RF-2), cliente de login con cookies (RF-3), URL base configurable (RF-4), éxito con sesión en memoria (RF-5), mapa de errores por status (RF-6, RF-7), bloqueo de envío doble y cancelación (RF-8), limpieza de contraseña tras `401` (RF-9), navegación sin router y aviso de sesión expirada (RF-10), sin almacenamiento ni consola (RF-11). La spec se alineó con el código: los parámetros del mensaje de largo son `{{passwordMin}}` y `{{passwordMax}}`.
 
-**Diferido:** Playwright e2e del flujo; prueba manual contra el backend real; cierre de sesión; recuperar la sesión al recargar; unificar `lib/rut.ts` con la rama 016; resolver el número 014 duplicado.
+**Integración (rama `integration/login-score`, 2026-11-09):** `normalizeRut` unificado con el de 019 (una sola implementación en `lib/rut.ts`, ahora con recorte de espacios exteriores); `VITE_API_BASE_URL` vacía cae a `/api` (`||`); el temporizador de expiración se acota a 2147483647 ms y se rearma si el plazo es mayor; el marcador `ScorePlaceholder` y sus llaves `session.placeholder.*` se eliminaron porque tras el login `App` muestra `ScorePage` (spec 019). Probado de inicio a fin contra el backend real (login por cookies y consulta de score).
+
+**Diferido:** Playwright e2e del flujo contra el backend; cierre de sesión; recuperar la sesión al recargar.
 
 **Revisión final: aprobada, con hallazgos menores pendientes:**
 
-- `api.config.ts`: `VITE_API_BASE_URL` definida pero vacía no aplica el valor por defecto (`??`); usar `||` y agregar prueba.
-- `App.tsx`: el `setTimeout` de expiración no tiene tope; acotar a 2147483647 ms (hoy el backend da 900 s).
+- [x] `api.config.ts`: `VITE_API_BASE_URL` definida pero vacía no aplica el valor por defecto (`??`); usar `||` y agregar prueba.
+- [x] `App.tsx`: el `setTimeout` de expiración no tiene tope; acotar a 2147483647 ms (hoy el backend da 900 s).
 - `LoginPage.tsx`: el fallback usa la llave literal `login.errors.network` en vez de `LOGIN_ERROR_KEYS.network`; `login.notices.sessionExpired` en `App.tsx` también es literal.
-- `lib/rut.ts`: `normalizeRut` no recorta espacios exteriores (solo el RUT, nunca la contraseña); acepta puntos en cualquier posición (inofensivo).
+- [x] `lib/rut.ts`: `normalizeRut` no recorta espacios exteriores (solo el RUT, nunca la contraseña); acepta puntos en cualquier posición (inofensivo).
 - `login.client.test.ts` y `LoginPage`: faltan casos de `AbortError` lanzado por `response.json()`, cliente por defecto con el `fetch` global, comprobación de que la URL no contiene RUT ni contraseña, y una prueba de Enter para el envío doble.
 - Tag de la spec: se asignará al promover.
 

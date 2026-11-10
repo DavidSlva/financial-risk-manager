@@ -126,7 +126,9 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 **Parcial (2026-11-09).** Implementado el núcleo del frontend: normalización de RUT, cliente de score, mapa de errores sin texto del servidor, formato de fecha, textos `score.*`, `ScoreResult`, `ScorePage` y estilos (commits `f5d7188`, `cc92e21`). Verificado: format, lint, typecheck, test (frontend 18 archivos y 135 pruebas; backend 27 archivos y 516), check:policy y build del frontend.
 
-**Diferido:** montar `ScorePage` en `App` con la sesión en memoria, `onSessionExpired` e `initialRut` (tras 015); Playwright e2e; la reconciliación con la 013 quedó resuelta (`consulted_at`).
+**Integración (rama `integration/login-score`, 2026-11-09):** `ScorePage` quedó montado en `App` con `initialRut` = RUT de la sesión y `onSessionExpired` (vuelve al login con el aviso `login.notices.sessionExpired`); `ScorePlaceholder` eliminado. Corregido: el cliente de score ignoraba `VITE_API_BASE_URL` (llamaba a `/api/score` relativo; ahora usa `apiUrl`), una excepción no-abort del cliente se trata como fallo de red, un `401` sin `onSessionExpired` muestra `score.errors.sessionExpired`, y el campo RUT recibe el foco con error local o `400` (RF-10). `normalizeRut` se unificó con el de 018 (recorta espacios). Probado de inicio a fin contra el backend real: login por cookies, score propio, otro RUT (admin), `403`, `404`, `400` local y `401` por sesión expirada.
+
+**Diferido:** Playwright e2e del flujo contra el backend; la reconciliación con la 013 quedó resuelta (`consulted_at`).
 
 **Hallazgos de la revisión final (aprobada):** 1 importante (`ScorePage` sin montar en `App`, la spec no puede cerrarse sin la integración) y 7 menores (errores no-abort en `ScorePage`, foco en el campo con error RF-10, `AbortError` en `parseSuccess`, `hourCycle` no documentado, `normalizeRut` sin trim, `line-height: 1` literal, y un punto sin hallazgos). Detalle en [implement.md](../implementation/019-score-consulta/implement.md).
 

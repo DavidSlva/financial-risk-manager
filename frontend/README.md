@@ -13,3 +13,11 @@ Los scripts viven en `e2e/` y corren contra Vite (puerto 5299, levantado y deten
 - Las líneas base se generaron con Chromium en Windows y pueden diferir en otras plataformas (el CI no corre Playwright). `--update-snapshots=all` es lo que las regenera; la forma `-- --update-snapshots` no las reescribió.
 - `bundle.spec.ts` compila en un directorio temporal (no toca `dist/`) y comprueba que la vista previa no entra al bundle de producción.
 - El CI no corre Playwright (solo Vitest).
+
+## Probar de inicio a fin (login y score)
+
+Desarrollo local con el backend real (puertos libres a elección; el frontend usa `localhost`, nunca `127.0.0.1`):
+
+1. Datos: copiar `backend/data/users.example.json` y `scores.example.json` a `users.json` y `scores.json` (no se versionan; la contraseña de ejemplo está en `backend/README.md`).
+2. Backend: variables `JWT_SECRET` (`pnpm --filter @financial-risk-manager/backend run generate-secret`), `PORT` y `CORS_ORIGINS=<origen del frontend>`.
+3. Frontend: `VITE_API_BASE_URL=http://localhost:<puerto-backend>/api pnpm --filter @financial-risk-manager/frontend exec vite --port <puerto>`. Sin esa variable, el cliente usa `/api` (mismo dominio).
