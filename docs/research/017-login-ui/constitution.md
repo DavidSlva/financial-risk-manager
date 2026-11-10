@@ -1,10 +1,10 @@
-# Constitution — 014-login-ui
+# Constitution — 017-login-ui
 
-Spec: [../../specs/014-login-ui.md](../../specs/014-login-ui.md)
+Spec: [../../specs/017-login-ui.md](../../specs/017-login-ui.md)
 
 ## Principios y restricciones
 
-- Solo presentación: el formulario no valida, no formatea el RUT y no usa la red; eso es de [015-login-logica](../../specs/015-login-logica.md).
+- Solo presentación: el formulario no valida, no formatea el RUT y no usa la red; eso es de [018-login-logica](../../specs/018-login-logica.md).
 - Mobile first, tema claro estilo Vercel (variante elegida por el usuario), sin sistema de diseño.
 - Valores de diseño solo en `frontend/src/config/styles.config.ts`; textos solo en i18next.
 - Sin datos en el navegador; el bundle de producción es estático, minificado y sin vista previa.

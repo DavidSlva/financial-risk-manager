@@ -1,18 +1,18 @@
 ---
-id: 015-login-logica
+id: 018-login-logica
 title: Lógica del login (validación, llamada a /login, errores por status HTTP)
 status: draft # en espera: se retoma cuando el backend publique el login (009)
 created: 2026-11-09
 updated: 2026-11-09
-depends_on: [014-login-ui, 010-tdd-vitest, 012-errores-http]
+depends_on: [017-login-ui, 010-tdd-vitest, 012-errores-http]
 related: [009-emision-tokens, 013-consulta-score, 008-validador-rut]
 supersedes: []
 superseded_by: []
 ---
 
-# 015-login-logica — Lógica del login
+# 018-login-logica — Lógica del login
 
-> **En espera.** Borrador surgido del brainstorming; se retoma cuando el backend publique el login real ([009-emision-tokens](009-emision-tokens.md)). Se separó de [014-login-ui](014-login-ui.md): **todo lo visual** (diseño, tokens, estados, accesibilidad, textos de la interfaz, andamiaje de Vite/React/i18next y Playwright) vive allí y **prevalece** sobre lo que se repita aquí (RF-1, RF-2, RF-6 en su parte visual y RF-10). Esta spec añade solo la lógica y se reconcilia con 014 antes de planificarse. Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario.
+> **En espera.** Borrador surgido del brainstorming; se retoma cuando el backend publique el login real ([009-emision-tokens](009-emision-tokens.md)). Se separó de [017-login-ui](017-login-ui.md): **todo lo visual** (diseño, tokens, estados, accesibilidad, textos de la interfaz, andamiaje de Vite/React/i18next y Playwright) vive allí y **prevalece** sobre lo que se repita aquí (RF-1, RF-2, RF-6 en su parte visual y RF-10). Esta spec añade solo la lógica y se reconcilia con 014 antes de planificarse. Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario.
 
 ## Resumen
 
@@ -90,18 +90,18 @@ El frontend tendrá dos pantallas: **login** y **consulta de score** ([013-consu
 
 ## Documentos RPI
 
-- Research (constitution): [../research/015-login-logica/constitution.md](../research/014-frontend-login/constitution.md)
-- Plan: [../plan/015-login-logica/plan.md](../plan/014-frontend-login/plan.md)
-- Tasks: [../implementation/015-login-logica/tasks.md](../implementation/015-login-logica/tasks.md)
-- Implement: [../implementation/015-login-logica/implement.md](../implementation/015-login-logica/implement.md)
-- Prompt origen: [../prompts/2026-11-09_2103_014-login-ui.md](../prompts/2026-11-09_2103_014-frontend-login.md)
+- Research (constitution): [../research/018-login-logica/constitution.md](../research/014-frontend-login/constitution.md)
+- Plan: [../plan/018-login-logica/plan.md](../plan/014-frontend-login/plan.md)
+- Tasks: [../implementation/018-login-logica/tasks.md](../implementation/018-login-logica/tasks.md)
+- Implement: [../implementation/018-login-logica/implement.md](../implementation/018-login-logica/implement.md)
+- Prompt origen: [../prompts/2026-11-09_2103_017-login-ui.md](../prompts/2026-11-09_2103_014-frontend-login.md)
 
 ## Specs relacionadas
 
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — Vitest y TDD; [012-errores-http](012-errores-http.md) — status que el frontend traduce a mensajes.
 - relacionada con: [009-emision-tokens](009-emision-tokens.md) — endpoint real de login que reemplazará al mock; [013-consulta-score](013-consulta-score.md) — destino tras el login; [008-validador-rut](008-validador-rut.md) — formato canónico del RUT.
 
-> **Nota (Converge de 014, 2026-11-09):** [014-login-ui](014-login-ui.md) quedó `converged`. Su interfaz usa el **tema claro** (no el oscuro); si esta spec menciona colores o un tema oscuro, prevalece 014. `LoginForm` solo presenta: esta spec le conecta validación, llamada a `/login` y errores por status vía `formErrorKey`/`fieldErrorKeys`, y monta `LoginPage` en `App`.
+> **Nota (Converge de 014, 2026-11-09):** [017-login-ui](017-login-ui.md) quedó `converged`. Su interfaz usa el **tema claro** (no el oscuro); si esta spec menciona colores o un tema oscuro, prevalece 014. `LoginForm` solo presenta: esta spec le conecta validación, llamada a `/login` y errores por status vía `formErrorKey`/`fieldErrorKeys`, y monta `LoginPage` en `App`.
 
 ## Estado final (completar en Converge)
 

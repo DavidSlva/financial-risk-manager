@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md` y `014-login-ui.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md` y `017-login-ui.md`.
 
 ## Metodología: SDD corto + RPI
 

@@ -1,6 +1,6 @@
-# Tasks — 014-login-ui
+# Tasks — 017-login-ui
 
-Spec: [../../specs/014-login-ui.md](../../specs/014-login-ui.md) · Plan: [../../plan/014-login-ui/plan.md](../../plan/014-login-ui/plan.md)
+Spec: [../../specs/017-login-ui.md](../../specs/017-login-ui.md) · Plan: [../../plan/017-login-ui/plan.md](../../plan/017-login-ui/plan.md)
 
 - [x] T1 — Andamiaje de Vite, React, i18next y entorno de pruebas (jsdom, Testing Library) · commit `d535e7e` · verificación: `build`, `test`, `typecheck`, `check:policy`
 - [x] T2 — Configuración de estilos (`styles.config.ts`) y `applyStyleTokens` · commit `3428fde` · verificación: pruebas de publicación de variables

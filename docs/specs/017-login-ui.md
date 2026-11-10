@@ -1,18 +1,18 @@
 ---
-id: 014-login-ui
+id: 017-login-ui
 title: Diseño de la pantalla de login (mobile first, tema claro, sin lógica de negocio)
 status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [010-tdd-vitest]
-related: [015-login-logica, 013-consulta-score]
+related: [018-login-logica, 013-consulta-score]
 supersedes: []
 superseded_by: []
 ---
 
-# 014-login-ui — Diseño de la pantalla de login
+# 017-login-ui — Diseño de la pantalla de login
 
-> Borrador para revisión. Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario. La lógica (validación, llamada a `/login`, errores por status) queda **fuera** y se especifica en [015-login-logica](015-login-logica.md) cuando el backend esté listo.
+> Borrador para revisión. Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario. La lógica (validación, llamada a `/login`, errores por status) queda **fuera** y se especifica en [018-login-logica](018-login-logica.md) cuando el backend esté listo.
 
 ## Resumen
 
@@ -28,7 +28,7 @@ Quien la usa abre la app en su celular para consultar su score de riesgo financi
 ## Alcance
 
 **Incluye:** andamiaje mínimo del frontend (Vite + React + TypeScript, ver "Andamiaje"); pantalla y componentes del login; tema claro con valores de diseño en un archivo de configuración de estilos que se publica como variables CSS; todos los estados visuales; textos en i18next (solo `es`); accesibilidad básica; vista previa de estados para desarrollo; pruebas Vitest y scripts Playwright **del diseño**.
-**No incluye:** validación de RUT o contraseña y su archivo de límites; llamada de red; mapa de errores por status HTTP; navegación tras el login; mock del endpoint; otros idiomas (solo queda lista la infraestructura). Todo eso va en [015-login-logica](015-login-logica.md).
+**No incluye:** validación de RUT o contraseña y su archivo de límites; llamada de red; mapa de errores por status HTTP; navegación tras el login; mock del endpoint; otros idiomas (solo queda lista la infraestructura). Todo eso va en [018-login-logica](018-login-logica.md).
 
 ## Diseño visual
 
@@ -119,7 +119,7 @@ frontend/src/
 
 - RF-1: La pantalla se ve y funciona según "Diseño visual" en anchos de 360, 390, 768 y 1280 px.
 - RF-2: Cubre los siete estados anteriores, controlados solo por props (más el estado local de Mostrar/Ocultar).
-- RF-3: Todo texto sale de i18next con recursos `es`; las llaves tienen una convención estable (`login.title`, `login.rut.label`, `login.errors.invalidCredentials`, …) para que [015-login-logica](015-login-logica.md) agregue sus mensajes sin tocar componentes.
+- RF-3: Todo texto sale de i18next con recursos `es`; las llaves tienen una convención estable (`login.title`, `login.rut.label`, `login.errors.invalidCredentials`, …) para que [018-login-logica](018-login-logica.md) agregue sus mensajes sin tocar componentes.
 - RF-4: Accesibilidad: cada campo con `<label>` asociado; `autocomplete="username"` y `autocomplete="current-password"` (para gestores de contraseñas); `inputMode` y `autocapitalize="off"` adecuados al RUT **(supuesto)**; errores de campo enlazados con `aria-describedby` y `aria-invalid`; el mensaje de error del formulario con `role="alert"`; el orden de tabulación es RUT → contraseña → Mostrar → Continuar; contraste AA como mínimo.
 - RF-5: Una **vista previa de estados** solo para desarrollo (`/dev/login-states`, excluida del bundle de producción) muestra los siete estados en una sola página para revisión visual **(supuesto)**.
 - RF-6: El bundle de producción es estático, minificado y con nombres hasheados ([001-setup-inicial](001-setup-inicial.md)); no incluye vista previa ni datos de prueba.
@@ -151,25 +151,25 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)): `frontend/test/` espeja `src/
 
 ## Restricciones del repo
 
-- Rama y workspace: `feature/014-login-ui` en `D:\Persona-ws\014-login-ui`.
+- Rama y workspace: `feature/017-login-ui` en `D:\Persona-ws\017-login-ui`.
 - Commits con scope `014`: `tipo(014): descripción`. Hooks y CI sin saltarse.
 
 ## Documentos RPI
 
-- Research (constitution): [../research/014-login-ui/constitution.md](../research/014-login-ui/constitution.md)
-- Plan: [../plan/014-login-ui/plan.md](../plan/014-login-ui/plan.md)
-- Tasks: [../implementation/014-login-ui/tasks.md](../implementation/014-login-ui/tasks.md)
-- Implement: [../implementation/014-login-ui/implement.md](../implementation/014-login-ui/implement.md)
-- Prompt origen: [../prompts/2026-11-09_2103_014-login-ui.md](../prompts/2026-11-09_2103_014-login-ui.md)
+- Research (constitution): [../research/017-login-ui/constitution.md](../research/017-login-ui/constitution.md)
+- Plan: [../plan/017-login-ui/plan.md](../plan/017-login-ui/plan.md)
+- Tasks: [../implementation/017-login-ui/tasks.md](../implementation/017-login-ui/tasks.md)
+- Implement: [../implementation/017-login-ui/implement.md](../implementation/017-login-ui/implement.md)
+- Prompt origen: [../prompts/2026-11-09_2103_017-login-ui.md](../prompts/2026-11-09_2103_017-login-ui.md)
 
 ## Specs relacionadas
 
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — Vitest y TDD.
-- relacionada con: [015-login-logica](015-login-logica.md) — depende de esta spec; conecta este formulario con validación, `/login` y errores; [013-consulta-score](013-consulta-score.md) — pantalla a la que se llega tras el login.
+- relacionada con: [018-login-logica](018-login-logica.md) — depende de esta spec; conecta este formulario con validación, `/login` y errores; [013-consulta-score](013-consulta-score.md) — pantalla a la que se llega tras el login.
 
 ## Estado final (Converge)
 
-Implementada en `feature/014-login-ui` (8 tareas, commits `7339b2c`..`f73cbff` más el de Converge). Se construyó el andamiaje (Vite, React, i18next, Vitest con jsdom, Playwright), `config/styles.config.ts` con `applyStyleTokens`, textos en `i18n/es.json`, los componentes `Button`, `TextField`, `PasswordField`, `LoginForm` y `LoginPage`, y la vista previa `/dev/login-states` (solo desarrollo, fuera del bundle de producción).
+Implementada en `feature/017-login-ui` (8 tareas, commits `7339b2c`..`f73cbff` más el de Converge). Se construyó el andamiaje (Vite, React, i18next, Vitest con jsdom, Playwright), `config/styles.config.ts` con `applyStyleTokens`, textos en `i18n/es.json`, los componentes `Button`, `TextField`, `PasswordField`, `LoginForm` y `LoginPage`, y la vista previa `/dev/login-states` (solo desarrollo, fuera del bundle de producción).
 
 **Verificación final (2026-11-09):** `check:policy`, `install --frozen-lockfile`, `format:check`, `lint`, `typecheck` y `build` en verde; Vitest: backend 164 y frontend 71 pruebas; Playwright: 44 pruebas en verde (Chromium, puerto 5299). El CI no corre Playwright (solo Vitest).
 
@@ -181,9 +181,9 @@ Implementada en `feature/014-login-ui` (8 tareas, commits `7339b2c`..`f73cbff` m
 - **Mostrar/Ocultar dentro del campo** (`endAdornment`), tras una corrección de la Tarea 5 (queda bajo el campo en la primera versión).
 - Las líneas base de Playwright son de Chromium en Windows y pueden diferir en otras plataformas.
 
-**Diferidos (menores):** contraste del botón deshabilitado (~2.4:1, `textDisabled` exento de AA); spinner detenido con `prefers-reduced-motion`; fuente de campo de 14 px desde 480 px; ancho del toggle atado a las etiquetas en español; `snapshotPathTemplate` sin `{platform}`; `showPassword` de la vista previa no es seguro bajo StrictMode; detalle completo en [implement.md](../implementation/014-login-ui/implement.md).
+**Diferidos (menores):** contraste del botón deshabilitado (~2.4:1, `textDisabled` exento de AA); spinner detenido con `prefers-reduced-motion`; fuente de campo de 14 px desde 480 px; ancho del toggle atado a las etiquetas en español; `snapshotPathTemplate` sin `{platform}`; `showPassword` de la vista previa no es seguro bajo StrictMode; detalle completo en [implement.md](../implementation/017-login-ui/implement.md).
 
-**Siguiente:** [015-login-logica](015-login-logica.md) depende de esta spec (conecta lógica y errores a `LoginForm`).
+**Siguiente:** [018-login-logica](018-login-logica.md) depende de esta spec (conecta lógica y errores a `LoginForm`).
 
 **Revisión de documentos relacionados:**
 
