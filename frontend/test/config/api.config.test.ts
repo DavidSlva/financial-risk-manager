@@ -19,6 +19,12 @@ describe('api.config', () => {
     expect(mod.apiUrl('/auth/login')).toBe('/api/auth/login');
   });
 
+  it('con VITE_API_BASE_URL vacía usa /api', async () => {
+    const { API_BASE_URL, apiUrl } = await load('');
+    expect(API_BASE_URL).toBe('/api');
+    expect(apiUrl('/score/12345678-5')).toBe('/api/score/12345678-5');
+  });
+
   it('une base y path con una sola barra', async () => {
     const { apiUrl } = await load('/api/');
     expect(apiUrl('/auth/login')).toBe('/api/auth/login');
