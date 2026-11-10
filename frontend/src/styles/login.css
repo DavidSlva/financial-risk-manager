@@ -218,11 +218,31 @@ body {
   }
 }
 
+/* Vista previa de estados (solo desarrollo): tarjetas apiladas. */
+.login-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  min-height: 100%;
+  padding: var(--spacing-6) var(--sizes-mobile-gutter);
+}
+
+.login-preview__state {
+  margin: 0 auto;
+}
+
+.login-preview__state > h2 {
+  margin: 0 0 var(--spacing-4);
+  color: var(--colors-text-muted);
+  font-size: var(--typography-size-label);
+  font-weight: var(--typography-weight-label);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    transition: none;
-    animation: none;
+    transition: none !important;
+    animation: none !important;
   }
 }

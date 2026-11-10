@@ -12,3 +12,7 @@ backend/data/scores.json
 
 # Maquetas del visual companion (superpowers brainstorming)
 .superpowers/
+
+# Playwright (spec 014)
+playwright-report/
+test-results/

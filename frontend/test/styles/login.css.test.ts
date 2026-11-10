@@ -112,4 +112,10 @@ describe('login.css', () => {
     const missing = used.filter((name) => !published.has(name));
     expect(missing).toEqual([]);
   });
+
+  it('reduced-motion anula transiciones y animaciones con !important (si no, las reglas de clase ganan al selector universal)', () => {
+    const block = stripComments(css).split(allowedMotionQuery)[1] ?? '';
+    expect(block).toMatch(/transition:\s*none\s*!important/);
+    expect(block).toMatch(/animation:\s*none\s*!important/);
+  });
 });

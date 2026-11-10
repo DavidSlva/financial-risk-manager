@@ -42,7 +42,7 @@ function PreviewState({ name, setup, children }: PreviewStateProps) {
     if (ref.current && setup) setup(ref.current);
   }, []);
   return (
-    <section ref={ref} data-state={name} className="login-preview__state">
+    <section ref={ref} data-state={name} className="login-preview__state login-card">
       <h2>{DEV_TITLES[name]}</h2>
       {children}
     </section>
