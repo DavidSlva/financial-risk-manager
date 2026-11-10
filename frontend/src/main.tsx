@@ -4,6 +4,7 @@ import { App } from './App';
 import { initI18n } from './i18n/index';
 import { applyStyleTokens } from './styles/apply-tokens';
 import './styles/login.css';
+import './styles/score.css';
 
 const i18n = initI18n();
 applyStyleTokens();

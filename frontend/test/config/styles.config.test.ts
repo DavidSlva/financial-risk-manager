@@ -44,3 +44,9 @@ describe('styles.config', () => {
     expect(styles.sizes.passwordToggleWidth).toBeGreaterThanOrEqual(styles.sizes.touchTarget);
   });
 });
+
+describe('styles.config (spec 016)', () => {
+  it('define el tamaño del score destacado', () => {
+    expect(styles.typography.sizeScore).toBe(56);
+  });
+});

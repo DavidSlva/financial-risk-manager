@@ -1,10 +1,11 @@
 /**
  * Normaliza un RUT chileno al formato canónico "12345678-5" (sin puntos, con guion, K mayúscula).
- * Devuelve null si el formato o el dígito verificador (módulo 11) no son válidos.
+ * Recorta los espacios al inicio y al final. Devuelve null si el formato o el dígito verificador (módulo 11) no son válidos.
  */
 export function normalizeRut(raw: string): string | null {
-  if (raw.length > 20) return null;
-  const match = /^(\d{1,8})-?([\dkK])$/.exec(raw.replace(/\./g, ''));
+  const trimmed = raw.trim();
+  if (trimmed.length > 20) return null;
+  const match = /^(\d{1,8})-?([\dkK])$/.exec(trimmed.replace(/\./g, ''));
   if (!match) return null;
   const body = match[1] as string;
   const dv = (match[2] as string).toUpperCase();
