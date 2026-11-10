@@ -8,4 +8,5 @@ export const router = Router();
 
 router.use('/health', healthRouter);
 router.use('/auth', authRouter);
-router.use('/scores', scoresRouter);
+// Excepción a la convención de recursos en plural: designa el score único de un rut.
+router.use('/score', scoresRouter);
