@@ -1,7 +1,7 @@
 ---
 id: 016-score-consulta
 title: Pantalla de consulta de score (frontend)
-status: draft
+status: implementing
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [013-consulta-score, 014-login-ui, 015-login-logica]
@@ -124,13 +124,17 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 ## Estado final (completar en Converge)
 
-Pendiente.
+**Parcial (2026-11-09).** Implementado el núcleo del frontend: normalización de RUT, cliente de score, mapa de errores sin texto del servidor, formato de fecha, textos `score.*`, `ScoreResult`, `ScorePage` y estilos (commits `f5d7188`, `cc92e21`). Verificado: format, lint, typecheck, test (frontend 18 archivos y 135 pruebas; backend 27 archivos y 516), check:policy y build del frontend.
+
+**Diferido:** montar `ScorePage` en `App` con la sesión en memoria, `onSessionExpired` e `initialRut` (tras 015); Playwright e2e; reconciliar con la spec 013 el campo `fecha` y el formato del `rut`.
+
+**Hallazgos de la revisión final (aprobada):** 1 importante (`ScorePage` sin montar en `App`, la spec no puede cerrarse sin la integración) y 7 menores (errores no-abort en `ScorePage`, foco en el campo con error RF-10, `AbortError` en `parseSuccess`, `hourCycle` no documentado, `normalizeRut` sin trim, `line-height: 1` literal, y un punto sin hallazgos). Detalle en [implement.md](../implementation/016-score-consulta/implement.md).
 
 **Revisión de documentos relacionados:**
 
-- [ ] constitution actualizada
-- [ ] plan actualizado
-- [ ] tasks actualizadas
-- [ ] implement actualizado
+- [x] constitution actualizada
+- [x] plan actualizado
+- [x] tasks actualizadas
+- [x] implement actualizado
 - [ ] specs relacionadas revisadas
-- [ ] índice `specs/README.md` actualizado
+- [x] índice `specs/README.md` actualizado
