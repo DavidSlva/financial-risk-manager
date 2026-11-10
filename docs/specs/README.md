@@ -37,6 +37,7 @@ graph LR
   S011[011-rbac]
   S012[012-errores-http]
   S013[013-consulta-score]
+  S016[016-score-consulta]
   S001 -.->|relacionada| S005
   S002 -->|depende de| S001
   S002 -.->|relacionada| S004
@@ -72,4 +73,10 @@ graph LR
   S013 -->|depende de| S010
   S013 -->|depende de| S011
   S013 -->|depende de| S012
+  S016 -->|depende de| S013
+  S016 -->|depende de| S014
+  S016 -->|depende de| S015
+  S016 -.->|relacionada| S009
+  S016 -.->|relacionada| S011
+  S016 -.->|relacionada| S008
 ```
