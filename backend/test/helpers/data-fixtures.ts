@@ -6,7 +6,10 @@ export interface RawData {
   roles: unknown;
   users: unknown;
   scores: unknown;
+  permissions: unknown;
 }
+
+export type DataTable = keyof RawData;
 
 /** Conjunto de datos válido; cada prueba lo modifica para provocar una violación concreta. */
 export function validData(): RawData {
@@ -20,6 +23,11 @@ export function validData(): RawData {
       { rut: '22222222-2', role: 'user', active: false },
     ],
     scores: [{ rut: '11111111-1', score: 780 }],
+    permissions: [
+      { role: 'admin', key: 'can_get_score', value: true },
+      { role: 'admin', key: 'can_get_all_score', value: true },
+      { role: 'user', key: 'can_get_score', value: true },
+    ],
   };
 }
 
@@ -35,7 +43,7 @@ export function makeTempDir(): string {
  */
 export function writeDataFile(
   dir: string,
-  name: 'roles' | 'users' | 'scores',
+  name: DataTable,
   content: unknown,
   mtimeSeconds: number,
 ): void {
@@ -45,7 +53,7 @@ export function writeDataFile(
 }
 
 export function writeAll(dir: string, data: RawData, mtimeSeconds: number): void {
-  writeDataFile(dir, 'roles', data.roles, mtimeSeconds);
-  writeDataFile(dir, 'users', data.users, mtimeSeconds);
-  writeDataFile(dir, 'scores', data.scores, mtimeSeconds);
+  for (const table of Object.keys(data) as DataTable[]) {
+    writeDataFile(dir, table, data[table], mtimeSeconds);
+  }
 }

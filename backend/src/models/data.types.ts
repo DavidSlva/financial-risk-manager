@@ -16,13 +16,19 @@ export interface Score {
   score: number;
 }
 
-export type DataFileName = 'roles.json' | 'users.json' | 'scores.json';
+export interface Permission {
+  role: string;
+  key: string;
+  value: boolean;
+}
+
+export type DataFileName = 'roles.json' | 'users.json' | 'scores.json' | 'permissions.json';
 
 export interface Violation {
   file: DataFileName;
   /** Índice (desde 0) de la fila dentro del arreglo, si aplica. */
   row?: number;
-  /** Id de la regla de integridad (IR-1…IR-9). */
+  /** Id de la regla de integridad (IR-1…IR-12). */
   rule: string;
   message: string;
 }
@@ -31,4 +37,5 @@ export interface DataSnapshot {
   roles: readonly Readonly<Role>[];
   users: readonly Readonly<User>[];
   scores: readonly Readonly<Score>[];
+  permissions: readonly Readonly<Permission>[];
 }

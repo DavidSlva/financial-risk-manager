@@ -1,3 +1,4 @@
+import { isPermissionKey } from '../config/permissions.js';
 import type { DataFileName, Violation } from '../models/data.types.js';
 
 /** Contenido ya parseado de cada archivo, sin ninguna garantía sobre su forma. */
@@ -5,6 +6,7 @@ export interface RawData {
   roles: unknown;
   users: unknown;
   scores: unknown;
+  permissions: unknown;
 }
 
 type ColumnType = 'string' | 'boolean' | 'number';
@@ -31,6 +33,11 @@ const SCHEMAS = {
     file: 'scores.json',
     columns: { rut: 'string', score: 'number' },
     keyColumns: ['rut'],
+  },
+  permissions: {
+    file: 'permissions.json',
+    columns: { role: 'string', key: 'string', value: 'boolean' },
+    keyColumns: ['role', 'key'],
   },
 } as const satisfies Record<string, TableSchema>;
 
@@ -130,7 +137,7 @@ function checkUnique(
 }
 
 /**
- * Valida la integridad referencial de roles, users y scores (reglas IR-1…IR-9 de la spec 006).
+ * Valida la integridad referencial de roles, users, scores y permissions (reglas IR-1…IR-9 de la spec 006 e IR-10…IR-12 de la 011).
  * Función pura: acumula y devuelve todas las violaciones; arreglo vacío = datos íntegros.
  */
 export function validateIntegrity(data: RawData): Violation[] {
@@ -139,10 +146,28 @@ export function validateIntegrity(data: RawData): Violation[] {
   const roles = validateTable(SCHEMAS.roles, data.roles, violations);
   const users = validateTable(SCHEMAS.users, data.users, violations);
   const scores = validateTable(SCHEMAS.scores, data.scores, violations);
+  const permissions = validateTable(SCHEMAS.permissions, data.permissions, violations);
 
   const roleNames = checkUnique('roles.json', 'IR-4', 'name', roles.rows, violations);
   const userRuts = checkUnique('users.json', 'IR-5', 'rut', users.rows, violations);
   checkUnique('scores.json', 'IR-6', 'rut', scores.rows, violations);
+
+  // IR-10: clave primaria compuesta (role, key).
+  const seenPermissions = new Set<string>();
+  permissions.rows.forEach((row, index) => {
+    const id = `${row.role as string}\u0000${row.key as string}`;
+    if (seenPermissions.has(id)) {
+      violations.push(
+        violation(
+          'permissions.json',
+          'IR-10',
+          `(role, key) duplicado: ("${row.role}", "${row.key}")`,
+          index,
+        ),
+      );
+    }
+    seenPermissions.add(id);
+  });
 
   // Las claves foráneas solo se comprueban si la tabla padre es utilizable por completo;
   // si no, cada fila hija fallaría en cascada y ocultaría la causa real.
@@ -164,6 +189,36 @@ export function validateIntegrity(data: RawData): Violation[] {
       }
     });
   }
+
+  // IR-11: clave foránea permissions.role → roles.name.
+  if (roles.usable) {
+    permissions.rows.forEach((row, index) => {
+      if (!roleNames.has(row.role as string)) {
+        violations.push(
+          violation(
+            'permissions.json',
+            'IR-11',
+            `"role" no existe en roles.json: "${row.role}"`,
+            index,
+          ),
+        );
+      }
+    });
+  }
+
+  // IR-12: la clave debe estar en el catálogo de permisos.
+  permissions.rows.forEach((row, index) => {
+    if (!isPermissionKey(row.key)) {
+      violations.push(
+        violation(
+          'permissions.json',
+          'IR-12',
+          `"key" no está en el catálogo de permisos: "${row.key}"`,
+          index,
+        ),
+      );
+    }
+  });
 
   scores.rows.forEach((row, index) => {
     const score = row.score as number;

@@ -88,17 +88,39 @@ pnpm --filter @financial-risk-manager/backend run generate-secret
 
 ## Datos
 
-Sin base de datos: tres archivos JSON en `backend/data/` (spec [006-modelo-datos](../docs/specs/006-modelo-datos.md)).
+Sin base de datos: cuatro archivos JSON en `backend/data/` (spec [006-modelo-datos](../docs/specs/006-modelo-datos.md)).
 
-| Archivo       | Contenido                                                 | En git                              |
-| ------------- | --------------------------------------------------------- | ----------------------------------- |
-| `roles.json`  | Catálogo de roles (nivel de privilegios), extensible      | sí                                  |
-| `users.json`  | Usuarios: `rut`, `role` (FK a roles), `active` (vigencia) | no (ejemplo: `users.example.json`)  |
-| `scores.json` | Score por rut: `rut` (PK y FK a users), `score` (0–1000)  | no (ejemplo: `scores.example.json`) |
+| Archivo            | Contenido                                                        | En git                              |
+| ------------------ | ---------------------------------------------------------------- | ----------------------------------- |
+| `roles.json`       | Catálogo de roles (nivel de privilegios), extensible             | sí                                  |
+| `permissions.json` | Permisos por rol: `role` (FK a roles), `key` (catálogo), `value` | sí                                  |
+| `users.json`       | Usuarios: `rut`, `role` (FK a roles), `active` (vigencia)        | no (ejemplo: `users.example.json`)  |
+| `scores.json`      | Score por rut: `rut` (PK y FK a users), `score` (0–1000)         | no (ejemplo: `scores.example.json`) |
 
 Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json` a `scores.json`.
 
 La integridad referencial se valida al arrancar (el proceso aborta e informa todas las violaciones) y se revalida cuando cambia un archivo. Si los datos dejan de ser íntegros, se rechazan las operaciones que dependan de ellos. Poner `active: false` a un usuario lo revoca sin reiniciar. La función de cada columna está en la spec.
+
+## Autorización
+
+Spec [011-rbac](../docs/specs/011-rbac.md). Los permisos son **personalizados** (no son endpoints): son claves de un catálogo cerrado (`config/permissions.ts`) asignadas a un rol en `permissions.json` (`role`, `key`, `value`; solo `value: true` concede; sin fila, denegado).
+
+| Permiso             | Significado                                           |
+| ------------------- | ----------------------------------------------------- |
+| `can_get_score`     | Puede ver su propio score                             |
+| `can_get_all_score` | Puede ver el score de cualquier rut (incluye el suyo) |
+
+`authorize(check)` va **después de `authenticate`** y recibe un **callback definido en el service del recurso**: `check({ user, params, query })` devuelve `true` solo si el usuario puede acceder al recurso solicitado. Sin callback no hay autorización permisiva por omisión. Sin `req.user` responde 401; si el callback no devuelve `true`, 403.
+
+```ts
+router.get('/:rut', authenticate, authorize(canGetScore), controller.getScore); // callback del service
+router.get(
+  '/otro',
+  authenticate,
+  authorize(requirePermission('can_get_all_score')),
+  controller.otro,
+); // recurso trivial
+```
 
 ## Autenticación
 

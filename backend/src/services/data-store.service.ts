@@ -19,10 +19,13 @@ export interface DataStore {
   load(): DataSnapshot;
 }
 
-const FILES: Record<'roles' | 'users' | 'scores', DataFileName> = {
+type Table = 'roles' | 'users' | 'scores' | 'permissions';
+
+const FILES: Record<Table, DataFileName> = {
   roles: 'roles.json',
   users: 'users.json',
   scores: 'scores.json',
+  permissions: 'permissions.json',
 };
 
 function deepFreezeRows<T extends object>(rows: readonly T[]): readonly Readonly<T>[] {
@@ -34,7 +37,7 @@ export function createDataStore(dataDir: string): DataStore {
   let cacheKey: string | undefined;
   let cached: { snapshot: DataSnapshot } | { error: DataIntegrityError } | undefined;
 
-  function readRaw(violations: Violation[]): Record<'roles' | 'users' | 'scores', unknown> {
+  function readRaw(violations: Violation[]): Record<Table, unknown> {
     const raw: Record<string, unknown> = {};
     for (const [table, file] of Object.entries(FILES)) {
       try {
@@ -47,7 +50,7 @@ export function createDataStore(dataDir: string): DataStore {
         violations.push({ file, rule: 'IR-1', message: `${file}: ${reason}` });
       }
     }
-    return raw as Record<'roles' | 'users' | 'scores', unknown>;
+    return raw as Record<Table, unknown>;
   }
 
   function keyFor(): string {
@@ -80,6 +83,9 @@ export function createDataStore(dataDir: string): DataStore {
                   roles: deepFreezeRows(raw.roles as DataSnapshot['roles'][number][]),
                   users: deepFreezeRows(raw.users as DataSnapshot['users'][number][]),
                   scores: deepFreezeRows(raw.scores as DataSnapshot['scores'][number][]),
+                  permissions: deepFreezeRows(
+                    raw.permissions as DataSnapshot['permissions'][number][],
+                  ),
                 }),
               };
       }
