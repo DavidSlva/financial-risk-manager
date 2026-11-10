@@ -28,7 +28,7 @@ describe('app', () => {
     const res = await fetch(`${baseUrl}/api/nope`);
 
     expect(res.status).toBe(404);
-    expect(await res.json()).toEqual({ error: 'Not Found', path: '/api/nope' });
+    expect(await res.json()).toEqual({ error: 'Not Found' });
   });
 
   it('POST /api/auth/refresh está registrado y rechaza un token inválido con 401', async () => {
@@ -39,6 +39,17 @@ describe('app', () => {
     });
 
     expect(res.status).toBe(401);
+  });
+
+  it('un JSON malformado responde 400 genérico (no 500)', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{ roto',
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'Bad Request' });
   });
 
   it('no expone la cabecera x-powered-by', async () => {

@@ -1,9 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import {
-  AuthenticationError,
-  authenticateAccess,
-  type AuthDeps,
-} from '../services/auth.service.js';
+import { HttpError } from '../config/http-errors.js';
+import { authenticateAccess, type AuthDeps } from '../services/auth.service.js';
 
 const BEARER = /^Bearer ([^\s]+)$/;
 
@@ -15,7 +12,7 @@ export function createAuthenticate(deps: AuthDeps = {}): RequestHandler {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       const token = BEARER.exec(req.headers.authorization ?? '')?.[1];
-      if (!token) throw new AuthenticationError();
+      if (!token) throw new HttpError('UNAUTHORIZED');
       req.user = await authenticateAccess(token, deps);
       next();
     } catch (error) {

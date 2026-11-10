@@ -5,7 +5,7 @@ status: draft
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [006-modelo-datos, 007-auth-jwt]
-related: []
+related: [012-errores-http]
 supersedes: []
 superseded_by: []
 ---
@@ -33,6 +33,7 @@ Ninguno todavía.
 
 - depende de: [006-modelo-datos](006-modelo-datos.md) — tabla `roles` sobre la que se agregan los permisos.
 - depende de: [007-auth-jwt](007-auth-jwt.md) — el usuario autenticado y su rol vigente.
+- relacionada con: [012-errores-http](012-errores-http.md) — el middleware de autorización lanza `FORBIDDEN` del mapa de errores.
 
 ## Estado final (Converge)
 

@@ -82,7 +82,7 @@ Notas:
 - Al agregar dependencias, `pnpm` reescribió `pnpm-lock.yaml` con su propio formato y `prettier --check` falló. Se corrigió en la spec 004 (commit `fix(004)`, `pnpm-lock.yaml` en `.prettierignore`); esta rama lo incluye.
 - Los imports relativos llevan extensión `.js` por `moduleResolution: NodeNext`.
 
-Evolución posterior (converge): las specs siguientes extendieron esta estructura sin romperla. La [006](006-modelo-datos.md) agregó `models/` (solo tipos) y que `index.ts` valide los datos al arrancar; la [007](007-auth-jwt.md) agregó `types/`, el recurso `auth` (controlador, rutas, servicios) y que `error-handler` traduzca `AuthenticationError` a 401; la [010](010-tdd-vitest.md) agregó `test/` espejo de `src/`. `backend/README.md` ya refleja estas carpetas.
+Evolución posterior (converge): las specs siguientes extendieron esta estructura sin romperla. La [006](006-modelo-datos.md) agregó `models/` (solo tipos) y que `index.ts` valide los datos al arrancar; la [007](007-auth-jwt.md) agregó `types/`, el recurso `auth` (controlador, rutas, servicios) y un manejador de errores para el 401 (la [012](012-errores-http.md) lo reemplazó por un único `error-handler` basado en el mapa `config/http-errors.ts`); la [010](010-tdd-vitest.md) agregó `test/` espejo de `src/`. `backend/README.md` ya refleja estas carpetas.
 
 **Revisión de documentos relacionados:**
 

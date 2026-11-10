@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md` y `007-auth-jwt.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md` `007-auth-jwt.md` y `012-errores-http.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -102,6 +102,12 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Rechazos: `401` genérico con `WWW-Authenticate: Bearer`; nunca indicar si falló la firma, la expiración o la vigencia.
 - Rutas protegidas: `router.get(..., authenticate, controller)`; el usuario queda en `req.user`.
 - Emisión del primer par de tokens (login): pendiente, spec 009. La autorización por rol: pendiente, spec 011.
+
+## Errores HTTP (spec 012)
+
+- Los errores HTTP soportados viven en el mapa `backend/src/config/http-errors.ts` (`BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `INTERNAL_SERVER_ERROR`). Rutas, controladores, servicios y middlewares lanzan `throw new HttpError('<TIPO>')`.
+- Hay **un único** `error-handler.middleware`; **no** crear middlewares ni clases de error por tipo. Un tipo nuevo es una entrada nueva en el mapa.
+- Nunca armar `res.status(4xx).json(...)` a mano para errores. El mensaje al cliente sale del mapa, nunca del detalle interno.
 
 ## Reglas para agentes
 
