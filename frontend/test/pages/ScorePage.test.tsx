@@ -122,6 +122,54 @@ describe('ScorePage', () => {
     expect(screen.queryByRole('status')).toBeNull();
   });
 
+  it('401 sin onSessionExpired: muestra el aviso de sesión expirada', async () => {
+    const client = vi.fn<ScoreClient>().mockResolvedValue(fail('unauthorized', 401));
+    renderPage({ client, initialRut: '12345678-5' });
+    await userEvent.click(submitButton());
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toBe(t('score.errors.sessionExpired'));
+  });
+
+  it('una excepción del cliente (no abort) se trata como fallo de red y libera la carga', async () => {
+    const client = vi
+      .fn<ScoreClient>()
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce(OK);
+    renderPage({ client, initialRut: '12345678-5' });
+    await userEvent.click(submitButton());
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toBe(t(SCORE_ERROR_KEYS.network));
+    expect(submitButton().disabled).toBe(false);
+    expect(input().readOnly).toBe(false);
+    await userEvent.click(submitButton());
+    expect((await screen.findByRole('status')).textContent).toContain('73');
+    expect(client).toHaveBeenCalledTimes(2);
+  });
+
+  it('enfoca el campo RUT cuando el RUT local es inválido', async () => {
+    renderPage({ client: vi.fn<ScoreClient>() });
+    await userEvent.type(input(), '12345678-0');
+    submitButton().focus();
+    await userEvent.click(submitButton());
+    expect(document.activeElement).toBe(input());
+  });
+
+  it('enfoca el campo RUT cuando el servidor responde 400', async () => {
+    const client = vi.fn<ScoreClient>().mockResolvedValue(fail('invalid-rut', 400));
+    renderPage({ client, initialRut: '12345678-5' });
+    await userEvent.click(submitButton());
+    await waitFor(() => expect(document.activeElement).toBe(input()));
+  });
+
+  it('recorta los espacios alrededor del RUT antes de consultar', async () => {
+    const client = vi.fn<ScoreClient>().mockResolvedValue(OK);
+    renderPage({ client });
+    await userEvent.type(input(), '  12.345.678-5 ');
+    await userEvent.click(submitButton());
+    await screen.findByRole('status');
+    expect(client.mock.calls[0]?.[0]).toBe('12345678-5');
+  });
+
   it('durante la carga: botón deshabilitado con "Consultando…", campo de solo lectura', async () => {
     const d = deferred();
     const client = vi.fn<ScoreClient>().mockReturnValue(d.promise);

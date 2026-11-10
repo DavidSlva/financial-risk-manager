@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchScore } from '../api/score.client.js';
 import type { ScoreClient, ScoreOutcome } from '../api/score.types.js';
+import { SCORE_ERROR_KEYS } from '../config/score-errors';
 import { Button } from '../components/Button';
 import { ScoreResult } from '../components/ScoreResult';
 import { TextField } from '../components/TextField';
@@ -31,6 +32,12 @@ export function ScorePage({
   const [isLoading, setIsLoading] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
   const inFlightRef = useRef(false);
+  const rutInputRef = useRef<HTMLInputElement>(null);
+  const [focusNonce, setFocusNonce] = useState(0);
+
+  useEffect(() => {
+    if (focusNonce > 0) rutInputRef.current?.focus();
+  }, [focusNonce]);
 
   useEffect(
     () => () => {
@@ -59,6 +66,7 @@ export function ScorePage({
     if (canonical === null) {
       setOutcome(undefined);
       setFieldError(INVALID_RUT_KEY);
+      setFocusNonce((n) => n + 1);
       return;
     }
     setFieldError(undefined);
@@ -72,7 +80,11 @@ export function ScorePage({
       result = await client(canonical, { signal: controller.signal });
     } catch (error) {
       if (controller.signal.aborted || isAbortError(error)) return;
-      throw error;
+      result = {
+        kind: 'error',
+        reason: 'network',
+        messageKey: SCORE_ERROR_KEYS.network,
+      };
     }
     if (controller.signal.aborted || controllerRef.current !== controller) return;
     controllerRef.current = null;
@@ -80,10 +92,11 @@ export function ScorePage({
     setIsLoading(false);
     if (result.kind === 'error' && result.reason === 'invalid-rut') {
       setFieldError(INVALID_RUT_KEY);
+      setFocusNonce((n) => n + 1);
       return;
     }
-    if (result.kind === 'error' && result.reason === 'unauthorized') {
-      onSessionExpired?.();
+    if (result.kind === 'error' && result.reason === 'unauthorized' && onSessionExpired) {
+      onSessionExpired();
       return;
     }
     setOutcome(result);
@@ -101,6 +114,7 @@ export function ScorePage({
             value={rut}
             onChange={handleChange}
             errorKey={fieldError}
+            inputRef={rutInputRef}
             readOnly={isLoading}
             inputMode="text"
             autoComplete="off"
