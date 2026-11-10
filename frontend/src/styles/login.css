@@ -1,0 +1,248 @@
+/* Estilos del login (spec 014). Solo consumen variables publicadas por applyStyleTokens. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--colors-background);
+  color: var(--colors-text);
+  font-family: var(--typography-font-family);
+  font-weight: var(--typography-weight-regular);
+}
+
+/* Móvil primero: sin borde de tarjeta, ancho completo con margen lateral. */
+.login-page {
+  display: flex;
+  min-height: 100%;
+  padding: var(--spacing-6) var(--sizes-mobile-gutter);
+}
+
+.login-card {
+  width: 100%;
+  min-width: 0;
+  margin: auto;
+  overflow-wrap: anywhere;
+}
+
+.login-card__title {
+  margin: 0 0 var(--spacing-2);
+  font-size: var(--typography-size-title);
+  font-weight: var(--typography-weight-title);
+  letter-spacing: var(--typography-letter-spacing-title);
+}
+
+.login-card__subtitle {
+  margin: 0 0 var(--spacing-6);
+  color: var(--colors-text-muted);
+  font-size: var(--typography-size-subtitle);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.login-form__error {
+  margin: 0;
+  color: var(--colors-danger);
+  font-size: var(--typography-size-error);
+}
+
+/* Campos */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  min-width: 0;
+}
+
+.login-field__label {
+  font-size: var(--typography-size-label);
+  font-weight: var(--typography-weight-label);
+}
+
+.login-field__control {
+  position: relative;
+}
+
+.login-field__input {
+  width: 100%;
+  min-height: var(--sizes-touch-target);
+  padding: 0 var(--spacing-3);
+  border: var(--sizes-border-width) solid var(--colors-border);
+  border-radius: var(--radius-field);
+  background: var(--colors-background);
+  color: var(--colors-text);
+  font-family: inherit;
+  font-size: var(--typography-size-field-mobile);
+  transition: border-color var(--motion-transition-duration);
+}
+
+.login-field__input::placeholder {
+  color: var(--colors-text-disabled);
+}
+
+.login-field__input:focus {
+  outline: none;
+}
+
+.login-field__input:focus-visible,
+.login-password-toggle:focus-visible,
+.login-button:focus-visible {
+  outline: var(--sizes-focus-ring-width) solid var(--colors-border-focus);
+  outline-offset: var(--sizes-border-width);
+}
+
+.login-field__input:focus-visible {
+  border-color: var(--colors-border-focus);
+}
+
+.login-field__input:read-only {
+  color: var(--colors-text-disabled);
+}
+
+.login-field__hint,
+.login-field__message {
+  margin: 0;
+  font-size: var(--typography-size-error);
+}
+
+.login-field__hint {
+  color: var(--colors-text-muted);
+}
+
+.login-field__message {
+  color: var(--colors-danger);
+}
+
+.login-field--error .login-field__input {
+  border-color: var(--colors-danger);
+}
+
+/* Contraseña: Mostrar/Ocultar dentro del campo, al borde derecho */
+.login-password .login-field__input {
+  padding-inline-end: calc(var(--sizes-password-toggle-width) + var(--spacing-2));
+}
+
+.login-password-toggle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-end: 0;
+  width: var(--sizes-password-toggle-width);
+  min-height: var(--sizes-touch-target);
+  padding: 0 var(--spacing-2);
+  border: 0;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: var(--radius-field);
+  background: transparent;
+  color: var(--colors-text-muted);
+  font-family: inherit;
+  font-size: var(--typography-size-label);
+  cursor: pointer;
+  transition: color var(--motion-transition-duration);
+}
+
+.login-password-toggle:hover {
+  color: var(--colors-text);
+}
+
+/* Botón principal */
+.login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  width: 100%;
+  min-height: var(--sizes-touch-target);
+  padding: 0 var(--spacing-4);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--colors-button-background);
+  color: var(--colors-button-text);
+  font-family: inherit;
+  font-size: var(--typography-size-button);
+  font-weight: var(--typography-weight-label);
+  cursor: pointer;
+  transition: background-color var(--motion-transition-duration);
+}
+
+.login-button:disabled {
+  background: var(--colors-border);
+  color: var(--colors-text-disabled);
+  cursor: default;
+}
+
+.login-button__spinner {
+  display: inline-block;
+  flex: none;
+  width: var(--sizes-spinner-size);
+  height: var(--sizes-spinner-size);
+  border: var(--sizes-spinner-border-width) solid var(--colors-text-disabled);
+  border-top-color: var(--colors-text);
+  border-radius: var(--sizes-spinner-size);
+  animation: login-spin var(--motion-spinner-duration) linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(var(--motion-spinner-turn));
+  }
+}
+
+/* Desde el breakpoint: tarjeta con borde, centrada. */
+@media (min-width: 480px) {
+  .login-card {
+    max-width: var(--sizes-card-max-width);
+    padding: var(--spacing-8);
+    border: var(--sizes-border-width) solid var(--colors-border);
+    border-radius: var(--radius-card);
+    background: var(--colors-surface);
+  }
+
+  .login-field__input {
+    background: var(--colors-surface);
+    font-size: var(--typography-size-field);
+  }
+}
+
+/* Vista previa de estados (solo desarrollo): tarjetas apiladas. */
+.login-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  min-height: 100%;
+  padding: var(--spacing-6) var(--sizes-mobile-gutter);
+}
+
+.login-preview__state {
+  margin: 0 auto;
+}
+
+.login-preview__state > h2 {
+  margin: 0 0 var(--spacing-4);
+  color: var(--colors-text-muted);
+  font-size: var(--typography-size-label);
+  font-weight: var(--typography-weight-label);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

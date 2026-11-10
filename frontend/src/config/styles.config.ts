@@ -1,0 +1,62 @@
+/** Configuración central de estilos (spec 014). Todo valor visual sale de aquí. */
+export const styles = {
+  colors: {
+    background: '#fafafa',
+    surface: '#ffffff',
+    border: '#eaeaea',
+    borderFocus: '#000000',
+    text: '#000000',
+    textMuted: '#666666',
+    textDisabled: '#999999',
+    danger: '#cd2b31',
+    buttonBackground: '#000000',
+    buttonText: '#ffffff',
+  },
+  radius: {
+    field: 6,
+    card: 12,
+  },
+  typography: {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+    sizeTitle: 22,
+    sizeSubtitle: 13,
+    sizeLabel: 12,
+    sizeField: 14,
+    sizeButton: 14,
+    sizeError: 12,
+    sizeFieldMobile: 16,
+    weightTitle: 600,
+    weightLabel: 500,
+    weightRegular: 400,
+    letterSpacingTitle: '-0.02em',
+  },
+  sizes: {
+    touchTarget: 44,
+    cardMaxWidth: 400,
+    mobileGutter: 24,
+    cardBreakpoint: 480,
+    borderWidth: 1,
+    focusRingWidth: 2,
+    spinnerSize: 16,
+    spinnerBorderWidth: 2,
+    // "Mostrar"/"Ocultar" a 12 px/500 miden ~46 px; + padding horizontal, >= touchTarget.
+    passwordToggleWidth: 72,
+  },
+  spacing: {
+    1: 4,
+    2: 8,
+    3: 12,
+    4: 16,
+    5: 20,
+    6: 24,
+    7: 28,
+    8: 32,
+  },
+  motion: {
+    transitionDuration: 150,
+    spinnerDuration: 750,
+    spinnerTurn: '1turn',
+  },
+} as const;
+
+export type StylesConfig = typeof styles;
