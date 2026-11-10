@@ -5,7 +5,7 @@ Spec: [../../specs/014-login-ui.md](../../specs/014-login-ui.md)
 ## Principios y restricciones
 
 - Solo presentación: el formulario no valida, no formatea el RUT y no usa la red; eso es de [015-login-logica](../../specs/015-login-logica.md).
-- Mobile first, tema oscuro estilo Vercel (variante elegida por el usuario), sin sistema de diseño.
+- Mobile first, tema claro estilo Vercel (variante elegida por el usuario), sin sistema de diseño.
 - Valores de diseño solo en `frontend/src/config/styles.config.ts`; textos solo en i18next.
 - Sin datos en el navegador; el bundle de producción es estático, minificado y sin vista previa.
 - TDD, cadena de suministro de la spec 004 intacta (`allowBuilds` vacío, cuarentena de 7 días).
@@ -16,6 +16,7 @@ Spec: [../../specs/014-login-ui.md](../../specs/014-login-ui.md)
 - El backend responde errores como `{ "error": "<texto>" }` con status (spec 012); el login real llega con la spec 009. Nada de eso se usa aquí.
 - Numeración: 011 (RBAC), 012 (errores) y 013 (score) estaban tomadas por otras ramas; esta spec es 014 y la lógica es 015.
 - Maqueta aprobada: variante B (oscura) del brainstorming; los mensajes de error de ejemplo son propuesta del agente.
+- El usuario eligió el tema claro el 2026-11-09 (variante A, tras ver el login en ambos temas); `danger` pasó a `#cd2b31` para cumplir AA.
 
 ## Preguntas abiertas
 

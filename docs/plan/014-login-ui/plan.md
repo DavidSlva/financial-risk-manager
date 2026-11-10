@@ -2,7 +2,7 @@
 
 > **Para agentes:** SUB-SKILL REQUERIDA: usar `superpowers:subagent-driven-development` (método elegido por el usuario) para ejecutar este plan tarea por tarea. Los pasos usan casillas `- [ ]`.
 
-**Objetivo:** construir la pantalla de login (solo presentación, tema oscuro, mobile first) con valores de diseño en un archivo de configuración, textos en i18next, pruebas Vitest y scripts Playwright.
+**Objetivo:** construir la pantalla de login (solo presentación, tema claro, mobile first) con valores de diseño en un archivo de configuración, textos en i18next, pruebas Vitest y scripts Playwright.
 
 **Arquitectura:** SPA React + Vite. `config/styles.config.ts` es la fuente única de valores de diseño y `applyStyleTokens()` los publica como variables CSS; `login.css` solo consume `var(--…)`. `LoginForm` es puramente presentacional: estados por props, sin red ni validación. Una vista previa de estados, solo en desarrollo, sirve para revisión visual y para Playwright.
 
@@ -14,7 +14,7 @@
 
 - Node `>=22.22.0 <23`; pnpm (`packageManager`); dependencias solo con `pnpm add`; `allowBuilds` vacío; cuarentena de 7 días; no debilitar `pnpm-workspace.yaml` (spec 004).
 - TDD: prueba que falla → código mínimo → refactor. Pruebas en `frontend/test/` espejo de `src/`, nombre `<recurso>.<capa>.test.tsx`, imports `../src/...`, sin globales de Vitest (importar `describe`, `it`, `expect`).
-- Colores: `background #000000`, `surface #0a0a0a`, `border #333333`, `borderFocus #ededed`, `text #ededed`, `textMuted #a1a1a1`, `textDisabled #6b6b6b`, `danger #ff6166`, `buttonBackground #ededed`, `buttonText #000000`. Radios: `field` 6 px, `card` 12 px.
+- Colores: `background #fafafa`, `surface #ffffff`, `border #eaeaea`, `borderFocus #000000`, `text #000000`, `textMuted #666666`, `textDisabled #999999`, `danger #cd2b31`, `buttonBackground #000000`, `buttonText #ffffff`. Radios: `field` 6 px, `card` 12 px.
 - Tamaños: `touchTarget` 44, `cardMaxWidth` 400, `mobileGutter` 24, `cardBreakpoint` 480, `borderWidth` 1; espaciado de 4 px; `transitionDuration` 150 ms. Diseño desde 360 px; sin scroll horizontal en 360, 390, 768 y 1280 px.
 - Tipografía: pila `system-ui, -apple-system, "Segoe UI", sans-serif`, sin fuentes externas; título 22/600, subtítulo 13, etiquetas 12/500, campos y botón 14, errores 12; campos de texto en móvil ≥ 16 px.
 - Ningún componente contiene texto visible literal; todo sale de i18next (`es`). Ningún componente ni `login.css` contiene colores, radios ni medidas literales (excepto el breakpoint de `login.css`, que debe coincidir con `sizes.cardBreakpoint`).
@@ -83,7 +83,7 @@
 
 - [ ] **Paso 1: Pruebas que fallan**
   - `styles.config.test.ts`: los diez colores y los dos radios tienen exactamente los valores de "Restricciones globales"; `sizes.touchTarget === 44`, `sizes.cardMaxWidth === 400`, `sizes.cardBreakpoint === 480`.
-  - `apply-tokens.test.ts`: tras `applyStyleTokens()`, `--colors-danger` vale `#ff6166` y `--radius-card` vale `12px`; cada clave de cada grupo queda publicada; llamar con una configuración modificada (`colors.danger = '#f00'`) cambia la variable publicada; `toCssVarName('colors','textMuted') === '--colors-text-muted'`.
+  - `apply-tokens.test.ts`: tras `applyStyleTokens()`, `--colors-danger` vale `#cd2b31` y `--radius-card` vale `12px`; cada clave de cada grupo queda publicada; llamar con una configuración modificada (`colors.danger = '#f00'`) cambia la variable publicada; `toCssVarName('colors','textMuted') === '--colors-text-muted'`.
 - [ ] **Paso 2: Ejecutar** `pnpm --filter @financial-risk-manager/frontend run test`. Esperado: FALLA (módulos inexistentes).
 - [ ] **Paso 3: Implementar** los dos archivos con las firmas de Interfaces; recorrer los grupos de forma genérica (sin una línea por variable).
 - [ ] **Paso 4: Verificar** pruebas, `typecheck`, `lint`, `format:check`. Esperado: PASA.
@@ -160,7 +160,7 @@
 - [ ] **Paso 2: Prueba de CSS que falla** (`login.css.test.ts`): `login.css` no contiene colores (`#hex`, `rgb(`), ni medidas literales en `px`/`rem` fuera de la media query; todos los valores usan `var(--…)`; la media query usa exactamente `styles.sizes.cardBreakpoint` (480); cada variable `var(--…)` usada existe entre las publicadas por `applyStyleTokens`.
 - [ ] **Paso 3: Ejecutar** ambas pruebas. Esperado: FALLAN.
 - [ ] **Paso 4: Implementar** `LoginForm` (sin validación ni red; guarda solo los valores de los campos), `LoginPage`, `App`, el arranque en `main.tsx` y `login.css` según "Diseño visual" de la spec: mobile first desde 360 px; por debajo de 480 px sin borde de tarjeta, margen lateral `mobileGutter` y contenido a todo el ancho; desde 480 px tarjeta con borde, radio `card`, `max-width` = `cardMaxWidth`, centrada; campos y botón con alto ≥ `touchTarget`; campos con tamaño de fuente ≥ 16 px en móvil; foco visible con `borderFocus`; `@media (prefers-reduced-motion: reduce)` sin transiciones.
-- [ ] **Paso 5: Verificar** pruebas, `typecheck`, `lint`, `format:check`, y `pnpm --filter @financial-risk-manager/frontend run dev` abre el login en `http://localhost:5173`. Esperado: pasa y el login se ve oscuro.
+- [ ] **Paso 5: Verificar** pruebas, `typecheck`, `lint`, `format:check`, y `pnpm --filter @financial-risk-manager/frontend run dev` abre el login en `http://localhost:5173`. Esperado: pasa y el login se ve claro.
 - [ ] **Paso 6: Commit** — `feat(014): pantalla de login con estados y estilos`
 
 ---
@@ -204,7 +204,7 @@
 - [ ] **Paso 2: Escribir los scripts** (fallan o no según el estado del código; todos deben terminar en verde):
   - `layout.spec.ts`: en 320, 360, 390, 768 y 1280 px `document.documentElement.scrollWidth <= clientWidth` en `/` y en `/dev/login-states`; **pegar 500 caracteres en RUT y contraseña no genera scroll horizontal**; con un viewport de 195 px de ancho (equivale a 390 px con zoom al 200 %) la tarjeta no se corta ni se solapa; por debajo de 480 px la tarjeta no tiene borde y desde 480 px tiene borde y `max-width` de 400 px.
   - `states.spec.ts`: cada `data-state` existe y es visible en 390 y 1280 px; `form-error` expone un `role="alert"`; `submitting` tiene el botón deshabilitado; `password-visible` muestra el texto y el botón "Ocultar"; captura `toHaveScreenshot` de cada estado en ambos anchos (primera ejecución con `--update-snapshots`, revisada a mano).
-  - `a11y.spec.ts`: la tabulación recorre RUT → contraseña → Mostrar → Continuar; el campo enfocado tiene borde con color `borderFocus`; campos, botón y "Mostrar" miden ≥ 44 px de alto; el fondo de la página es `#000000` y el de la tarjeta `#0a0a0a` (colores de la configuración); con `emulateMedia({ reducedMotion: 'reduce' })` el `transition-duration` computado de los campos es `0s`.
+  - `a11y.spec.ts`: la tabulación recorre RUT → contraseña → Mostrar → Continuar; el campo enfocado tiene borde con color `borderFocus`; campos, botón y "Mostrar" miden ≥ 44 px de alto; el fondo de la página y el de la tarjeta son `background` y `surface` leídos de la configuración; con `emulateMedia({ reducedMotion: 'reduce' })` el `transition-duration` computado de los campos es `0s`.
   - `bundle.spec.ts`: ejecuta `vite build` en un directorio temporal y comprueba que ningún archivo de `dist/` contiene `login-states`.
 - [ ] **Paso 3: Ejecutar** `pnpm --filter @financial-risk-manager/frontend run test:e2e`. Esperado: todo pasa; corregir `login.css` o la vista previa si algún caso real revela un defecto (con su prueba Vitest correspondiente si aplica).
 - [ ] **Paso 4: Verificar** `typecheck`, `lint`, `format:check`; las capturas quedan versionadas en `e2e/__screenshots__`.

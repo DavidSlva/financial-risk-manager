@@ -14,7 +14,7 @@ describe('applyStyleTokens', () => {
   it('publica colores y radios', () => {
     const root = document.createElement('div');
     applyStyleTokens(styles, root);
-    expect(root.style.getPropertyValue('--colors-danger')).toBe('#ff6166');
+    expect(root.style.getPropertyValue('--colors-danger')).toBe('#cd2b31');
     expect(root.style.getPropertyValue('--radius-card')).toBe('12px');
   });
 

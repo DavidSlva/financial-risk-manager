@@ -1,16 +1,16 @@
 /** Configuración central de estilos (spec 014). Todo valor visual sale de aquí. */
 export const styles = {
   colors: {
-    background: '#000000',
-    surface: '#0a0a0a',
-    border: '#333333',
-    borderFocus: '#ededed',
-    text: '#ededed',
-    textMuted: '#a1a1a1',
-    textDisabled: '#6b6b6b',
-    danger: '#ff6166',
-    buttonBackground: '#ededed',
-    buttonText: '#000000',
+    background: '#fafafa',
+    surface: '#ffffff',
+    border: '#eaeaea',
+    borderFocus: '#000000',
+    text: '#000000',
+    textMuted: '#666666',
+    textDisabled: '#999999',
+    danger: '#cd2b31',
+    buttonBackground: '#000000',
+    buttonText: '#ffffff',
   },
   radius: {
     field: 6,

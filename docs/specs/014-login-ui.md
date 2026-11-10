@@ -1,6 +1,6 @@
 ---
 id: 014-login-ui
-title: Diseño de la pantalla de login (mobile first, tema oscuro, sin lógica de negocio)
+title: Diseño de la pantalla de login (mobile first, tema claro, sin lógica de negocio)
 status: planned
 created: 2026-11-09
 updated: 2026-11-09
@@ -22,17 +22,17 @@ Quien la usa abre la app en su celular para consultar su score de riesgo financi
 
 ## Intención y anti-objetivos
 
-- **Meta:** un login minimalista, claro y confiable en móvil, con estilo Vercel en su **variante oscura** (elegida por el usuario).
+- **Meta:** un login minimalista, claro y confiable en móvil, con estilo Vercel en su **variante clara** (elegida por el usuario tras comparar claro y oscuro; la oscura se descartó).
 - **Anti-objetivos:** un sistema de diseño o librería de componentes (la configuración de estilos solo trae los valores que la spec usa); colores, radios o tamaños escritos a mano fuera del archivo de configuración; textos escritos a mano en los componentes; que el diseño dependa del backend para verse o probarse; guardar cualquier dato en el navegador.
 
 ## Alcance
 
-**Incluye:** andamiaje mínimo del frontend (Vite + React + TypeScript, ver "Andamiaje"); pantalla y componentes del login; tema oscuro con valores de diseño en un archivo de configuración de estilos que se publica como variables CSS; todos los estados visuales; textos en i18next (solo `es`); accesibilidad básica; vista previa de estados para desarrollo; pruebas Vitest y scripts Playwright **del diseño**.
+**Incluye:** andamiaje mínimo del frontend (Vite + React + TypeScript, ver "Andamiaje"); pantalla y componentes del login; tema claro con valores de diseño en un archivo de configuración de estilos que se publica como variables CSS; todos los estados visuales; textos en i18next (solo `es`); accesibilidad básica; vista previa de estados para desarrollo; pruebas Vitest y scripts Playwright **del diseño**.
 **No incluye:** validación de RUT o contraseña y su archivo de límites; llamada de red; mapa de errores por status HTTP; navegación tras el login; mock del endpoint; otros idiomas (solo queda lista la infraestructura). Todo eso va en [015-login-logica](015-login-logica.md).
 
 ## Diseño visual
 
-Referencia aprobada: variante B (oscura) de la maqueta de brainstorming.
+Referencia aprobada: variante A (clara) de la maqueta de brainstorming; la variante B (oscura) se descartó.
 
 **Fuente única de los valores de diseño:** el archivo de configuración de estilos `frontend/src/config/styles.config.ts` (ver "Configuración de estilos"). Los valores de abajo son los iniciales; cambiarlos es editar ese archivo, sin tocar componentes ni CSS.
 
@@ -40,16 +40,18 @@ Referencia aprobada: variante B (oscura) de la maqueta de brainstorming.
 
 | Clave (`colors.*`) | Valor     | Uso                                |
 | ------------------ | --------- | ---------------------------------- |
-| `background`       | `#000000` | fondo de la página                 |
-| `surface`          | `#0a0a0a` | tarjeta                            |
-| `border`           | `#333333` | bordes de tarjeta y campos         |
-| `borderFocus`      | `#ededed` | borde del campo con foco           |
-| `text`             | `#ededed` | texto principal                    |
-| `textMuted`        | `#a1a1a1` | subtítulo y acciones secundarias   |
-| `textDisabled`     | `#6b6b6b` | placeholder y estado deshabilitado |
-| `danger`           | `#ff6166` | borde y texto de error             |
-| `buttonBackground` | `#ededed` | botón principal                    |
-| `buttonText`       | `#000000` | texto del botón principal          |
+| `background`       | `#fafafa` | fondo de la página                 |
+| `surface`          | `#ffffff` | tarjeta                            |
+| `border`           | `#eaeaea` | bordes de tarjeta y campos         |
+| `borderFocus`      | `#000000` | borde del campo con foco           |
+| `text`             | `#000000` | texto principal                    |
+| `textMuted`        | `#666666` | subtítulo y acciones secundarias   |
+| `textDisabled`     | `#999999` | placeholder y estado deshabilitado |
+| `danger`           | `#cd2b31` | borde y texto de error             |
+| `buttonBackground` | `#000000` | botón principal                    |
+| `buttonText`       | `#ffffff` | texto del botón principal          |
+
+Todos los colores viven en `styles.config.ts`: un tema oscuro es solo otro conjunto de valores, sin tocar componentes ni CSS. `danger` se oscureció respecto de la maqueta (`#e5484d` daba 3.7:1 sobre `#fafafa`) a `#cd2b31` (5.05:1 sobre `#fafafa`, 5.27:1 sobre `#ffffff`) para cumplir AA (RF-4); una prueba Vitest (`styles.contrast.test.ts`) verifica 4.5:1 en los pares texto/fondo (`textDisabled` y el placeholder están exentos).
 
 **Radios (`radius.*`):** `field` 6 px (campos y botón), `card` 12 px (tarjeta).
 
@@ -76,7 +78,7 @@ Solo las especificaciones generales que esta spec usa; no es un sistema de dise�
 - Por debajo de 480 px **(supuesto)**: sin borde de tarjeta, contenido a todo el ancho con 24 px de margen lateral, centrado verticalmente en alturas grandes y alineado arriba cuando el teclado reduce la altura.
 - Desde 480 px **(supuesto)**: tarjeta con borde fino, `max-width: 400px`, centrada en la pantalla.
 - Objetivos táctiles (campos, botón, "Mostrar") de **al menos 44 px** de alto.
-- Se respeta `prefers-reduced-motion` (sin transiciones si está activo) y el tema es solo oscuro (sin selector de tema).
+- Se respeta `prefers-reduced-motion` (sin transiciones si está activo) y el tema es solo claro (sin selector de tema).
 
 ## Componentes
 
@@ -142,7 +144,7 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)): `frontend/test/` espeja `src/
 - **Playwright** (`frontend/e2e/`, contra la vista previa de estados y el login servido por Vite, sin backend):
   - los siete estados en 390 px y 1280 px; sin scroll horizontal en 360, 390, 768 y 1280 px;
   - el orden de tabulación y el foco visible;
-  - objetivos táctiles de al menos `sizes.touchTarget` (44 px); la tarjeta respeta `sizes.cardMaxWidth` y el borde y fondo de la página usan los colores de la configuración;
+  - objetivos táctiles de al menos `sizes.touchTarget` (44 px); la tarjeta respeta `sizes.cardMaxWidth`; el fondo de la página y el de la tarjeta son los colores `background` y `surface` de la configuración, no literales;
   - capturas de pantalla de cada estado como referencia visual (la línea base se revisa a mano la primera vez) **(supuesto)**;
   - el bundle de producción no contiene la vista previa.
 - La implementación se ejecuta con **subagentes**: `superpowers:writing-plans` para el plan y `superpowers:subagent-driven-development` para ejecutarlo, una tarea por subagente con revisión entre tareas.
