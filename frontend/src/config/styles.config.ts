@@ -1,0 +1,55 @@
+/** Configuración central de estilos (spec 014). Todo valor visual sale de aquí. */
+export const styles = {
+  colors: {
+    background: '#000000',
+    surface: '#0a0a0a',
+    border: '#333333',
+    borderFocus: '#ededed',
+    text: '#ededed',
+    textMuted: '#a1a1a1',
+    textDisabled: '#6b6b6b',
+    danger: '#ff6166',
+    buttonBackground: '#ededed',
+    buttonText: '#000000',
+  },
+  radius: {
+    field: 6,
+    card: 12,
+  },
+  typography: {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+    sizeTitle: 22,
+    sizeSubtitle: 13,
+    sizeLabel: 12,
+    sizeField: 14,
+    sizeButton: 14,
+    sizeError: 12,
+    sizeFieldMobile: 16,
+    weightTitle: 600,
+    weightLabel: 500,
+    weightRegular: 400,
+    letterSpacingTitle: '-0.02em',
+  },
+  sizes: {
+    touchTarget: 44,
+    cardMaxWidth: 400,
+    mobileGutter: 24,
+    cardBreakpoint: 480,
+    borderWidth: 1,
+  },
+  spacing: {
+    1: 4,
+    2: 8,
+    3: 12,
+    4: 16,
+    5: 20,
+    6: 24,
+    7: 28,
+    8: 32,
+  },
+  motion: {
+    transitionDuration: 150,
+  },
+} as const;
+
+export type StylesConfig = typeof styles;
