@@ -1,18 +1,18 @@
 ---
-id: 015-login-logica
+id: 018-login-logica
 title: Lógica del login (validación, /api/auth/login, sesión por cookies, errores por status)
 status: implementing
 created: 2026-11-09
 updated: 2026-11-09
-depends_on: [009-emision-tokens, 010-tdd-vitest, 012-errores-http, 014-login-ui]
-related: [013-consulta-score, 016-score-consulta, 008-validador-rut, 014-cors-desarrollo]
+depends_on: [009-emision-tokens, 010-tdd-vitest, 012-errores-http, 017-login-ui]
+related: [013-consulta-score, 019-score-consulta, 008-validador-rut, 014-cors-desarrollo]
 supersedes: []
 superseded_by: []
 ---
 
-# 015-login-logica — Lógica del login
+# 018-login-logica — Lógica del login
 
-> Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario. Esta spec conecta la interfaz de [014-login-ui](014-login-ui.md) con el login real del backend ([009-emision-tokens](009-emision-tokens.md), ya en `develop` con sesión por cookies). Reemplaza al borrador anterior, que se basaba en un mock.
+> Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario. Esta spec conecta la interfaz de [017-login-ui](017-login-ui.md) con el login real del backend ([009-emision-tokens](009-emision-tokens.md), ya en `develop` con sesión por cookies). Reemplaza al borrador anterior, que se basaba en un mock.
 
 ## Resumen
 
@@ -26,7 +26,7 @@ La persona escribe su RUT y contraseña; el frontend los valida, llama a `POST /
 ## Alcance
 
 **Incluye:** validación local con límites en un archivo de configuración; cliente de login; estado de sesión en memoria; mapa de errores por status; conexión con `LoginForm`/`LoginPage` de 014; navegación al score; configuración de la URL base del API (desarrollo y producción); pruebas Vitest.
-**No incluye:** cierre de sesión (el backend no tiene `logout` todavía), renovación de sesión (`/api/auth/refresh`), recuperar la sesión al recargar (no existe un endpoint que diga quién soy), recuperar contraseña, la pantalla de score ([016-score-consulta](016-score-consulta.md)), scripts Playwright de este flujo (quedan diferidos hasta integrar la infraestructura e2e de 014).
+**No incluye:** cierre de sesión (el backend no tiene `logout` todavía), renovación de sesión (`/api/auth/refresh`), recuperar la sesión al recargar (no existe un endpoint que diga quién soy), recuperar contraseña, la pantalla de score ([019-score-consulta](019-score-consulta.md)), scripts Playwright de este flujo (quedan diferidos hasta integrar la infraestructura e2e de 014).
 
 ## Contrato real consumido (spec 009, versión con cookies)
 
@@ -62,7 +62,7 @@ La respuesta de éxito **no incluye** datos del usuario: el frontend usa el RUT 
 - RF-7: **Mapa llave → mensaje** en `frontend/src/config/login-errors.ts` (status → llave) y los textos en `es.json` (`login.errors.*`); un status sin entrada usa el de su clase (4xx → `clientError`, 5xx → `serverError`). Se agrega también `429` → `tooManyRequests` ("Demasiados intentos. Espera unos minutos e inténtalo otra vez.") **(supuesto)**: hoy el backend no lo emite, pero un proxy podría.
 - RF-8: Mientras hay una petición en curso: `isSubmitting` activo en `LoginForm`, sin segundo envío (ni con Enter ni con submit directo). Si el componente se desmonta durante la petición, se cancela con `AbortController` y no se actualiza estado.
 - RF-9: Tras un `401` se **limpia la contraseña** y se conserva el RUT **(supuesto)**; el foco vuelve al campo de contraseña. Un error de campo o de formulario se borra cuando la persona edita el campo o vuelve a enviar.
-- RF-10: **Navegación y sesión sin router (supuesto):** `App` guarda en memoria la pantalla actual (`login` | `score`) y la sesión. No hay rutas ni nada en la URL (el RUT nunca aparece en la barra). Mientras [016-score-consulta](016-score-consulta.md) no esté integrada, la pantalla `score` es un marcador mínimo que muestra el RUT de la sesión; al integrarla recibe `initialRut = session.rut` y, ante un `401`, `onSessionExpired` limpia la sesión y vuelve al login con el aviso `login.notices.sessionExpired` ("Tu sesión expiró. Vuelve a iniciar sesión.", `role="status"`). Recargar la página vuelve al login (no hay forma de recuperar la sesión sin un endpoint).
+- RF-10: **Navegación y sesión sin router (supuesto):** `App` guarda en memoria la pantalla actual (`login` | `score`) y la sesión. No hay rutas ni nada en la URL (el RUT nunca aparece en la barra). Mientras [019-score-consulta](019-score-consulta.md) no esté integrada, la pantalla `score` es un marcador mínimo que muestra el RUT de la sesión; al integrarla recibe `initialRut = session.rut` y, ante un `401`, `onSessionExpired` limpia la sesión y vuelve al login con el aviso `login.notices.sessionExpired` ("Tu sesión expiró. Vuelve a iniciar sesión.", `role="status"`). Recargar la página vuelve al login (no hay forma de recuperar la sesión sin un endpoint).
 - RF-11: La contraseña y el RUT no se escriben en `localStorage`, `sessionStorage`, la URL ni la consola; los errores de red no se registran con sus datos.
 
 ## Pruebas
@@ -80,7 +80,7 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 ## Restricciones del repo
 
-- Rama y workspace: `feature/015-login-logica` en `D:\Persona-ws\015-login-logica`; incluye el código de 014 (integrado desde `feature/014-login-ui`).
+- Rama y workspace: `feature/018-login-logica` en `D:\Persona-ws\018-login-logica`; incluye el código de 014 (integrado desde `feature/017-login-ui`).
 - pnpm y política de [004-pnpm-ci](004-pnpm-ci.md): sin dependencias nuevas.
 - Commits `tipo(015): descripción`, sin saltarse hooks.
 
@@ -88,24 +88,24 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 - **Cierre de sesión:** el backend no tiene `POST /api/auth/logout` y el frontend no puede borrar cookies `HttpOnly`; hasta entonces la sesión termina al caducar las cookies.
 - **Recuperar la sesión al recargar:** requiere un endpoint (p. ej. `/api/auth/me`); sin él, recargar vuelve al login.
-- **Utilidad de RUT compartida:** [016-score-consulta](016-score-consulta.md) también necesita `normalizeRut`; ambas ramas definen `frontend/src/lib/rut.ts` con la misma firma (`normalizeRut(raw: string): string | null`). Al integrar la segunda, se conserva una sola versión.
-- **Numeración:** ya existe `014-cors-desarrollo`, igual prefijo que `014-login-ui`; conviene resolver la duplicidad de número antes de promover.
+- **Utilidad de RUT compartida:** [019-score-consulta](019-score-consulta.md) también necesita `normalizeRut`; ambas ramas definen `frontend/src/lib/rut.ts` con la misma firma (`normalizeRut(raw: string): string | null`). Al integrar la segunda, se conserva una sola versión.
+- **Numeración:** ya existe `014-cors-desarrollo`, igual prefijo que `017-login-ui`; conviene resolver la duplicidad de número antes de promover.
 
 ## Documentos RPI
 
-- Research (constitution): [../research/015-login-logica/constitution.md](../research/015-login-logica/constitution.md)
-- Plan: [../plan/015-login-logica/plan.md](../plan/015-login-logica/plan.md)
-- Tasks: [../implementation/015-login-logica/tasks.md](../implementation/015-login-logica/tasks.md)
-- Implement: [../implementation/015-login-logica/implement.md](../implementation/015-login-logica/implement.md)
-- Prompt origen: [../prompts/2026-11-09_2103_014-login-ui.md](../prompts/2026-11-09_2103_014-login-ui.md)
+- Research (constitution): [../research/018-login-logica/constitution.md](../research/018-login-logica/constitution.md)
+- Plan: [../plan/018-login-logica/plan.md](../plan/018-login-logica/plan.md)
+- Tasks: [../implementation/018-login-logica/tasks.md](../implementation/018-login-logica/tasks.md)
+- Implement: [../implementation/018-login-logica/implement.md](../implementation/018-login-logica/implement.md)
+- Prompt origen: [../prompts/2026-11-09_2103_017-login-ui.md](../prompts/2026-11-09_2103_017-login-ui.md)
 
 ## Specs relacionadas
 
 - depende de: [009-emision-tokens](009-emision-tokens.md) — contrato real del login y sesión por cookies.
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — TDD.
 - depende de: [012-errores-http](012-errores-http.md) — status que el frontend traduce a mensajes.
-- depende de: [014-login-ui](014-login-ui.md) — interfaz que esta spec conecta.
-- relacionada con: [014-cors-desarrollo](014-cors-desarrollo.md) — origen y cookies en desarrollo; [016-score-consulta](016-score-consulta.md) — destino tras el login; [013-consulta-score](013-consulta-score.md); [008-validador-rut](008-validador-rut.md) — formato canónico del RUT.
+- depende de: [017-login-ui](017-login-ui.md) — interfaz que esta spec conecta.
+- relacionada con: [014-cors-desarrollo](014-cors-desarrollo.md) — origen y cookies en desarrollo; [019-score-consulta](019-score-consulta.md) — destino tras el login; [013-consulta-score](013-consulta-score.md); [008-validador-rut](008-validador-rut.md) — formato canónico del RUT.
 
 ## Estado final (parcial)
 

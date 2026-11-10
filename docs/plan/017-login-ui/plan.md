@@ -1,4 +1,4 @@
-# 014-login-ui — Plan de implementación
+# 017-login-ui — Plan de implementación
 
 > **Para agentes:** SUB-SKILL REQUERIDA: usar `superpowers:subagent-driven-development` (método elegido por el usuario) para ejecutar este plan tarea por tarea. Los pasos usan casillas `- [ ]`.
 
@@ -8,7 +8,7 @@
 
 **Tecnologías:** React, React DOM, Vite, `@vitejs/plugin-react`, i18next, react-i18next, Vitest con jsdom y Testing Library, Playwright.
 
-**Spec:** [../../specs/014-login-ui.md](../../specs/014-login-ui.md) · Constitution: [../../research/014-login-ui/constitution.md](../../research/014-login-ui/constitution.md)
+**Spec:** [../../specs/017-login-ui.md](../../specs/017-login-ui.md) · Constitution: [../../research/017-login-ui/constitution.md](../../research/017-login-ui/constitution.md)
 
 ## Restricciones globales (valores de la spec)
 
@@ -19,7 +19,7 @@
 - Tipografía: pila `system-ui, -apple-system, "Segoe UI", sans-serif`, sin fuentes externas; título 22/600, subtítulo 13, etiquetas 12/500, campos y botón 14, errores 12; campos de texto en móvil ≥ 16 px.
 - Ningún componente contiene texto visible literal; todo sale de i18next (`es`). Ningún componente ni `login.css` contiene colores, radios ni medidas literales (excepto el breakpoint de `login.css`, que debe coincidir con `sizes.cardBreakpoint`).
 - Sin `localStorage`/`sessionStorage`; sin llamadas de red; sin backend.
-- Commits: `tipo(014): descripción`, sin `--no-verify`. Trabajar solo en `D:\Persona-ws\014-login-ui` (rama `feature/014-login-ui`). Push, tags y PRs requieren confirmación del usuario.
+- Commits: `tipo(014): descripción`, sin `--no-verify`. Trabajar solo en `D:\Persona-ws\017-login-ui` (rama `feature/017-login-ui`). Push, tags y PRs requieren confirmación del usuario.
 
 ## Foco de revisión (casos que la spec no nombra y que más probablemente fallen)
 
@@ -216,8 +216,8 @@
 
 **Archivos:**
 
-- Crear: `docs/implementation/014-login-ui/{tasks,implement}.md`
-- Modificar: `docs/specs/014-login-ui.md` (estado final, `status: converged`), `docs/specs/015-login-logica.md` (reconciliar con 014), `docs/specs/README.md` (índice y grafo), `docs/research/014-login-ui/constitution.md`, `frontend/README.md`, `CLAUDE.md` (sección "Frontend (spec 014)": estructura, config de estilos, textos con i18next, scripts), `.github/workflows/ci.yml` solo si hace falta (Vitest ya corre con `pnpm run test`)
+- Crear: `docs/implementation/017-login-ui/{tasks,implement}.md`
+- Modificar: `docs/specs/017-login-ui.md` (estado final, `status: converged`), `docs/specs/018-login-logica.md` (reconciliar con 014), `docs/specs/README.md` (índice y grafo), `docs/research/017-login-ui/constitution.md`, `frontend/README.md`, `CLAUDE.md` (sección "Frontend (spec 014)": estructura, config de estilos, textos con i18next, scripts), `.github/workflows/ci.yml` solo si hace falta (Vitest ya corre con `pnpm run test`)
 
 - [ ] **Paso 1:** Ejecutar la verificación completa: `pnpm run check:policy`, `pnpm install --frozen-lockfile`, `pnpm run format:check`, `pnpm run lint`, `pnpm run typecheck`, `pnpm run test`, `pnpm --filter @financial-risk-manager/frontend run build`, `test:e2e`. Esperado: todo verde.
 - [ ] **Paso 2:** Completar `tasks.md` (esta lista de tareas con su estado) e `implement.md` (decisiones tomadas, desviaciones, comandos usados).

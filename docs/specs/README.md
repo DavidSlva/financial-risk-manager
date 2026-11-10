@@ -18,8 +18,8 @@ Cada spec es un nodo del grafo. Las relaciones se declaran en el front matter de
 | [014-cors-desarrollo](014-cors-desarrollo.md)       | CORS para desarrollo (front en localhost:3000, back en localhost:8000)                   | converged    | 005, 009, 010           | 007                | [constitution](../research/014-cors-desarrollo/constitution.md)    | [plan](../plan/014-cors-desarrollo/plan.md)    | [tasks](../implementation/014-cors-desarrollo/tasks.md) · [implement](../implementation/014-cors-desarrollo/implement.md)       |
 | [010-tdd-vitest](010-tdd-vitest.md)                 | TDD con Vitest (test/ espejo de src/) e integración en el CI                             | converged    | 004, 005                | 006, 007           | [constitution](../research/010-tdd-vitest/constitution.md)         | [plan](../plan/010-tdd-vitest/plan.md)         | [tasks](../implementation/010-tdd-vitest/tasks.md) · [implement](../implementation/010-tdd-vitest/implement.md)                 |
 | [011-rbac](011-rbac.md)                             | RBAC simple con permisos personalizados y middleware de autorización                     | converged    | 006, 007, 010, 012      | 013                | [constitution](../research/011-rbac/constitution.md)               | [plan](../plan/011-rbac/plan.md)               | [tasks](../implementation/011-rbac/tasks.md) · [implement](../implementation/011-rbac/implement.md)                             |
-| [014-login-ui](014-login-ui.md)                     | Diseño de la pantalla de login (mobile first, tema oscuro, config de estilos)            | implementing | 010                     | 015, 013           | [constitution](../research/014-login-ui/constitution.md)           | [plan](../plan/014-login-ui/plan.md)           | —                                                                                                                               |
-| [015-login-logica](015-login-logica.md)             | Lógica del login (validación, `/api/auth/login`, sesión por cookies, errores por status) | implementing | 009, 010, 012, 014      | 013, 016, 008, 014 | [constitution](../research/015-login-logica/constitution.md)       | [plan](../plan/015-login-logica/plan.md)       | [tasks](../implementation/015-login-logica/tasks.md) · [implement](../implementation/015-login-logica/implement.md)             |
+| [017-login-ui](017-login-ui.md)                     | Diseño de la pantalla de login (mobile first, tema oscuro, config de estilos)            | implementing | 010                     | 018, 013           | [constitution](../research/017-login-ui/constitution.md)           | [plan](../plan/017-login-ui/plan.md)           | —                                                                                                                               |
+| [018-login-logica](018-login-logica.md)             | Lógica del login (validación, `/api/auth/login`, sesión por cookies, errores por status) | implementing | 009, 010, 012, 017      | 013, 019, 008, 014 | [constitution](../research/018-login-logica/constitution.md)       | [plan](../plan/018-login-logica/plan.md)       | [tasks](../implementation/018-login-logica/tasks.md) · [implement](../implementation/018-login-logica/implement.md)             |
 
 Estados: `draft` → `specified` → `planned` → `tasked` → `implementing` → `converged`.
 
@@ -41,8 +41,8 @@ graph LR
   S012[012-errores-http]
   S013[013-consulta-score]
   S014[014-cors-desarrollo]
-  S014[014-login-ui]
-  S015[015-login-logica]
+  S017[017-login-ui]
+  S018[018-login-logica]
   S001 -.->|relacionada| S005
   S002 -->|depende de| S001
   S002 -.->|relacionada| S004
@@ -82,14 +82,14 @@ graph LR
   S014 -->|depende de| S005
   S014 -->|depende de| S009
   S014 -->|depende de| S010
-  S014 -->|depende de| S010
-  S014 -.->|relacionada| S013
-  S015 -->|depende de| S009
-  S015 -->|depende de| S010
-  S015 -->|depende de| S012
-  S015 -->|depende de| S014
-  S015 -.->|relacionada| S013
-  S015 -.->|relacionada| S016
-  S015 -.->|relacionada| S008
-  S015 -.->|relacionada| S014
+  S017 -->|depende de| S010
+  S017 -.->|relacionada| S013
+  S018 -->|depende de| S009
+  S018 -->|depende de| S010
+  S018 -->|depende de| S012
+  S018 -->|depende de| S017
+  S018 -.->|relacionada| S013
+  S018 -.->|relacionada| S019
+  S018 -.->|relacionada| S008
+  S018 -.->|relacionada| S014
 ```

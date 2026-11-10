@@ -1,6 +1,6 @@
-# Tasks — 015-login-logica
+# Tasks — 018-login-logica
 
-Spec: [../../specs/015-login-logica.md](../../specs/015-login-logica.md) · Plan: [../../plan/015-login-logica/plan.md](../../plan/015-login-logica/plan.md)
+Spec: [../../specs/018-login-logica.md](../../specs/018-login-logica.md) · Plan: [../../plan/018-login-logica/plan.md](../../plan/018-login-logica/plan.md)
 
 Orden TDD en cada tarea: prueba que falla → código mínimo → refactor.
 
@@ -17,5 +17,5 @@ Orden TDD en cada tarea: prueba que falla → código mínimo → refactor.
 - [ ] D3 — Cierre de sesión (el backend no tiene `logout`)
 - [ ] D4 — Recuperar la sesión al recargar (requiere un endpoint tipo `/api/auth/me`)
 - [ ] D5 — Unificar `lib/rut.ts` con la rama 016
-- [ ] D6 — Resolver el número 014 duplicado (`014-login-ui` y `014-cors-desarrollo`)
+- [ ] D6 — Resolver el número 014 duplicado (`017-login-ui` y `014-cors-desarrollo`)
 - [ ] D7 — Hallazgos menores de la revisión final (ver el estado final de la spec)

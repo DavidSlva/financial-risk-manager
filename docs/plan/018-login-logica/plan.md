@@ -1,4 +1,4 @@
-# 015-login-logica — Plan de implementación
+# 018-login-logica — Plan de implementación
 
 > **Para agentes:** ejecutar tarea por tarea con TDD. Los pasos usan casillas `- [ ]`.
 
@@ -8,7 +8,7 @@
 
 **Tecnologías:** las existentes (React 19, Vite, Vitest + jsdom, Testing Library, i18next). Sin dependencias nuevas.
 
-**Spec:** [../../specs/015-login-logica.md](../../specs/015-login-logica.md) · Constitution: [../../research/015-login-logica/constitution.md](../../research/015-login-logica/constitution.md)
+**Spec:** [../../specs/018-login-logica.md](../../specs/018-login-logica.md) · Constitution: [../../research/018-login-logica/constitution.md](../../research/018-login-logica/constitution.md)
 
 ## Restricciones globales (valores de la spec)
 
