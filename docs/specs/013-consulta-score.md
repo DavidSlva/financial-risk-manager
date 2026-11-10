@@ -90,7 +90,7 @@ export function canGetScore(
 
 ## Puntos abiertos
 
-- **Comparación del rut propio:** es textual exacta. Mientras no exista la normalización de [008-validador-rut](008-validador-rut.md), `12.345.678-5` y `12345678-5` son ruts distintos.
+- ~~Comparación del rut propio~~ — resuelto por la spec [008-validador-rut](008-validador-rut.md): `:rut` se valida (400) y existe un único formato válido.
 - **Listado de todos los scores** (¿`can_get_all_score` implica un `GET /api/scores`?): se interpretó como "ver el score de cualquier rut", sin listado.
 - **Usuario sin score:** hoy `404`; se podría distinguir "rut inexistente" de "sin score" solo para quienes tienen `can_get_all_score`.
 
@@ -113,6 +113,8 @@ Notas:
 - Las specs [011](011-rbac.md) y [012](012-errores-http.md) enlazan ahora a esta.
 
 Cambio posterior (2026-11-09 21:08): la ruta pasó de `/api/scores/:rut` a **`/api/score/:rut`** a pedido del usuario, manteniendo la convención general de recursos en plural. Se cambiaron primero las pruebas (1 en rojo) y luego `routes/index.ts`; el comportamiento no cambia.
+
+Evolución posterior: la spec [008](008-validador-rut.md) hace que el controlador valide `:rut` (400 si no es canónico), después de autenticar y autorizar. Orden de decisión: 401 → 403 → 400 → 404.
 
 **Revisión de documentos relacionados:**
 

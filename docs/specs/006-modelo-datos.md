@@ -168,7 +168,7 @@ Notas:
 - No existe aún un script de compilación del backend. Para la verificación manual se compiló con `tsc --outDir dist --rootDir .` y se ejecutó con `DATA_DIR`; los scripts `build` y `start` siguen pendientes (spec posterior).
 - Los servicios aceptan un almacén por parámetro (por defecto el de la aplicación) para poder probarse con carpetas temporales.
 - Evolución posterior: la spec [011](011-rbac.md) agregó la tabla `permissions` (`role`, `key`, `value`; clave primaria `(role, key)`, clave foránea a `roles`, catálogo cerrado en código) y las reglas IR-10…IR-12; `permissions.json` se versiona y forma parte de los datos validados.
-- Pendiente en specs derivadas: formato del rut ([008](008-validador-rut.md)).
+- Evolución posterior: la spec [008](008-validador-rut.md) agregó IR-13 (`users.rut` y `scores.rut` con formato canónico `12345678-5` y dígito verificador válido).
 
 **Revisión de documentos relacionados:**
 
