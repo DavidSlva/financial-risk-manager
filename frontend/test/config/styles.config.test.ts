@@ -38,4 +38,9 @@ describe('styles.config', () => {
     expect(styles.motion.spinnerDuration).toBe(750);
     expect(styles.motion.spinnerTurn).toBe('1turn');
   });
+
+  it('el ancho del toggle de contraseña cubre el alto táctil', () => {
+    expect(styles.sizes.passwordToggleWidth).toBe(72);
+    expect(styles.sizes.passwordToggleWidth).toBeGreaterThanOrEqual(styles.sizes.touchTarget);
+  });
 });

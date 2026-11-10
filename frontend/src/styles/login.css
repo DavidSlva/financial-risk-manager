@@ -132,7 +132,7 @@ body {
 
 /* Contraseña: Mostrar/Ocultar dentro del campo, al borde derecho */
 .login-password .login-field__input {
-  padding-inline-end: calc(var(--sizes-touch-target) + var(--spacing-2));
+  padding-inline-end: calc(var(--sizes-password-toggle-width) + var(--spacing-2));
 }
 
 .login-password-toggle {
@@ -140,10 +140,12 @@ body {
   top: 0;
   bottom: 0;
   inset-inline-end: 0;
-  min-width: var(--sizes-touch-target);
+  width: var(--sizes-password-toggle-width);
   min-height: var(--sizes-touch-target);
   padding: 0 var(--spacing-2);
   border: 0;
+  text-align: center;
+  white-space: nowrap;
   border-radius: var(--radius-field);
   background: transparent;
   color: var(--colors-text-muted);

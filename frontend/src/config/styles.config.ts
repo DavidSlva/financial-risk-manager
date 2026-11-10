@@ -39,6 +39,8 @@ export const styles = {
     focusRingWidth: 2,
     spinnerSize: 16,
     spinnerBorderWidth: 2,
+    // "Mostrar"/"Ocultar" a 12 px/500 miden ~46 px; + padding horizontal, >= touchTarget.
+    passwordToggleWidth: 72,
   },
   spacing: {
     1: 4,

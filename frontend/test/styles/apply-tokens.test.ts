@@ -18,6 +18,18 @@ describe('applyStyleTokens', () => {
     expect(root.style.getPropertyValue('--radius-card')).toBe('12px');
   });
 
+  it('publica con valor y unidad correctos los tokens de spinner, foco y toggle', () => {
+    const root = document.createElement('div');
+    applyStyleTokens(styles, root);
+    const value = (name: string) => root.style.getPropertyValue(name);
+    expect(value('--sizes-focus-ring-width')).toBe('2px');
+    expect(value('--sizes-spinner-size')).toBe('16px');
+    expect(value('--sizes-spinner-border-width')).toBe('2px');
+    expect(value('--sizes-password-toggle-width')).toBe('72px');
+    expect(value('--motion-spinner-duration')).toBe('750ms');
+    expect(value('--motion-spinner-turn')).toBe('1turn');
+  });
+
   it('usa document.documentElement por defecto', () => {
     applyStyleTokens();
     expect(document.documentElement.style.getPropertyValue('--radius-field')).toBe('6px');
