@@ -1,18 +1,18 @@
 ---
-id: 016-score-consulta
+id: 019-score-consulta
 title: Pantalla de consulta de score (frontend)
 status: implementing
 created: 2026-11-09
 updated: 2026-11-09
-depends_on: [013-consulta-score, 014-login-ui, 015-login-logica]
+depends_on: [013-consulta-score, 017-login-ui, 018-login-logica]
 related: [009-emision-tokens, 011-rbac, 008-validador-rut]
 supersedes: []
 superseded_by: []
 ---
 
-# 016-score-consulta — Pantalla de consulta de score
+# 019-score-consulta — Pantalla de consulta de score
 
-> Borrador para revisión. El **diseño de la pantalla y la forma de la respuesta fueron confirmados por el usuario**. Los puntos marcados **(supuesto)** que quedan son decisiones del agente, no del usuario. Es la segunda y última pantalla de la app; la primera es el login ([014-login-ui](014-login-ui.md), [015-login-logica](015-login-logica.md)).
+> Borrador para revisión. El **diseño de la pantalla y la forma de la respuesta fueron confirmados por el usuario**. Los puntos marcados **(supuesto)** que quedan son decisiones del agente, no del usuario. Es la segunda y última pantalla de la app; la primera es el login ([017-login-ui](017-login-ui.md), [018-login-logica](018-login-logica.md)).
 
 ## Resumen
 
@@ -30,7 +30,7 @@ Una persona ya autenticada consulta el **score de riesgo financiero** de un RUT.
 
 ## Contrato consumido (spec 013 y respuesta confirmada por el usuario)
 
-`GET /api/score/:rut` (la ruta es **singular**), autenticado con la sesión del login (cookies, ver [015-login-logica](015-login-logica.md)).
+`GET /api/score/:rut` (la ruta es **singular**), autenticado con la sesión del login (cookies, ver [018-login-logica](018-login-logica.md)).
 
 | Status | Significado                                                                                  | Qué muestra el frontend                              |
 | ------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
@@ -48,7 +48,7 @@ El orden de decisión del backend es 401 → 403 → 400 → 404. El frontend nu
 
 ## Diseño visual
 
-Misma identidad que el login ([014-login-ui](014-login-ui.md)): tema oscuro, tokens de `styles.config.ts`, mobile first desde 360 px, objetivos táctiles de 44 px, componentes `TextField` y `Button` reutilizados. Los valores de diseño nuevos que haga falta se agregan al archivo de configuración de estilos, no a los componentes.
+Misma identidad que el login ([017-login-ui](017-login-ui.md)): tema oscuro, tokens de `styles.config.ts`, mobile first desde 360 px, objetivos táctiles de 44 px, componentes `TextField` y `Button` reutilizados. Los valores de diseño nuevos que haga falta se agregan al archivo de configuración de estilos, no a los componentes.
 
 **Estructura (de arriba abajo; aprobada por el usuario):** título "Consulta tu score" → subtítulo → campo RUT con su error → botón "Consultar" → tarjeta de resultado.
 
@@ -67,7 +67,7 @@ Los avisos usan `role="alert"`; el resultado exitoso se anuncia con `role="statu
 ## Comportamiento
 
 - RF-1: La pantalla pide un RUT y, al enviar, consulta `GET /api/score/<rut>` con el RUT normalizado a `12345678-5` (sin puntos, `K` en mayúscula) y `encodeURIComponent`. Usa `credentials: 'include'`; no guarda ni lee tokens.
-- RF-2: Validación local previa con el mismo validador y normalizador de RUT que usa el login ([015-login-logica](015-login-logica.md)): formato y dígito verificador. Un RUT inválido no hace petición.
+- RF-2: Validación local previa con el mismo validador y normalizador de RUT que usa el login ([018-login-logica](018-login-logica.md)): formato y dígito verificador. Un RUT inválido no hace petición.
 - RF-3: El campo RUT parte con **el RUT del usuario autenticado** **(supuesto)**, que se toma del resultado del login y vive solo en memoria. Si no está disponible, parte vacío. Esto no decide permisos: el backend responde igual.
 - RF-4: Mensajes por status en un **mapa llave → mensaje** con i18next (`score.errors.forbidden`, `score.errors.notFound`, …), igual que en el login. Un status sin entrada usa el mensaje por defecto de su clase (4xx o 5xx). Nunca se muestra texto del servidor.
 - RF-5: `403` muestra el mismo mensaje exista o no el RUT; la pantalla no hace ninguna otra petición para "comprobar" el RUT.
@@ -94,7 +94,7 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 ## Restricciones del repo
 
-- Rama y workspace: `feature/016-score-consulta` en `D:\Persona-ws\016-score-consulta`. La implementación necesita el código de [014-login-ui](014-login-ui.md) y de [015-login-logica](015-login-logica.md) integrado en `develop` (o en una rama de integración).
+- Rama y workspace: `feature/019-score-consulta` en `D:\Persona-ws\019-score-consulta`. La implementación necesita el código de [017-login-ui](017-login-ui.md) y de [018-login-logica](018-login-logica.md) integrado en `develop` (o en una rama de integración).
 - pnpm y política de cadena de suministro de [004-pnpm-ci](004-pnpm-ci.md): sin dependencias nuevas salvo necesidad probada, solo con `pnpm add`.
 - Commits `tipo(016): descripción`, sin saltarse hooks ni CI.
 
@@ -108,17 +108,17 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 ## Documentos RPI
 
-- Research (constitution): [../research/016-score-consulta/constitution.md](../research/016-score-consulta/constitution.md)
-- Plan: [../plan/016-score-consulta/plan.md](../plan/016-score-consulta/plan.md)
-- Tasks: [../implementation/016-score-consulta/tasks.md](../implementation/016-score-consulta/tasks.md)
-- Implement: [../implementation/016-score-consulta/implement.md](../implementation/016-score-consulta/implement.md)
-- Prompt origen: [../prompts/2026-11-09_2138_016-score-consulta.md](../prompts/2026-11-09_2138_016-score-consulta.md)
+- Research (constitution): [../research/019-score-consulta/constitution.md](../research/019-score-consulta/constitution.md)
+- Plan: [../plan/019-score-consulta/plan.md](../plan/019-score-consulta/plan.md)
+- Tasks: [../implementation/019-score-consulta/tasks.md](../implementation/019-score-consulta/tasks.md)
+- Implement: [../implementation/019-score-consulta/implement.md](../implementation/019-score-consulta/implement.md)
+- Prompt origen: [../prompts/2026-11-09_2138_019-score-consulta.md](../prompts/2026-11-09_2138_019-score-consulta.md)
 
 ## Specs relacionadas
 
 - depende de: [013-consulta-score](013-consulta-score.md) — contrato del endpoint y tabla de decisión.
-- depende de: [014-login-ui](014-login-ui.md) — diseño, componentes, tokens e i18next que se reutilizan.
-- depende de: [015-login-logica](015-login-logica.md) — sesión por cookies, cliente de API, validador de RUT y mapa de errores por status.
+- depende de: [017-login-ui](017-login-ui.md) — diseño, componentes, tokens e i18next que se reutilizan.
+- depende de: [018-login-logica](018-login-logica.md) — sesión por cookies, cliente de API, validador de RUT y mapa de errores por status.
 - relacionada con: [009-emision-tokens](009-emision-tokens.md), [011-rbac](011-rbac.md) — sesión y permisos del lado del backend.
 - relacionada con: [008-validador-rut](008-validador-rut.md) — formato canónico del RUT.
 
@@ -128,7 +128,7 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 
 **Diferido:** montar `ScorePage` en `App` con la sesión en memoria, `onSessionExpired` e `initialRut` (tras 015); Playwright e2e; la reconciliación con la 013 quedó resuelta (`consulted_at`).
 
-**Hallazgos de la revisión final (aprobada):** 1 importante (`ScorePage` sin montar en `App`, la spec no puede cerrarse sin la integración) y 7 menores (errores no-abort en `ScorePage`, foco en el campo con error RF-10, `AbortError` en `parseSuccess`, `hourCycle` no documentado, `normalizeRut` sin trim, `line-height: 1` literal, y un punto sin hallazgos). Detalle en [implement.md](../implementation/016-score-consulta/implement.md).
+**Hallazgos de la revisión final (aprobada):** 1 importante (`ScorePage` sin montar en `App`, la spec no puede cerrarse sin la integración) y 7 menores (errores no-abort en `ScorePage`, foco en el campo con error RF-10, `AbortError` en `parseSuccess`, `hourCycle` no documentado, `normalizeRut` sin trim, `line-height: 1` literal, y un punto sin hallazgos). Detalle en [implement.md](../implementation/019-score-consulta/implement.md).
 
 **Revisión de documentos relacionados:**
 

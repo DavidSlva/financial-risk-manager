@@ -1,6 +1,6 @@
-# Tasks — 016-score-consulta
+# Tasks — 019-score-consulta
 
-Spec: [../../specs/016-score-consulta.md](../../specs/016-score-consulta.md) · Plan: [../../plan/016-score-consulta/plan.md](../../plan/016-score-consulta/plan.md)
+Spec: [../../specs/019-score-consulta.md](../../specs/019-score-consulta.md) · Plan: [../../plan/019-score-consulta/plan.md](../../plan/019-score-consulta/plan.md)
 
 Orden TDD en cada tarea: prueba que falla → código mínimo → refactor.
 

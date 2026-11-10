@@ -1,6 +1,6 @@
-# Implement — 016-score-consulta
+# Implement — 019-score-consulta
 
-Spec: [../../specs/016-score-consulta.md](../../specs/016-score-consulta.md) · Tasks: [tasks.md](tasks.md)
+Spec: [../../specs/019-score-consulta.md](../../specs/019-score-consulta.md) · Tasks: [tasks.md](tasks.md)
 
 ## Registro
 

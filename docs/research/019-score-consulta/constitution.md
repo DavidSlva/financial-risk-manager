@@ -1,6 +1,6 @@
-# Constitution — 016-score-consulta
+# Constitution — 019-score-consulta
 
-Spec: [../../specs/016-score-consulta.md](../../specs/016-score-consulta.md)
+Spec: [../../specs/019-score-consulta.md](../../specs/019-score-consulta.md)
 
 ## Principios y restricciones
 

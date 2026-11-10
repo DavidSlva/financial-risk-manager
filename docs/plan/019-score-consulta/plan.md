@@ -1,4 +1,4 @@
-# 016-score-consulta — Plan de implementación
+# 019-score-consulta — Plan de implementación
 
 > **Para agentes:** SUB-SKILL REQUERIDA: usar `superpowers:subagent-driven-development` para ejecutar este plan tarea por tarea. Los pasos usan casillas `- [ ]`.
 
@@ -8,7 +8,7 @@
 
 **Tecnologías:** React 19, i18next/react-i18next, Vitest con jsdom y Testing Library (sin dependencias nuevas).
 
-**Spec:** [../../specs/016-score-consulta.md](../../specs/016-score-consulta.md) · Constitution: [../../research/016-score-consulta/constitution.md](../../research/016-score-consulta/constitution.md)
+**Spec:** [../../specs/019-score-consulta.md](../../specs/019-score-consulta.md) · Constitution: [../../research/019-score-consulta/constitution.md](../../research/019-score-consulta/constitution.md)
 
 ## Restricciones globales (valores de la spec)
 
@@ -17,7 +17,7 @@
 - Ningún componente con texto visible literal; todo por i18next (`es`). Ningún color, radio ni medida literal en CSS; solo `var(--...)` y tokens de `styles.config.ts` (si falta uno, agregarlo al config con su prueba). Reutilizar `Button` y `TextField`.
 - Nada del RUT ni del score en `localStorage`, `sessionStorage`, URL ni `console`. El texto del cuerpo de los errores nunca se lee.
 - Antes de cada commit: `pnpm run format:check`, `lint`, `typecheck`, `test`, `check:policy` y `pnpm --filter @financial-risk-manager/frontend run build`.
-- Commits `tipo(016): descripción`, sin `--no-verify`. Trabajar solo en `D:\Persona-ws\016-score-consulta` (rama `feature/016-score-consulta`). Sin push ni PR.
+- Commits `tipo(016): descripción`, sin `--no-verify`. Trabajar solo en `D:\Persona-ws\019-score-consulta` (rama `feature/019-score-consulta`). Sin push ni PR.
 
 ## Interfaces fijas
 
@@ -167,7 +167,7 @@ Depende de la spec 015 (sesión por cookies, RUT del usuario autenticado como `i
 - [ ] Montar `ScorePage` en `App` tras el login y conectar `onSessionExpired` (limpia la sesión en memoria y vuelve al login con aviso) e `initialRut` (RF-3).
 - [ ] Reemplazar `normalizeRut` por el validador compartido de la spec 015 si existe, conservando la interfaz.
 - [ ] Scripts Playwright en `frontend/e2e/` con `page.route`: flujo feliz, 403, 404, 400, 401, 500 y red caída; 390 y 1280 px sin scroll horizontal; objetivos táctiles de 44 px; capturas por estado; la URL nunca contiene el RUT.
-- [ ] Converge: `docs/implementation/016-score-consulta/{tasks,implement}.md`, estado final de la spec, índice `docs/specs/README.md`, `CLAUDE.md` y `frontend/README.md`.
+- [ ] Converge: `docs/implementation/019-score-consulta/{tasks,implement}.md`, estado final de la spec, índice `docs/specs/README.md`, `CLAUDE.md` y `frontend/README.md`.
 
 ---
 
