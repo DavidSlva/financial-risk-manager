@@ -28,12 +28,6 @@
       "sessionExpired": "Tu sesión expiró. Vuelve a iniciar sesión."
     }
   },
-  "session": {
-    "placeholder": {
-      "title": "Sesión iniciada",
-      "rut": "RUT"
-    }
-  },
   "score": {
     "title": "Consulta tu score",
     "subtitle": "Ingresa un RUT para ver su score.",
