@@ -12,7 +12,7 @@ superseded_by: []
 
 # 016-score-consulta — Pantalla de consulta de score
 
-> Borrador para revisión. Los puntos marcados **(supuesto)** son decisiones del agente, no del usuario. Es la segunda y última pantalla de la app; la primera es el login ([014-login-ui](014-login-ui.md), [015-login-logica](015-login-logica.md)).
+> Borrador para revisión. El **diseño de la pantalla y la forma de la respuesta fueron confirmados por el usuario**. Los puntos marcados **(supuesto)** que quedan son decisiones del agente, no del usuario. Es la segunda y última pantalla de la app; la primera es el login ([014-login-ui](014-login-ui.md), [015-login-logica](015-login-logica.md)).
 
 ## Resumen
 
@@ -26,15 +26,15 @@ Una persona ya autenticada consulta el **score de riesgo financiero** de un RUT.
 ## Alcance
 
 **Incluye:** pantalla de consulta (campo RUT, botón, resultado); llamada `GET /api/score/:rut` con `credentials: 'include'`; estados de carga, éxito y cada error; mapa de mensajes por status con i18next (`score.*`, solo `es`); manejo de sesión vencida (`401`); pruebas Vitest y scripts Playwright.
-**No incluye:** consultas masivas o listados; historial de consultas; interpretación del score (rangos, colores, categorías de riesgo: el contrato solo entrega un número); cerrar sesión; renovar la sesión automáticamente; recuperar contraseña; otros idiomas.
+**No incluye:** consultas masivas o listados; historial de consultas; interpretación del score (rangos, colores, categorías de riesgo: confirmado por el usuario que no existen; el backend entrega el número y su fecha); cerrar sesión; renovar la sesión automáticamente; recuperar contraseña; otros idiomas.
 
-## Contrato consumido (spec 013, ya en `develop`)
+## Contrato consumido (spec 013 y respuesta confirmada por el usuario)
 
 `GET /api/score/:rut` (la ruta es **singular**), autenticado con la sesión del login (cookies, ver [015-login-logica](015-login-logica.md)).
 
 | Status | Significado                                                                              | Qué muestra el frontend                              |
 | ------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `200`  | `{ "rut": "…", "score": N }`                                                             | el score                                             |
+| `200`  | `{ "rut": "12.345.678-9", "score": 73, "fecha": "2025-06-27T14:35:00Z" }` (ver abajo)    | el score, el RUT y la fecha del score                |
 | `400`  | `:rut` no es canónico (`12345678-5`)                                                     | mensaje de RUT inválido                              |
 | `401`  | sesión ausente, vencida o usuario no vigente                                             | vuelve al login con aviso de sesión vencida          |
 | `403`  | sin permiso para ver ese RUT. Es **idéntico** exista o no el RUT                         | mensaje de falta de permiso, sin pistas sobre el RUT |
@@ -42,19 +42,21 @@ Una persona ya autenticada consulta el **score de riesgo financiero** de un RUT.
 | `5xx`  | error del servidor                                                                       | mensaje de problema temporal                         |
 | red    | sin respuesta                                                                            | mensaje de falta de conexión                         |
 
+**Respuesta `200` confirmada por el usuario:** `rut` (texto con el formato que entrega el backend, p. ej. `12.345.678-9`), `score` (número) y `fecha` (instante ISO 8601 en UTC). La spec 013 en `develop` documenta solo `{ rut, score }` y un RUT canónico sin puntos; la diferencia (campo `fecha` y formato del `rut` de respuesta) debe reconciliarla el backend (ver "Por definir"). El frontend muestra el `rut` de la respuesta **tal como llega**, sin reformatearlo, y no lo usa para ninguna decisión.
+
 El orden de decisión del backend es 401 → 403 → 400 → 404. El frontend nunca interpreta el texto `error` de la respuesta: elige el mensaje solo por el status.
 
 ## Diseño visual
 
 Misma identidad que el login ([014-login-ui](014-login-ui.md)): tema oscuro, tokens de `styles.config.ts`, mobile first desde 360 px, objetivos táctiles de 44 px, componentes `TextField` y `Button` reutilizados. Los valores de diseño nuevos que haga falta se agregan al archivo de configuración de estilos, no a los componentes.
 
-**Estructura (de arriba abajo) (supuesto):** título "Consulta tu score" → subtítulo → campo RUT con su error → botón "Consultar" → tarjeta de resultado.
+**Estructura (de arriba abajo; aprobada por el usuario):** título "Consulta tu score" → subtítulo → campo RUT con su error → botón "Consultar" → tarjeta de resultado.
 
-**Estados de la tarjeta de resultado (supuesto):**
+**Estados de la tarjeta de resultado (aprobados por el usuario):**
 
 1. **Reposo:** sin tarjeta; solo el formulario.
 2. **Cargando:** botón deshabilitado con indicador y "Consultando…"; campo de solo lectura.
-3. **Éxito:** el score como número grande y el RUT consultado debajo, formateado como se escribió. Sin colores de riesgo ni categorías.
+3. **Éxito:** el score como número grande; debajo, el RUT tal como lo entrega el backend y la fecha del score (ej. "27 de junio de 2025, 10:35" en la hora local del usuario). Sin colores de riesgo, rangos ni categorías.
 4. **Sin permiso (`403`):** tarjeta de aviso con "No tienes permiso para ver el score de este RUT."
 5. **Sin score (`404`):** "No encontramos un score para este RUT."
 6. **RUT inválido (local o `400`):** error de campo bajo el RUT.
@@ -70,9 +72,10 @@ Los avisos usan `role="alert"`; el resultado exitoso se anuncia con `role="statu
 - RF-4: Mensajes por status en un **mapa llave → mensaje** con i18next (`score.errors.forbidden`, `score.errors.notFound`, …), igual que en el login. Un status sin entrada usa el mensaje por defecto de su clase (4xx o 5xx). Nunca se muestra texto del servidor.
 - RF-5: `403` muestra el mismo mensaje exista o no el RUT; la pantalla no hace ninguna otra petición para "comprobar" el RUT.
 - RF-6: `401` limpia la sesión en memoria y vuelve al login con un aviso de sesión vencida **(supuesto)**. No se reintenta ni se renueva la sesión automáticamente (ver "Por definir").
-- RF-7: Una respuesta `200` mal formada (no JSON, `score` que no es número finito, o `rut` ausente) se trata como error temporal (`5xx`). Se muestra el score tal como lo entrega el backend, sin redondear ni inventar escala.
+- RF-7: Una respuesta `200` mal formada (no JSON; `score` que no es número finito; `rut` ausente o que no es texto; `fecha` ausente o que no es una fecha ISO válida) se trata como error temporal (`5xx`). La `fecha` es obligatoria **(supuesto)**. Se muestra el score tal como lo entrega el backend, sin redondear ni inventar escala.
 - RF-8: Mientras hay una consulta en curso, no se envía otra (botón deshabilitado y Enter bloqueado). Si el usuario edita el RUT durante la carga o se cancela la consulta, una respuesta tardía **no** reemplaza lo que se ve ahora (se cancela con `AbortController` y se ignoran respuestas obsoletas).
 - RF-9: El RUT consultado y el score nunca se escriben en `localStorage`, `sessionStorage`, la URL ni los registros de consola. El RUT va solo en la ruta de la API.
+- RF-11: La `fecha` se muestra con `Intl.DateTimeFormat` en español de Chile (`es-CL`), fecha larga y hora corta, en la zona horaria local del usuario **(supuesto)**. El formateador recibe la zona como parámetro para que las pruebas usen una fija (`UTC`). El texto de la etiqueta ("Fecha del score") sale de i18next.
 - RF-10: Accesibilidad: etiqueta asociada al campo, error enlazado con `aria-describedby`/`aria-invalid`, foco al campo con error, orden de tabulación RUT → Consultar.
 
 ## Pruebas
@@ -80,7 +83,7 @@ Los avisos usan `role="alert"`; el resultado exitoso se anuncia con `role="statu
 Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/`.
 
 - **Vitest:**
-  - cliente de score: éxito; cada status del contrato (400, 401, 403, 404, 500) y un status sin entrada; falla de red; `200` mal formado; la petición lleva `credentials: 'include'`, el RUT normalizado y codificado y no escribe en el almacenamiento del navegador;
+  - cliente de score: éxito; cada status del contrato (400, 401, 403, 404, 500) y un status sin entrada; falla de red; `200` mal formado (incluida `fecha` ausente o inválida); la respuesta de ejemplo `{ rut: "12.345.678-9", score: 73, fecha: "2025-06-27T14:35:00Z" }` se interpreta bien; el formateo de la fecha con zona fija; la petición lleva `credentials: 'include'`, el RUT normalizado y codificado y no escribe en el almacenamiento del navegador;
   - mapa de mensajes: cada llave existe en `es.json`; ningún texto del servidor llega a la pantalla;
   - pantalla: cada estado de la tarjeta; el RUT inicial; el envío doble bloqueado; una respuesta tardía no reemplaza la actual; `401` vuelve al login.
 - **Playwright** (`frontend/e2e/`, con las respuestas del backend simuladas mediante `page.route`, sin backend real):
@@ -100,6 +103,7 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)); `frontend/test/` espeja `src/
 - **Renovación de sesión:** el backend tiene refresh de tokens; esta spec no lo usa y manda al login ante `401`. Decidir si el frontend debe renovar la sesión una vez antes de rendirse.
 - **Escala del score:** el contrato entrega un número sin rango. Si se quieren rangos, colores o categorías hace falta que el backend defina la escala.
 - **Distinguir "RUT inexistente" de "sin score"** para quienes pueden ver todos los scores (punto abierto de la spec 013).
+- **Reconciliar la spec 013 con la respuesta real:** agregar `fecha` y fijar el formato del `rut` de respuesta (`12.345.678-9` con puntos, frente al canónico `12345678-5` que usan la ruta y las demás specs). Lo decide el backend; el frontend se adapta a lo que se confirme.
 - **Número de spec:** hay otra rama con el prefijo `014` (`feature/014-cors-desarrollo`); los ids de spec deberían ser únicos antes de integrar.
 
 ## Documentos RPI
