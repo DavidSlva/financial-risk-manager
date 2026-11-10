@@ -74,6 +74,7 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Nombres **Feature-Driven Separation**: `<recurso>.<capa>.ts` (ej. `health.controller.ts`, `health.routes.ts`, `health.service.ts`).
 - Flujo: route → middlewares → controller → service. Los controladores no llevan negocio; los servicios no importan Express.
 - Imports relativos con extensión `.js` (NodeNext).
+- Rutas HTTP: recursos en **plural** (`/api/users`…). Excepción deliberada: `/api/score/:rut` (singular). Los archivos siguen la convención (`scores.*.ts`).
 
 ## TDD y pruebas (spec 010)
 
@@ -118,7 +119,7 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 
 ## Consulta de score (spec 013)
 
-- `GET /api/scores/:rut` → `authenticate` → `authorize(canGetScore)` → `getScore`. El callback `canGetScore` está en `scores.service`: `can_get_all_score` ve cualquier rut; `can_get_score` solo el rut del usuario autenticado (`req.user`, nunca el cuerpo ni la query).
+- `GET /api/score/:rut` → `authenticate` → `authorize(canGetScore)` → `getScore`. El callback `canGetScore` está en `scores.service`: `can_get_all_score` ve cualquier rut; `can_get_score` solo el rut del usuario autenticado (`req.user`, nunca el cuerpo ni la query).
 - La autorización se decide **antes** de buscar el score: un no autorizado recibe el mismo 403 exista o no el rut; el 404 es solo para autorizados. No invertir ese orden.
 - Los recursos nuevos siguen este patrón: callback en su service, ruta con `authenticate` y `authorize`, errores con `HttpError`.
 

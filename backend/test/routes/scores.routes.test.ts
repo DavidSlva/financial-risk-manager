@@ -21,7 +21,7 @@ import {
   scoreScenario,
 } from '../helpers/score-fixtures.js';
 
-describe('GET /api/scores/:rut', () => {
+describe('GET /api/score/:rut', () => {
   let dir: string;
   let deps: AuthDeps;
   let server: TestServer;
@@ -33,7 +33,7 @@ describe('GET /api/scores/:rut', () => {
 
     const app = express();
     app.use(express.json());
-    app.use('/api/scores', createScoresRouter(deps));
+    app.use('/api/score', createScoresRouter(deps));
     app.use(errorHandler);
     server = await startServer(app);
   });
@@ -55,7 +55,7 @@ describe('GET /api/scores/:rut', () => {
   async function getScore(as: string | undefined, rut: string): Promise<Response> {
     const headers: Record<string, string> = {};
     if (as !== undefined) headers.authorization = `Bearer ${as}`;
-    return fetch(`${server.baseUrl}/api/scores/${encodeURIComponent(rut)}`, { headers });
+    return fetch(`${server.baseUrl}/api/score/${encodeURIComponent(rut)}`, { headers });
   }
 
   describe('autenticación', () => {
@@ -139,7 +139,7 @@ describe('GET /api/scores/:rut', () => {
     });
 
     it('no puede usar la query para suplantar otro rut', async () => {
-      const res = await fetch(`${server.baseUrl}/api/scores/${ADMIN}?rut=${USER_WITH_SCORE}`, {
+      const res = await fetch(`${server.baseUrl}/api/score/${ADMIN}?rut=${USER_WITH_SCORE}`, {
         headers: { authorization: `Bearer ${await accessFor(USER_WITH_SCORE)}` },
       });
 
@@ -202,7 +202,7 @@ describe('GET /api/scores/:rut', () => {
   });
 
   it('solo acepta GET', async () => {
-    const res = await fetch(`${server.baseUrl}/api/scores/${ADMIN}`, {
+    const res = await fetch(`${server.baseUrl}/api/score/${ADMIN}`, {
       method: 'POST',
       headers: { authorization: `Bearer ${await accessFor(ADMIN)}` },
     });

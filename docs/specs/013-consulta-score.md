@@ -14,7 +14,7 @@ superseded_by: []
 
 ## Resumen
 
-Es el objetivo de la app: **devolver el score financiero asociado a un rut**. El endpoint `GET /api/scores/:rut` exige autenticación y autorización. Es el primer recurso con **regla de autorización propia**: el callback vive en `scores.service` ([011-rbac](011-rbac.md)) y decide así:
+Es el objetivo de la app: **devolver el score financiero asociado a un rut**. El endpoint `GET /api/score/:rut` exige autenticación y autorización. Es el primer recurso con **regla de autorización propia**: el callback vive en `scores.service` ([011-rbac](011-rbac.md)) y decide así:
 
 - `can_get_all_score` → puede ver el score de **cualquier** rut.
 - `can_get_score` → puede ver el score **solo de su propio rut** (el del usuario autenticado).
@@ -22,12 +22,12 @@ Es el objetivo de la app: **devolver el score financiero asociado a un rut**. El
 
 ## Alcance
 
-**Incluye:** endpoint `GET /api/scores/:rut`, callback de autorización `canGetScore` en `scores.service`, controlador y rutas, pruebas, documentación.
+**Incluye:** endpoint `GET /api/score/:rut`, callback de autorización `canGetScore` en `scores.service`, controlador y rutas, pruebas, documentación.
 **No incluye:** listado de todos los scores, escritura o recálculo de scores, validación del formato del rut ([008-validador-rut](008-validador-rut.md)).
 
 ## Requisitos
 
-- RF-1: `GET /api/scores/:rut` → `200` con `{ "rut": "...", "score": N }`.
+- RF-1: `GET /api/score/:rut` → `200` con `{ "rut": "...", "score": N }`.
 - RF-2: La ruta se protege con `authenticate` y luego `authorize(canGetScore)`. Sin token válido → `401`; sin permiso → `403`.
 - RF-3: `canGetScore(contexto)` está definido en `scores.service` y es la **única** lógica de acceso del recurso:
   1. si el rol del usuario tiene `can_get_all_score` → `true`;
@@ -38,6 +38,7 @@ Es el objetivo de la app: **devolver el score financiero asociado a un rut**. El
 - RF-6: Un usuario **no autorizado** recibe el mismo `403` exista o no el rut: la respuesta no permite averiguar qué ruts existen.
 - RF-7: Los permisos y el rol se evalúan en cada petición con los datos vigentes (revocar un usuario o quitar un permiso rige sin reiniciar).
 - RF-8: Solo `GET`; las demás verbas sobre la ruta responden `404` del mapa de errores.
+- RF-9: La ruta es **`/api/score/:rut`** (singular). Es una **excepción deliberada** a la convención de usar nombres en plural para los recursos: designa el score único de un rut, no una colección. Los archivos del recurso siguen la convención (`scores.service.ts`, `scores.routes.ts`, …).
 
 ## Tabla de decisión
 
@@ -56,7 +57,7 @@ backend/src/
 ├── services/scores.service.ts        # findScoreByRut (006) + canGetScore (callback de autorización)
 ├── controllers/scores.controller.ts  # getScore: busca el score; NOT_FOUND si no hay
 ├── routes/scores.routes.ts           # GET /:rut → authenticate → authorize(canGetScore) → getScore
-└── routes/index.ts                   # + router.use('/scores', scoresRouter)
+└── routes/index.ts                   # + router.use('/score', scoresRouter)
 ```
 
 ```ts
@@ -110,6 +111,8 @@ Notas:
 - El 403 se decide **antes** de buscar el score; el 404 solo lo ve quien ya está autorizado.
 - La comparación del rut propio es textual hasta que exista la normalización de [008-validador-rut](008-validador-rut.md).
 - Las specs [011](011-rbac.md) y [012](012-errores-http.md) enlazan ahora a esta.
+
+Cambio posterior (2026-11-09 21:08): la ruta pasó de `/api/scores/:rut` a **`/api/score/:rut`** a pedido del usuario, manteniendo la convención general de recursos en plural. Se cambiaron primero las pruebas (1 en rojo) y luego `routes/index.ts`; el comportamiento no cambia.
 
 **Revisión de documentos relacionados:**
 
