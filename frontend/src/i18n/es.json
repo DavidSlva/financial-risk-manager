@@ -1,0 +1,22 @@
+{
+  "login": {
+    "title": "Iniciar sesión",
+    "subtitle": "Ingresa tu RUT y contraseña para ver tu score.",
+    "rut": {
+      "label": "RUT",
+      "placeholder": "12345678-K"
+    },
+    "password": {
+      "label": "Contraseña",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "submit": "Continuar",
+    "submitting": "Ingresando…",
+    "errors": {
+      "invalidCredentials": "RUT o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.",
+      "rutInvalid": "Ingresa un RUT válido.",
+      "passwordInvalid": "Ingresa tu contraseña."
+    }
+  }
+}
