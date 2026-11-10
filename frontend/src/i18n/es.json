@@ -14,9 +14,24 @@
     "submit": "Continuar",
     "submitting": "Ingresando…",
     "errors": {
-      "invalidCredentials": "RUT o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.",
+      "invalidCredentials": "RUT o contraseña incorrectos. Revisa tus datos; si ya lo intentaste varias veces, tu cuenta puede estar bloqueada.",
       "rutInvalid": "Ingresa un RUT válido.",
-      "passwordInvalid": "Ingresa tu contraseña."
+      "passwordInvalid": "Ingresa tu contraseña.",
+      "passwordLength": "La contraseña debe tener entre {{passwordMin}} y {{passwordMax}} caracteres.",
+      "badRequest": "Revisa los datos ingresados.",
+      "tooManyRequests": "Demasiados intentos. Espera unos minutos e inténtalo otra vez.",
+      "clientError": "No pudimos procesar la solicitud. Revisa los datos e inténtalo de nuevo.",
+      "serverError": "Tenemos un problema de nuestro lado. Inténtalo en unos minutos.",
+      "network": "No pudimos conectar. Revisa tu conexión."
+    },
+    "notices": {
+      "sessionExpired": "Tu sesión expiró. Vuelve a iniciar sesión."
+    }
+  },
+  "session": {
+    "placeholder": {
+      "title": "Sesión iniciada",
+      "rut": "RUT"
     }
   }
 }

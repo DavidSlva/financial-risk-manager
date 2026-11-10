@@ -45,7 +45,7 @@ describe('LoginStatesPreview', () => {
   it('form-error muestra el texto de credenciales inválidas', () => {
     const { container } = renderPreview();
     expect(section(container, 'form-error').textContent).toContain(
-      'RUT o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.',
+      'RUT o contraseña incorrectos. Revisa tus datos; si ya lo intentaste varias veces, tu cuenta puede estar bloqueada.',
     );
   });
 

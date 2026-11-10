@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 import { PasswordField } from './PasswordField';
@@ -9,6 +9,11 @@ export interface LoginFormProps {
   isSubmitting?: boolean;
   formErrorKey?: string;
   fieldErrorKeys?: { rut?: string; password?: string };
+  onFieldEdit?(field: 'rut' | 'password'): void;
+  /** Al cambiar, limpia la contraseña y la enfoca. */
+  resetPasswordSignal?: number;
+  /** Al cambiar el nonce, enfoca el campo indicado. */
+  focusField?: { field: 'rut' | 'password'; nonce: number };
 }
 
 export function LoginForm({
@@ -16,11 +21,31 @@ export function LoginForm({
   isSubmitting = false,
   formErrorKey,
   fieldErrorKeys,
+  onFieldEdit,
+  resetPasswordSignal,
+  focusField,
 }: LoginFormProps) {
   const { t } = useTranslation();
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
+  const rutRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const firstSignal = useRef(true);
   const hasFormError = formErrorKey !== undefined && formErrorKey !== '';
+
+  useEffect(() => {
+    if (firstSignal.current) {
+      firstSignal.current = false;
+      return;
+    }
+    setPassword('');
+    passwordRef.current?.focus();
+  }, [resetPasswordSignal]);
+
+  useEffect(() => {
+    if (!focusField) return;
+    (focusField.field === 'rut' ? rutRef : passwordRef).current?.focus();
+  }, [focusField?.field, focusField?.nonce]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,7 +59,11 @@ export function LoginForm({
         id="rut"
         label={t('login.rut.label')}
         value={rut}
-        onChange={setRut}
+        inputRef={rutRef}
+        onChange={(value) => {
+          setRut(value);
+          onFieldEdit?.('rut');
+        }}
         errorKey={fieldErrorKeys?.rut}
         readOnly={isSubmitting}
         inputMode="text"
@@ -46,7 +75,11 @@ export function LoginForm({
         id="password"
         label={t('login.password.label')}
         value={password}
-        onChange={setPassword}
+        inputRef={passwordRef}
+        onChange={(value) => {
+          setPassword(value);
+          onFieldEdit?.('password');
+        }}
         errorKey={fieldErrorKeys?.password}
         readOnly={isSubmitting}
         autoComplete="current-password"
