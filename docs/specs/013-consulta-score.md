@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [006-modelo-datos, 007-auth-jwt, 010-tdd-vitest, 011-rbac, 012-errores-http]
-related: []
+related: [008-validador-rut]
 supersedes: []
 superseded_by: []
 ---
@@ -85,7 +85,7 @@ export function canGetScore(
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — se implementa con TDD.
 - depende de: [011-rbac](011-rbac.md) — `authorize`, permisos y el catálogo.
 - depende de: [012-errores-http](012-errores-http.md) — `FORBIDDEN` y `NOT_FOUND`.
-- la validación del formato del rut queda en [008-validador-rut](008-validador-rut.md).
+- relacionada con: [008-validador-rut](008-validador-rut.md) — valida el formato de `:rut` y cierra el punto abierto sobre la comparación textual.
 
 ## Puntos abiertos
 
