@@ -56,6 +56,7 @@ services/health.service.ts
 Excepciones:
 
 - `routes/index.ts`: enrutador principal.
+- **Rutas HTTP:** los recursos van en **plural** (`/api/users`, `/api/permissions`…). Excepción deliberada: `/api/score/:rut`, que designa el score único de un rut.
 - `config/environment.ts`: no pertenece a un recurso.
 - Los middlewares transversales usan `<nombre>.middleware.ts` (`error-handler.middleware.ts`, `not-found.middleware.ts`).
 
@@ -132,6 +133,10 @@ JWT simétrico (spec [007-auth-jwt](../docs/specs/007-auth-jwt.md)); el algoritm
 - Los rechazos son `401` genéricos con `WWW-Authenticate: Bearer`. Si los datos no son íntegros, no se autentica (`500`).
 - Pendiente: cómo se obtiene el primer par de tokens ([009-emision-tokens](../docs/specs/009-emision-tokens.md)).
 
+## RUT
+
+Spec [008-validador-rut](../docs/specs/008-validador-rut.md). El RUT se guarda y se recibe **solo** en formato canónico `12345678-5`: 7 u 8 dígitos sin ceros a la izquierda, guion y dígito verificador (`0`–`9` o `K` mayúscula), sin puntos ni espacios. `isValidRut` (`rut.service.ts`) valida el formato y el dígito verificador por módulo 11; **no normaliza**: lo que no es canónico es inválido (400). Los datos lo exigen al arrancar (IR-13).
+
 ## Errores HTTP
 
 Un **único** `error-handler.middleware` traduce todos los errores usando el mapa de `config/http-errors.ts` (spec [012-errores-http](../docs/specs/012-errores-http.md)). Para responder un error, cualquier capa lanza un `HttpError` de un tipo del mapa; nadie arma respuestas de error a mano.
@@ -155,7 +160,7 @@ Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se regis
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
-- `GET /api/scores/:rut`: score de un rut → `{ "rut", "score" }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
+- `GET /api/score/:rut`: score de un rut → `{ "rut", "score" }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
 - `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
 
 ## Pruebas

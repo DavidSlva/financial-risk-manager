@@ -1,5 +1,6 @@
 import { isPermissionKey } from '../config/permissions.js';
 import type { DataFileName, Violation } from '../models/data.types.js';
+import { isValidRut } from './rut.service.js';
 
 /** Contenido ya parseado de cada archivo, sin ninguna garantía sobre su forma. */
 export interface RawData {
@@ -137,7 +138,7 @@ function checkUnique(
 }
 
 /**
- * Valida la integridad referencial de roles, users, scores y permissions (reglas IR-1…IR-9 de la spec 006 e IR-10…IR-12 de la 011).
+ * Valida la integridad referencial de roles, users, scores y permissions (reglas IR-1…IR-9 de la spec 006 IR-10…IR-12 de la 011 e IR-13 de la 008).
  * Función pura: acumula y devuelve todas las violaciones; arreglo vacío = datos íntegros.
  */
 export function validateIntegrity(data: RawData): Violation[] {
@@ -199,6 +200,25 @@ export function validateIntegrity(data: RawData): Violation[] {
             'permissions.json',
             'IR-11',
             `"role" no existe en roles.json: "${row.role}"`,
+            index,
+          ),
+        );
+      }
+    });
+  }
+
+  // IR-13: rut con formato canónico y dígito verificador válido (solo filas ya válidas en IR-2/3).
+  for (const [file, rows] of [
+    ['users.json', users.rows],
+    ['scores.json', scores.rows],
+  ] as const) {
+    rows.forEach((row, index) => {
+      if (!isValidRut(row.rut)) {
+        violations.push(
+          violation(
+            file,
+            'IR-13',
+            `"rut" debe tener el formato 12345678-5 con dígito verificador válido: "${row.rut}"`,
             index,
           ),
         );

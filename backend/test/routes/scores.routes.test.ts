@@ -21,7 +21,7 @@ import {
   scoreScenario,
 } from '../helpers/score-fixtures.js';
 
-describe('GET /api/scores/:rut', () => {
+describe('GET /api/score/:rut', () => {
   let dir: string;
   let deps: AuthDeps;
   let server: TestServer;
@@ -33,7 +33,7 @@ describe('GET /api/scores/:rut', () => {
 
     const app = express();
     app.use(express.json());
-    app.use('/api/scores', createScoresRouter(deps));
+    app.use('/api/score', createScoresRouter(deps));
     app.use(errorHandler);
     server = await startServer(app);
   });
@@ -55,7 +55,7 @@ describe('GET /api/scores/:rut', () => {
   async function getScore(as: string | undefined, rut: string): Promise<Response> {
     const headers: Record<string, string> = {};
     if (as !== undefined) headers.authorization = `Bearer ${as}`;
-    return fetch(`${server.baseUrl}/api/scores/${encodeURIComponent(rut)}`, { headers });
+    return fetch(`${server.baseUrl}/api/score/${encodeURIComponent(rut)}`, { headers });
   }
 
   describe('autenticación', () => {
@@ -139,7 +139,7 @@ describe('GET /api/scores/:rut', () => {
     });
 
     it('no puede usar la query para suplantar otro rut', async () => {
-      const res = await fetch(`${server.baseUrl}/api/scores/${ADMIN}?rut=${USER_WITH_SCORE}`, {
+      const res = await fetch(`${server.baseUrl}/api/score/${ADMIN}?rut=${USER_WITH_SCORE}`, {
         headers: { authorization: `Bearer ${await accessFor(USER_WITH_SCORE)}` },
       });
 
@@ -162,6 +162,36 @@ describe('GET /api/scores/:rut', () => {
 
     it('permiso propio negado (blocked) → 403 incluso sobre su propio rut', async () => {
       expect((await getScore(await accessFor(BLOCKED), BLOCKED)).status).toBe(403);
+    });
+  });
+
+  describe('orden de decisión: 401 → 403 → 400 → 404', () => {
+    const INVALID_RUT = '12345678-4';
+
+    it('sin token con un rut inválido → 401 (primero autenticar)', async () => {
+      expect((await getScore(undefined, INVALID_RUT)).status).toBe(401);
+    });
+
+    it('sin permiso con un rut inválido → 403 (primero autorizar)', async () => {
+      expect((await getScore(await accessFor(USER_WITH_SCORE), INVALID_RUT)).status).toBe(403);
+    });
+
+    it('autorizado con un rut inválido → 400', async () => {
+      const res = await getScore(await accessFor(ADMIN), INVALID_RUT);
+
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error: 'Bad Request' });
+    });
+
+    it.each(['12.345.678-5', '123456785', '1000005-k', '0123456-7'])(
+      'autorizado con el formato no canónico %j → 400',
+      async (rut) => {
+        expect((await getScore(await accessFor(ADMIN), rut)).status).toBe(400);
+      },
+    );
+
+    it('autorizado con un rut válido pero sin score → 404', async () => {
+      expect((await getScore(await accessFor(ADMIN), UNKNOWN_RUT)).status).toBe(404);
     });
   });
 
@@ -202,7 +232,7 @@ describe('GET /api/scores/:rut', () => {
   });
 
   it('solo acepta GET', async () => {
-    const res = await fetch(`${server.baseUrl}/api/scores/${ADMIN}`, {
+    const res = await fetch(`${server.baseUrl}/api/score/${ADMIN}`, {
       method: 'POST',
       headers: { authorization: `Bearer ${await accessFor(ADMIN)}` },
     });
