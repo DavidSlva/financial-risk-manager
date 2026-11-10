@@ -101,6 +101,8 @@ El frontend tendrá dos pantallas: **login** y **consulta de score** ([013-consu
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — Vitest y TDD; [012-errores-http](012-errores-http.md) — status que el frontend traduce a mensajes.
 - relacionada con: [009-emision-tokens](009-emision-tokens.md) — endpoint real de login que reemplazará al mock; [013-consulta-score](013-consulta-score.md) — destino tras el login; [008-validador-rut](008-validador-rut.md) — formato canónico del RUT.
 
+> **Nota (Converge de 014, 2026-11-09):** [014-login-ui](014-login-ui.md) quedó `converged`. Su interfaz usa el **tema claro** (no el oscuro); si esta spec menciona colores o un tema oscuro, prevalece 014. `LoginForm` solo presenta: esta spec le conecta validación, llamada a `/login` y errores por status vía `formErrorKey`/`fieldErrorKeys`, y monta `LoginPage` en `App`.
+
 ## Estado final (completar en Converge)
 
 Pendiente.

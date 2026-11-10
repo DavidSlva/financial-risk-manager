@@ -15,7 +15,7 @@ Spec: [../../specs/014-login-ui.md](../../specs/014-login-ui.md)
 - `frontend/` solo tenía Vitest (spec 010): no hay React, Vite ni entorno DOM, por eso la spec incluye el andamiaje.
 - El backend responde errores como `{ "error": "<texto>" }` con status (spec 012); el login real llega con la spec 009. Nada de eso se usa aquí.
 - Numeración: 011 (RBAC), 012 (errores) y 013 (score) estaban tomadas por otras ramas; esta spec es 014 y la lógica es 015.
-- Maqueta aprobada: variante B (oscura) del brainstorming; los mensajes de error de ejemplo son propuesta del agente.
+- Maqueta inicial: variante B (oscura) del brainstorming, luego reemplazada por la clara (ver la línea siguiente); los mensajes de error de ejemplo son propuesta del agente.
 - El usuario eligió el tema claro el 2026-11-09 (variante A, tras ver el login en ambos temas); `danger` pasó a `#cd2b31` para cumplir AA.
 
 ## Preguntas abiertas

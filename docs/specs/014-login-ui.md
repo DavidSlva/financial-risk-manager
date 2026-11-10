@@ -1,7 +1,7 @@
 ---
 id: 014-login-ui
 title: Diseño de la pantalla de login (mobile first, tema claro, sin lógica de negocio)
-status: planned
+status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [010-tdd-vitest]
@@ -165,17 +165,31 @@ Con **TDD** ([010-tdd-vitest](010-tdd-vitest.md)): `frontend/test/` espeja `src/
 ## Specs relacionadas
 
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — Vitest y TDD.
-- relacionada con: [015-login-logica](015-login-logica.md) — conecta este formulario con validación, `/login` y errores; [013-consulta-score](013-consulta-score.md) — pantalla a la que se llega tras el login.
+- relacionada con: [015-login-logica](015-login-logica.md) — depende de esta spec; conecta este formulario con validación, `/login` y errores; [013-consulta-score](013-consulta-score.md) — pantalla a la que se llega tras el login.
 
-## Estado final (completar en Converge)
+## Estado final (Converge)
 
-Pendiente.
+Implementada en `feature/014-login-ui` (8 tareas, commits `7339b2c`..`f73cbff` más el de Converge). Se construyó el andamiaje (Vite, React, i18next, Vitest con jsdom, Playwright), `config/styles.config.ts` con `applyStyleTokens`, textos en `i18n/es.json`, los componentes `Button`, `TextField`, `PasswordField`, `LoginForm` y `LoginPage`, y la vista previa `/dev/login-states` (solo desarrollo, fuera del bundle de producción).
+
+**Verificación final (2026-11-09):** `check:policy`, `install --frozen-lockfile`, `format:check`, `lint`, `typecheck` y `build` en verde; Vitest: backend 164 y frontend 71 pruebas; Playwright: 44 pruebas en verde (Chromium, puerto 5299). El CI no corre Playwright (solo Vitest).
+
+**Desviaciones respecto de lo planificado:**
+
+- **Tema claro** elegido por el usuario (la spec se redactó antes con la variante oscura); la oscura se descartó.
+- **`danger`** pasó de `#e5484d` a `#cd2b31` para cumplir AA (5.05:1 sobre `#fafafa`); prueba `styles.contrast.test.ts`.
+- **Tokens agregados** a la configuración: `focusRingWidth`, `spinnerSize`, `spinnerBorderWidth`, `spinnerDuration`, `spinnerTurn`, `passwordToggleWidth`.
+- **Mostrar/Ocultar dentro del campo** (`endAdornment`), tras una corrección de la Tarea 5 (queda bajo el campo en la primera versión).
+- Las líneas base de Playwright son de Chromium en Windows y pueden diferir en otras plataformas.
+
+**Diferidos (menores):** contraste del botón deshabilitado (~2.4:1, `textDisabled` exento de AA); spinner detenido con `prefers-reduced-motion`; fuente de campo de 14 px desde 480 px; ancho del toggle atado a las etiquetas en español; `snapshotPathTemplate` sin `{platform}`; `showPassword` de la vista previa no es seguro bajo StrictMode; detalle completo en [implement.md](../implementation/014-login-ui/implement.md).
+
+**Siguiente:** [015-login-logica](015-login-logica.md) depende de esta spec (conecta lógica y errores a `LoginForm`).
 
 **Revisión de documentos relacionados:**
 
-- [ ] constitution actualizada
-- [ ] plan actualizado
-- [ ] tasks actualizadas
-- [ ] implement actualizado
-- [ ] specs relacionadas revisadas
-- [ ] índice `specs/README.md` actualizado
+- [x] constitution actualizada
+- [x] plan actualizado
+- [x] tasks actualizadas
+- [x] implement actualizado
+- [x] specs relacionadas revisadas
+- [x] índice `specs/README.md` actualizado
