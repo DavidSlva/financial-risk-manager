@@ -10,5 +10,5 @@ Spec: [../../specs/004-pnpm-ci.md](../../specs/004-pnpm-ci.md) · Plan: [../../p
 - [x] T6 — Hooks con `pnpm exec`
 - [x] T7 — Workflow `.github/workflows/ci.yml` con acciones fijadas por SHA
 - [x] T8 — Documentación: spec 004, RPI, prompt, índice, `CLAUDE.md`, specs 002 y 003
-- [ ] T9 — Commit, push y PR (requiere confirmación)
-- [ ] T10 — Primera ejecución del CI en GitHub y ajustes
+- [x] T9 — Commit, push (19:36:38) e integración a `develop` por merge directo, sin PR (20:29)
+- [x] T10 — Primera ejecución del CI en GitHub: run 42720950711 en `develop`, todos los pasos en verde

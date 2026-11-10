@@ -35,5 +35,6 @@ docs/
    - Actualizar la spec con un **resumen del estado final** de la implementación y su `status`.
    - Revisar que constitution, plan, tasks e implement reflejen lo realmente construido; corregirlos si no.
    - Revisar las specs relacionadas (`depends_on`/`related`) y actualizar enlaces y estado.
-   - Actualizar el índice `specs/README.md`.
-5. **Prompts:** cada prompt del usuario se registra en `prompts/` (ver `prompts/README.md`).
+   - Actualizar el índice `specs/README.md`: las columnas de relaciones y el grafo se regeneran desde el front matter con `pnpm run docs:index` (y `pnpm run docs:index:check` los verifica).
+   - Contrastar lo documentado con la realidad (CI en GitHub, git, pruebas); las horas de `implement.md` salen de `date` o de git, nunca se estiman.
+5. **Prompts:** cada prompt del usuario, incluidas las confirmaciones y órdenes de integración, se registra en `prompts/` con su hora real (ver `prompts/README.md`).

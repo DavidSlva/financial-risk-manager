@@ -59,8 +59,9 @@ Notas:
 
 - `backend/src/index.ts` y `frontend/src/main.tsx` son placeholders vacíos; `tsc` necesita al menos un archivo de entrada.
 - Husky fija `core.hooksPath` en la config compartida del repositorio, por lo que aplica a todos los workspaces una vez que la rama tenga `.husky/`.
-- Versiones instaladas: ESLint 10, TypeScript 6, Prettier 3, Commitlint 21 (ver `package-lock.json`).
-- Pendiente: probar los hooks en un commit real (el commit de esta spec los ejercita).
+- Versiones instaladas: ESLint 10, TypeScript 6, Prettier 3, Commitlint 21 (ver `pnpm-lock.yaml`; la spec 004 migró de npm a pnpm).
+- Hooks probados en un commit real: el commit de la spec pasó por `pre-commit` y `commit-msg`, y un mensaje sin formato fue bloqueado por Commitlint.
+- Evolución posterior: la spec [004](004-pnpm-ci.md) migró a pnpm (los hooks usan `pnpm exec` y `pnpm run typecheck`) y fijó TypeScript en `~6.0.0`; la spec [010](010-tdd-vitest.md) hizo que `tsc` también cubra `test/`.
 
 **Revisión de documentos relacionados:**
 

@@ -18,5 +18,5 @@ Spec: [../../specs/003-tooling.md](../../specs/003-tooling.md)
 
 ## Preguntas abiertas
 
-- Gestor de paquetes: se eligió npm workspaces (no estaba definido). Revisar si se prefiere pnpm.
+- Gestor de paquetes: se eligió npm workspaces (no estaba definido). Resuelto en la spec 004: pnpm.
 - Instalar React/Vite y librerías del backend → specs posteriores.

@@ -21,8 +21,8 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 
 - Ids de spec: `NNN-slug`. Plantillas en `docs/specs/_templates/`.
 - Las specs forman un grafo: declarar `depends_on` / `related` en el front matter y reflejarlo en `docs/specs/README.md`.
-- **Converge (siempre):** actualizar la spec con el resumen del estado final, revisar que constitution/plan/tasks/implement y las specs relacionadas estén al día, y actualizar el índice.
-- **Prompts:** guardar cada prompt del usuario como `docs/prompts/YYYY-MM-DD_HHMM_NNN-slug.md` (hora local, texto textual). Ver `docs/prompts/README.md`.
+- **Converge (siempre):** actualizar la spec con el resumen del estado final, revisar que constitution/plan/tasks/implement y las specs relacionadas estén al día, y actualizar el índice (`pnpm run docs:index` regenera relaciones y grafo desde el front matter; `pnpm run docs:index:check` los verifica). Contrastar lo documentado con la realidad (CI, git, pruebas); las horas de `implement.md` salen de `date` o de git, nunca se estiman.
+- **Prompts:** guardar **cada** prompt del usuario (también las confirmaciones y órdenes de push, merge, promoción o converge) como `docs/prompts/YYYY-MM-DD_HHMM_NNN-slug.md` (hora local, texto textual). Ver `docs/prompts/README.md`.
 
 ## Flujo Git (gitflow)
 
@@ -34,7 +34,7 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 | `feature/<NNN-slug>` | trabajo de una spec | `develop`                    |
 
 - Una rama por spec, nombrada con el id de la spec: `feature/002-flujo-git-agentes`.
-- Los cambios llegan a `develop` por PR. No hacer commits directos en `main`, `staging` ni `develop`.
+- Los cambios llegan a `develop` por PR. No hacer commits directos en `main`, `staging` ni `develop`. (Hasta ahora las ramas se integraron con merge `--no-ff` sin PR, a pedido del usuario; ver puntos abiertos de la spec 002.)
 
 ## Workspaces de agentes
 

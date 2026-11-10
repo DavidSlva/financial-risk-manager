@@ -18,6 +18,8 @@ Configuración en la raíz compartida por ambos workspaces; cada workspace solo 
 | Regla de scope como plugin inline de Commitlint | `scope-enum` con lista fija    | El id crece con cada spec; una lista exigiría mantenimiento       |
 | `.gitattributes` con `eol=lf`                   | Dejar `autocrlf`               | Evita ruido CRLF en Windows y alinea con Prettier (`lf`)          |
 
+> Actualización (converge): el gestor pasó de npm a pnpm en la spec [004](../../specs/004-pnpm-ci.md). Donde este plan dice `npm`, hoy rige `pnpm` (`pnpm exec lint-staged`, `pnpm run typecheck`).
+
 ## Orden de ejecución del pre-commit
 
 1. lint-staged: ESLint `--fix` y Prettier sobre staged.

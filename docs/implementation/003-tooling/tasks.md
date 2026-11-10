@@ -12,4 +12,4 @@ Spec: [../../specs/003-tooling.md](../../specs/003-tooling.md) · Plan: [../../p
 - [x] T8 — `.gitattributes` y `.gitignore`
 - [x] T9 — Documentación: spec 003, RPI, prompt, índice y `CLAUDE.md`
 - [x] T10 — Commit de la spec en `feature/003-tooling` (ejercita los hooks)
-- [ ] T11 — Push y PR a `develop` (requiere confirmación)
+- [x] T11 — Push (19:36:38) e integración a `develop` por merge directo, sin PR (20:29)

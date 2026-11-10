@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [003-tooling, 004-pnpm-ci]
-related: [001-setup-inicial]
+related: [001-setup-inicial, 007-auth-jwt]
 supersedes: []
 superseded_by: []
 ---
@@ -63,6 +63,7 @@ La convención completa y la guía para agregar un recurso están en [backend/RE
 - depende de: [003-tooling](003-tooling.md) — lint, formato y `tsc` del código nuevo.
 - depende de: [004-pnpm-ci](004-pnpm-ci.md) — Express entra por `pnpm add` bajo la cuarentena de 7 días.
 - relacionada con: [001-setup-inicial](001-setup-inicial.md) — creó la carpeta `backend/`.
+- relacionada con: [007-auth-jwt](007-auth-jwt.md) — extiende `middlewares/`, `routes/` y `error-handler`.
 
 ## Puntos abiertos
 
@@ -80,6 +81,8 @@ Notas:
 - Dependencias nuevas: `express` y `@types/express` (resueltas con la cuarentena de 7 días).
 - Al agregar dependencias, `pnpm` reescribió `pnpm-lock.yaml` con su propio formato y `prettier --check` falló. Se corrigió en la spec 004 (commit `fix(004)`, `pnpm-lock.yaml` en `.prettierignore`); esta rama lo incluye.
 - Los imports relativos llevan extensión `.js` por `moduleResolution: NodeNext`.
+
+Evolución posterior (converge): las specs siguientes extendieron esta estructura sin romperla. La [006](006-modelo-datos.md) agregó `models/` (solo tipos) y que `index.ts` valide los datos al arrancar; la [007](007-auth-jwt.md) agregó `types/`, el recurso `auth` (controlador, rutas, servicios) y que `error-handler` traduzca `AuthenticationError` a 401; la [010](010-tdd-vitest.md) agregó `test/` espejo de `src/`. `backend/README.md` ya refleja estas carpetas.
 
 **Revisión de documentos relacionados:**
 

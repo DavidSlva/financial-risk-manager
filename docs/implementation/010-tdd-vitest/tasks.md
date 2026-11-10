@@ -11,4 +11,4 @@ Spec: [../../specs/010-tdd-vitest.md](../../specs/010-tdd-vitest.md) · Plan: [.
 - [x] T7 — Paso "Pruebas (Vitest)" en `.github/workflows/ci.yml`
 - [x] T8 — Regla TDD y comandos en `CLAUDE.md`; convención de pruebas en `backend/README.md`
 - [x] T9 — Verificación: pruebas, tipos, lint y formato
-- [ ] T10 — Push, PR y primera ejecución del CI (requiere confirmación)
+- [x] T10 — Push (20:29), integración a `develop` por merge directo, sin PR (20:29), y primera ejecución del CI en verde
