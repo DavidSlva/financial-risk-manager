@@ -1,3 +1,4 @@
+import { apiUrl } from '../config/api.config.js';
 import { reasonForStatus, SCORE_ERROR_KEYS } from '../config/score-errors.js';
 import type { ScoreClient, ScoreFailure, ScoreFailureReason, ScoreOutcome } from './score.types.js';
 
@@ -50,7 +51,7 @@ export function createScoreClient(fetchImpl?: typeof fetch): ScoreClient {
         headers: { Accept: 'application/json' },
       };
       if (options?.signal) init.signal = options.signal;
-      response = await doFetch(`/api/score/${encodeURIComponent(rut)}`, init);
+      response = await doFetch(apiUrl(`/score/${encodeURIComponent(rut)}`), init);
     } catch (error) {
       if (isAbortError(error)) throw error;
       return failure('network');

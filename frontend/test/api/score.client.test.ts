@@ -98,4 +98,19 @@ describe('createScoreClient', () => {
     expect(sessionStorage.length).toBe(0);
     setItem.mockRestore();
   });
+
+  it('usa la URL base configurada en VITE_API_BASE_URL', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8001/api/');
+    vi.resetModules();
+    try {
+      const mod = await import('../../src/api/score.client.js');
+      const f = vi.fn(async () => new Response('{}', { status: 404 }));
+      await mod.createScoreClient(f as unknown as typeof fetch)('12345678-5');
+      const [url] = f.mock.calls[0] as unknown as [string];
+      expect(url).toBe('http://localhost:8001/api/score/12345678-5');
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
+  });
 });
