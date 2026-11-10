@@ -12,7 +12,7 @@ Cada spec es un nodo del grafo. Las relaciones se declaran en el front matter de
 | [006-modelo-datos](006-modelo-datos.md)             | Modelo de datos base (roles, users, scores) e integridad referencial     | converged | 005, 010                | 007             | [constitution](../research/006-modelo-datos/constitution.md)       | [plan](../plan/006-modelo-datos/plan.md)       | [tasks](../implementation/006-modelo-datos/tasks.md) · [implement](../implementation/006-modelo-datos/implement.md)             |
 | [007-auth-jwt](007-auth-jwt.md)                     | Autenticación JWT simétrica con access/refresh y revocación por vigencia | converged | 006, 010                | 005             | [constitution](../research/007-auth-jwt/constitution.md)           | [plan](../plan/007-auth-jwt/plan.md)           | [tasks](../implementation/007-auth-jwt/tasks.md) · [implement](../implementation/007-auth-jwt/implement.md)                     |
 | [008-validador-rut](008-validador-rut.md)           | Validador del formato de RUT (formato canónico 12345678-5)               | converged | 006, 010                | 009, 013        | [constitution](../research/008-validador-rut/constitution.md)      | [plan](../plan/008-validador-rut/plan.md)      | [tasks](../implementation/008-validador-rut/tasks.md) · [implement](../implementation/008-validador-rut/implement.md)           |
-| [009-emision-tokens](009-emision-tokens.md)         | Emisión del primer par de tokens (pendiente)                             | draft     | 007                     | —               | —                                                                  | —                                              | —                                                                                                                               |
+| [009-emision-tokens](009-emision-tokens.md)         | Login con contraseña y emisión del primer par de tokens                  | converged | 006, 007, 008, 010, 012 | —               | [constitution](../research/009-emision-tokens/constitution.md)     | [plan](../plan/009-emision-tokens/plan.md)     | [tasks](../implementation/009-emision-tokens/tasks.md) · [implement](../implementation/009-emision-tokens/implement.md)         |
 | [012-errores-http](012-errores-http.md)             | Mapa de errores HTTP en config y manejador de errores único              | converged | 005, 007, 010           | 011, 013        | [constitution](../research/012-errores-http/constitution.md)       | [plan](../plan/012-errores-http/plan.md)       | [tasks](../implementation/012-errores-http/tasks.md) · [implement](../implementation/012-errores-http/implement.md)             |
 | [013-consulta-score](013-consulta-score.md)         | Consulta de score por rut con autorización personalizada                 | converged | 006, 007, 010, 011, 012 | 008             | [constitution](../research/013-consulta-score/constitution.md)     | [plan](../plan/013-consulta-score/plan.md)     | [tasks](../implementation/013-consulta-score/tasks.md) · [implement](../implementation/013-consulta-score/implement.md)         |
 | [010-tdd-vitest](010-tdd-vitest.md)                 | TDD con Vitest (test/ espejo de src/) e integración en el CI             | converged | 004, 005                | 006, 007        | [constitution](../research/010-tdd-vitest/constitution.md)         | [plan](../plan/010-tdd-vitest/plan.md)         | [tasks](../implementation/010-tdd-vitest/tasks.md) · [implement](../implementation/010-tdd-vitest/implement.md)                 |
@@ -52,9 +52,12 @@ graph LR
   S007 -->|depende de| S010
   S008 -->|depende de| S006
   S008 -->|depende de| S010
-  S008 -.->|relacionada| S009
   S008 -.->|relacionada| S013
+  S009 -->|depende de| S006
   S009 -->|depende de| S007
+  S009 -->|depende de| S008
+  S009 -->|depende de| S010
+  S009 -->|depende de| S012
   S010 -->|depende de| S004
   S010 -->|depende de| S005
   S011 -->|depende de| S006

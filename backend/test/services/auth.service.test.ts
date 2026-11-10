@@ -1,4 +1,5 @@
 import { rmSync } from 'node:fs';
+import { userRow } from '../helpers/user-fixtures.js';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   authenticateAccess,
@@ -76,13 +77,7 @@ describe('auth.service (validador con vigencia)', () => {
       const { accessToken } = await generateTokens(ADMIN, deps.jwt!);
       await expect(authenticateAccess(accessToken, deps)).resolves.toBeDefined();
 
-      setUsers(
-        [
-          { rut: '11111111-1', role: 'admin', active: false },
-          { rut: '22222222-2', role: 'user', active: false },
-        ],
-        2000,
-      );
+      setUsers([userRow('11111111-1', 'admin', false), userRow('22222222-2', 'user', false)], 2000);
 
       await expect(authenticateAccess(accessToken, deps)).rejects.toMatchObject({
         type: 'UNAUTHORIZED',
@@ -95,13 +90,7 @@ describe('auth.service (validador con vigencia)', () => {
         type: 'UNAUTHORIZED',
       });
 
-      setUsers(
-        [
-          { rut: '11111111-1', role: 'admin', active: true },
-          { rut: '22222222-2', role: 'user', active: true },
-        ],
-        2000,
-      );
+      setUsers([userRow('11111111-1', 'admin', true), userRow('22222222-2', 'user', true)], 2000);
 
       await expect(authenticateAccess(accessToken, deps)).resolves.toMatchObject({
         rut: '22222222-2',
@@ -111,13 +100,7 @@ describe('auth.service (validador con vigencia)', () => {
     it('el rol sale de users.json en el momento, no del token', async () => {
       const { accessToken } = await generateTokens(ADMIN, deps.jwt!);
 
-      setUsers(
-        [
-          { rut: '11111111-1', role: 'user', active: true },
-          { rut: '22222222-2', role: 'user', active: false },
-        ],
-        2000,
-      );
+      setUsers([userRow('11111111-1', 'user', true), userRow('22222222-2', 'user', false)], 2000);
 
       await expect(authenticateAccess(accessToken, deps)).resolves.toMatchObject({ role: 'user' });
     });
@@ -187,13 +170,7 @@ describe('auth.service (validador con vigencia)', () => {
       const { refreshToken } = await generateTokens(ADMIN, deps.jwt!);
       await expect(refreshAccess(refreshToken, deps)).resolves.toBeDefined();
 
-      setUsers(
-        [
-          { rut: '11111111-1', role: 'admin', active: false },
-          { rut: '22222222-2', role: 'user', active: false },
-        ],
-        2000,
-      );
+      setUsers([userRow('11111111-1', 'admin', false), userRow('22222222-2', 'user', false)], 2000);
 
       await expect(refreshAccess(refreshToken, deps)).rejects.toMatchObject({
         type: 'UNAUTHORIZED',

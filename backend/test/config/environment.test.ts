@@ -96,6 +96,22 @@ describe('config/environment', () => {
     });
   });
 
+  describe('LOGIN_MAX_ATTEMPTS', () => {
+    it('por defecto es 5', () => {
+      expect(parseEnvironment(base).loginMaxAttempts).toBe(5);
+    });
+
+    it('es configurable', () => {
+      expect(parseEnvironment({ ...base, LOGIN_MAX_ATTEMPTS: '3' }).loginMaxAttempts).toBe(3);
+    });
+
+    it.each(['0', '-1', 'abc', '2.5', ''])('rechaza %j', (value) => {
+      expect(() => parseEnvironment({ ...base, LOGIN_MAX_ATTEMPTS: value })).toThrow(
+        /LOGIN_MAX_ATTEMPTS/,
+      );
+    });
+  });
+
   describe('TTL', () => {
     it('por defecto: access 900 s y refresh 604800 s', () => {
       expect(parseEnvironment(base).jwt).toMatchObject({

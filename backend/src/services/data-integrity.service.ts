@@ -1,5 +1,6 @@
 import { isPermissionKey } from '../config/permissions.js';
 import type { DataFileName, Violation } from '../models/data.types.js';
+import { isPasswordHash } from './password.service.js';
 import { isValidRut } from './rut.service.js';
 
 /** Contenido ya parseado de cada archivo, sin ninguna garantía sobre su forma. */
@@ -27,7 +28,13 @@ const SCHEMAS = {
   },
   users: {
     file: 'users.json',
-    columns: { rut: 'string', role: 'string', active: 'boolean' },
+    columns: {
+      rut: 'string',
+      role: 'string',
+      active: 'boolean',
+      password_hash: 'string',
+      failed_attempts: 'number',
+    },
     keyColumns: ['rut', 'role'],
   },
   scores: {
@@ -138,7 +145,7 @@ function checkUnique(
 }
 
 /**
- * Valida la integridad referencial de roles, users, scores y permissions (reglas IR-1…IR-9 de la spec 006 IR-10…IR-12 de la 011 e IR-13 de la 008).
+ * Valida la integridad referencial de roles, users, scores y permissions (reglas IR-1…IR-9 de la spec 006 IR-10…IR-12 de la 011 e IR-13 de la 008 e IR-14…IR-15 de la 009).
  * Función pura: acumula y devuelve todas las violaciones; arreglo vacío = datos íntegros.
  */
 export function validateIntegrity(data: RawData): Violation[] {
@@ -225,6 +232,31 @@ export function validateIntegrity(data: RawData): Violation[] {
       }
     });
   }
+
+  // IR-14 e IR-15: contraseña e intentos fallidos (spec 009). Nunca se incluye el hash en el mensaje.
+  users.rows.forEach((row, index) => {
+    if (!isPasswordHash(row.password_hash)) {
+      violations.push(
+        violation(
+          'users.json',
+          'IR-14',
+          '"password_hash" debe tener el formato scrypt$N$r$p$sal$hash',
+          index,
+        ),
+      );
+    }
+    const attempts = row.failed_attempts as number;
+    if (!Number.isInteger(attempts) || attempts < 0) {
+      violations.push(
+        violation(
+          'users.json',
+          'IR-15',
+          '"failed_attempts" debe ser un entero mayor o igual a 0',
+          index,
+        ),
+      );
+    }
+  });
 
   // IR-12: la clave debe estar en el catálogo de permisos.
   permissions.rows.forEach((row, index) => {

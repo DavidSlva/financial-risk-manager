@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "generate-secret": "node scripts/generate-secret.mjs"
+    "generate-secret": "node scripts/generate-secret.mjs",
+    "hash-password": "node scripts/hash-password.mjs"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

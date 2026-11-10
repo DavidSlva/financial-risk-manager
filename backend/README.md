@@ -78,6 +78,7 @@ Excepciones:
 | `JWT_ALGORITHM`             | `HS256`, `HS384`, `HS512`                | `HS256`        | no          |
 | `ACCESS_TOKEN_TTL_SECONDS`  | entero positivo                          | `900`          | no          |
 | `REFRESH_TOKEN_TTL_SECONDS` | entero positivo, mayor que el del access | `604800`       | no          |
+| `LOGIN_MAX_ATTEMPTS`        | entero positivo                          | `5`            | no          |
 
 El proceso falla al arrancar si alguna es inválida o si falta `JWT_SECRET`. Los mensajes de error nunca incluyen el valor de la clave.
 
@@ -91,16 +92,50 @@ pnpm --filter @financial-risk-manager/backend run generate-secret
 
 Sin base de datos: cuatro archivos JSON en `backend/data/` (spec [006-modelo-datos](../docs/specs/006-modelo-datos.md)).
 
-| Archivo            | Contenido                                                        | En git                              |
-| ------------------ | ---------------------------------------------------------------- | ----------------------------------- |
-| `roles.json`       | Catálogo de roles (nivel de privilegios), extensible             | sí                                  |
-| `permissions.json` | Permisos por rol: `role` (FK a roles), `key` (catálogo), `value` | sí                                  |
-| `users.json`       | Usuarios: `rut`, `role` (FK a roles), `active` (vigencia)        | no (ejemplo: `users.example.json`)  |
-| `scores.json`      | Score por rut: `rut` (PK y FK a users), `score` (0–1000)         | no (ejemplo: `scores.example.json`) |
+| Archivo            | Contenido                                                                                     | En git                              |
+| ------------------ | --------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `roles.json`       | Catálogo de roles (nivel de privilegios), extensible                                          | sí                                  |
+| `permissions.json` | Permisos por rol: `role` (FK a roles), `key` (catálogo), `value`                              | sí                                  |
+| `users.json`       | Usuarios: `rut`, `role` (FK a roles), `active` (vigencia), `password_hash`, `failed_attempts` | no (ejemplo: `users.example.json`)  |
+| `scores.json`      | Score por rut: `rut` (PK y FK a users), `score` (0–1000)                                      | no (ejemplo: `scores.example.json`) |
 
 Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json` a `scores.json`.
 
 La integridad referencial se valida al arrancar (el proceso aborta e informa todas las violaciones) y se revalida cuando cambia un archivo. Si los datos dejan de ser íntegros, se rechazan las operaciones que dependan de ellos. Poner `active: false` a un usuario lo revoca sin reiniciar. La función de cada columna está en la spec.
+
+## Login y contraseñas
+
+Spec [009-emision-tokens](../docs/specs/009-emision-tokens.md).
+
+**`POST /api/auth/login`** — `Content-Type: application/json`:
+
+```json
+{ "rut": "12345678-5", "password": "una-clave-de-ejemplo" }
+```
+
+| Campo      | Validación                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| `rut`      | String en formato canónico con dígito verificador válido (`isValidRut`, sin normalización) |
+| `password` | String de **8 a 128 caracteres** (puntos de código Unicode); no se recorta                 |
+
+Estricto: cualquier otro campo → 400. Respuestas:
+
+| Situación                                                                                   | Respuesta                                                                                        |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Contrato inválido (se valida antes de tocar los datos)                                      | `400`                                                                                            |
+| Rut inexistente, contraseña incorrecta, usuario no vigente o **bloqueado** (aunque acierte) | `401` idéntico en los cuatro casos                                                               |
+| Datos no íntegros o no se pudo registrar el intento                                         | `500` genérico                                                                                   |
+| Correcto                                                                                    | `200` `{ accessToken, expiresIn, refreshToken, refreshExpiresIn }` con `Cache-Control: no-store` |
+
+**Límite de intentos:** `users.failed_attempts` cuenta los intentos fallidos; con `failed_attempts >= LOGIN_MAX_ATTEMPTS` el usuario está bloqueado. Un login exitoso lo reinicia a 0. Para desbloquear a mano, poner `failed_attempts` en 0 en `users.json`. El backend **escribe** `users.json` (solo ese contador) de forma atómica.
+
+**Contraseñas:** se guardan como hash `scrypt$N$r$p$sal$hash` en `users.password_hash`, nunca en claro. Para generar el hash de una contraseña (se pide sin mostrarla, o por entrada estándar):
+
+```
+pnpm --filter @financial-risk-manager/backend run hash-password
+```
+
+`users.example.json` trae dos usuarios de ejemplo cuya contraseña es `ejemplo-1234`.
 
 ## Autorización
 
@@ -161,6 +196,7 @@ Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se regis
 
 - `GET /api/health`: estado del servicio.
 - `GET /api/score/:rut`: score de un rut → `{ "rut", "score" }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
+- `POST /api/auth/login`: `{ "rut", "password" }` → `{ "accessToken", "expiresIn", "refreshToken", "refreshExpiresIn" }`. Ver _Login y contraseñas_.
 - `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
 
 ## Pruebas
