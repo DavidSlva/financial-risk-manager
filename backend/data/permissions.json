@@ -1,0 +1,5 @@
+[
+  { "role": "admin", "key": "can_get_score", "value": true },
+  { "role": "admin", "key": "can_get_all_score", "value": true },
+  { "role": "user", "key": "can_get_score", "value": true }
+]

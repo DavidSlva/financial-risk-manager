@@ -1,4 +1,5 @@
 # Tasks — NNN-slug
+
 Spec: [../../specs/NNN-slug.md](../../specs/NNN-slug.md) · Plan: [../../plan/NNN-slug/plan.md](../../plan/NNN-slug/plan.md)
 
 - [ ] T1 — descripción · verificación: …
