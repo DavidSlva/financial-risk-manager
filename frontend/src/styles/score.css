@@ -1,0 +1,50 @@
+/* Estilos de la consulta de score (spec 016). Solo variables publicadas por applyStyleTokens. */
+
+.score-result,
+.score-notice {
+  margin: var(--spacing-6) 0 0;
+  padding: var(--spacing-4);
+  border: var(--sizes-border-width) solid var(--colors-border);
+  border-radius: var(--radius-card);
+  background: var(--colors-surface);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.score-result__value {
+  margin: 0;
+  font-size: var(--typography-size-score);
+  font-weight: var(--typography-weight-title);
+  letter-spacing: var(--typography-letter-spacing-title);
+  line-height: 1;
+}
+
+.score-result__rut {
+  margin: var(--spacing-2) 0 0;
+  color: var(--colors-text-muted);
+  font-size: var(--typography-size-field);
+}
+
+.score-result__date {
+  margin: var(--spacing-3) 0 0;
+  color: var(--colors-text-muted);
+  font-size: var(--typography-size-label);
+}
+
+.score-result__date-label {
+  font-weight: var(--typography-weight-label);
+}
+
+.score-notice {
+  border-color: var(--colors-danger);
+  color: var(--colors-danger);
+  font-size: var(--typography-size-error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .score-result,
+  .score-notice {
+    transition: none;
+    animation: none;
+  }
+}

@@ -7,5 +7,5 @@
     "jsx": "react-jsx",
     "types": []
   },
-  "include": ["src", "test", "vitest.config.ts"]
+  "include": ["src", "test", "e2e", "vitest.config.ts", "vite.config.ts", "playwright.config.ts"]
 }

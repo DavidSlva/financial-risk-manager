@@ -6,7 +6,7 @@ Monorepo `financial-risk-manager` (https://github.com/DavidSlva/financial-risk-m
 - `frontend/`: SPA React + TypeScript con Vite. Producción = bundle estático, minificado y anonimizado.
 - `docs/`: toda la documentación. Ver `docs/README.md`.
 
-Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md`, `013-consulta-score.md`, `008-validador-rut.md`, `009-emision-tokens.md` y `014-cors-desarrollo.md`.
+Definido por: `docs/specs/001-setup-inicial.md`, `002-flujo-git-agentes.md`, `003-tooling.md`, `004-pnpm-ci.md`, `005-backend-estructura.md`, `010-tdd-vitest.md`, `006-modelo-datos.md`, `007-auth-jwt.md`, `012-errores-http.md`, `011-rbac.md`, `013-consulta-score.md`, `008-validador-rut.md`, `009-emision-tokens.md`, `014-cors-desarrollo.md`, `017-login-ui.md`, `018-login-logica.md` y `019-score-consulta.md`.
 
 ## Metodología: SDD corto + RPI
 
@@ -144,6 +144,16 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 - Puertos de desarrollo: backend `8000` (`PORT`), frontend `http://localhost:3000`. En producción frontend y backend comparten dominio: CORS desactivado.
 - `CORS_ORIGINS` (config) lista los orígenes permitidos; por defecto `http://localhost:3000` salvo en producción. **Nunca** `*` ni reflejar un origen: la sesión va en cookies (CORS con credenciales). El middleware `cors` va **primero** en `createApp`.
 - El frontend usa `credentials: 'include'` y `localhost` (no `127.0.0.1`).
+
+## Frontend (spec 017)
+
+- Vite + React + TypeScript. Estructura en `frontend/src/`: `pages/`, `components/`, `config/`, `i18n/`, `styles/`.
+- `config/styles.config.ts` es el **único** lugar con valores de diseño (colores, radios, tipografía, tamaños, espaciado, movimiento); `applyStyleTokens` los publica como variables CSS `--grupo-clave`. `styles/login.css` solo usa `var(--…)` (única excepción: el breakpoint, que debe coincidir con `sizes.cardBreakpoint`).
+- Todo texto visible sale de i18next (`i18n/es.json`); los componentes no llevan texto literal.
+- Pruebas Vitest en `frontend/test/`, espejo de `src/`. Playwright en `frontend/e2e/` (`test:e2e`; navegador con `e2e:install`; puerto 5299; el CI no lo corre).
+- La vista previa `/dev/login-states` es solo de desarrollo y se excluye del bundle de producción.
+- Tema claro, con una prueba de contraste AA (`styles.contrast.test.ts`).
+- Flujo (specs 018 y 019): `App` muestra `LoginPage`; tras el login guarda la sesión **solo en memoria** y muestra `ScorePage` (`initialRut` = RUT de la sesión). Un `401` en el score o la expiración del access vuelven al login con el aviso `login.notices.sessionExpired`. Toda llamada al backend usa `apiUrl` (`config/api.config.ts`, base `VITE_API_BASE_URL`, por defecto `/api`) con `credentials: 'include'`. Un solo `normalizeRut` en `lib/rut.ts`.
 
 ## Reglas para agentes
 

@@ -4,8 +4,16 @@ dist/
 .env
 .env.*
 !.env.example
+!frontend/.env.development
 .DS_Store
 
 # Datos personales (spec 006): se versionan solo los ejemplos
 backend/data/users.json
 backend/data/scores.json
+
+# Maquetas del visual companion (superpowers brainstorming)
+.superpowers/
+
+# Playwright (spec 014)
+playwright-report/
+test-results/
