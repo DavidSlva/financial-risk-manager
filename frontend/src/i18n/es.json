@@ -1,0 +1,52 @@
+{
+  "login": {
+    "title": "Iniciar sesión",
+    "subtitle": "Ingresa tu RUT y contraseña para ver tu score.",
+    "rut": {
+      "label": "RUT",
+      "placeholder": "12345678-K"
+    },
+    "password": {
+      "label": "Contraseña",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "submit": "Continuar",
+    "submitting": "Ingresando…",
+    "errors": {
+      "invalidCredentials": "RUT o contraseña incorrectos. Revisa tus datos; si ya lo intentaste varias veces, tu cuenta puede estar bloqueada.",
+      "rutInvalid": "Ingresa un RUT válido.",
+      "passwordInvalid": "Ingresa tu contraseña.",
+      "passwordLength": "La contraseña debe tener entre {{passwordMin}} y {{passwordMax}} caracteres.",
+      "badRequest": "Revisa los datos ingresados.",
+      "tooManyRequests": "Demasiados intentos. Espera unos minutos e inténtalo otra vez.",
+      "clientError": "No pudimos procesar la solicitud. Revisa los datos e inténtalo de nuevo.",
+      "serverError": "Tenemos un problema de nuestro lado. Inténtalo en unos minutos.",
+      "network": "No pudimos conectar. Revisa tu conexión."
+    },
+    "notices": {
+      "sessionExpired": "Tu sesión expiró. Vuelve a iniciar sesión."
+    }
+  },
+  "score": {
+    "title": "Consulta tu score",
+    "subtitle": "Ingresa un RUT para ver su score.",
+    "rut": {
+      "label": "RUT"
+    },
+    "submit": "Consultar",
+    "submitting": "Consultando…",
+    "date": {
+      "label": "Fecha del score"
+    },
+    "errors": {
+      "invalidRut": "Ingresa un RUT válido.",
+      "sessionExpired": "Tu sesión expiró. Vuelve a iniciar sesión.",
+      "forbidden": "No tienes permiso para ver el score de este RUT.",
+      "notFound": "No encontramos un score para este RUT.",
+      "clientError": "No pudimos procesar la consulta. Revisa los datos e inténtalo de nuevo.",
+      "serverError": "Tenemos un problema de nuestro lado. Inténtalo en unos minutos.",
+      "network": "No pudimos conectar. Revisa tu conexión."
+    }
+  }
+}

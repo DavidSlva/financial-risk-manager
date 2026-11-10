@@ -1,0 +1,5 @@
+node_modules
+dist
+pnpm-lock.yaml
+# Los prompts se guardan textuales; no se reformatean.
+docs/prompts

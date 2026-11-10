@@ -1,0 +1,16 @@
+[
+  {
+    "rut": "11111111-1",
+    "role": "admin",
+    "active": true,
+    "password_hash": "scrypt$32768$8$3$HmeLg8J8Mxu/iMRgGL6mMw==$X6cUY/i3zOOkDQIANHDZce+mbz+Ye9udoRiM+Qow4V8=",
+    "failed_attempts": 0
+  },
+  {
+    "rut": "22222222-2",
+    "role": "user",
+    "active": false,
+    "password_hash": "scrypt$32768$8$3$yPkpU9Zd/AD2fxVBoP7XTQ==$Wq23fPU2IN9aSA65t+7znmQsxrhhwXP0eGb3sNrc03c=",
+    "failed_attempts": 0
+  }
+]

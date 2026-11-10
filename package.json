@@ -1,0 +1,42 @@
+{
+  "name": "financial-risk-manager",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Monorepo financial-risk-manager (backend Node/TS + frontend React/TS)",
+  "engines": {
+    "node": ">=22.22.0 <23"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "check:policy": "node scripts/check-pnpm-policy.mjs",
+    "test": "pnpm -r --if-present run test",
+    "docs:index": "node scripts/sync-spec-index.mjs",
+    "docs:index:check": "node scripts/sync-spec-index.mjs --check"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css,html}": "prettier --write"
+  },
+  "packageManager": "pnpm@12.17.0",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1"
+  }
+}

@@ -1,0 +1,4 @@
+[
+  { "name": "admin", "description": "Administración de la plataforma" },
+  { "name": "user", "description": "Consulta de su propio score" }
+]
