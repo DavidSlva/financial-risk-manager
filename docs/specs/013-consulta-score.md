@@ -27,7 +27,7 @@ Es el objetivo de la app: **devolver el score financiero asociado a un rut**. El
 
 ## Requisitos
 
-- RF-1: `GET /api/score/:rut` → `200` con `{ "rut": "...", "score": N }`.
+- RF-1: `GET /api/score/:rut` → `200` con `{ "rut": "12.345.678-9", "score": N, "consulted_at": "2025-06-27T14:35:00Z" }`: rut con formato de presentación, `score` entero de 0 a 100 y fecha de la consulta en UTC (ISO 8601, sin milisegundos).
 - RF-2: La ruta se protege con `authenticate` y luego `authorize(canGetScore)`. Sin token válido → `401`; sin permiso → `403`.
 - RF-3: `canGetScore(contexto)` está definido en `scores.service` y es la **única** lógica de acceso del recurso:
   1. si el rol del usuario tiene `can_get_all_score` → `true`;
@@ -115,6 +115,8 @@ Notas:
 Cambio posterior (2026-11-09 21:08): la ruta pasó de `/api/scores/:rut` a **`/api/score/:rut`** a pedido del usuario, manteniendo la convención general de recursos en plural. Se cambiaron primero las pruebas (1 en rojo) y luego `routes/index.ts`; el comportamiento no cambia.
 
 Evolución posterior: la spec [008](008-validador-rut.md) hace que el controlador valide `:rut` (400 si no es canónico), después de autenticar y autorizar. Orden de decisión: 401 → 403 → 400 → 404.
+
+Cambio posterior (2026-11-09 21:41): la respuesta pasó a `{ rut (formateado), score, consulted_at }` y el score válido es 0–100 (IR-9 de [006](006-modelo-datos.md), antes 0–1000). Se agregó `formatRut` en `rut.service` y el controlador acepta un reloj inyectable (`now`). Pruebas primero (9 en rojo); 521 en verde, lint, tsc y prettier sin errores. El nombre `consulted_at` (snake_case, como el resto de los datos) es elección nuestra: confirmar con el consumidor.
 
 **Revisión de documentos relacionados:**
 

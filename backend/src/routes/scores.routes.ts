@@ -5,7 +5,7 @@ import { authorize } from '../middlewares/authorize.middleware.js';
 import type { AuthDeps } from '../services/auth.service.js';
 import { canGetScore } from '../services/scores.service.js';
 
-export function createScoresRouter(deps: AuthDeps = {}): Router {
+export function createScoresRouter(deps: AuthDeps & { now?: () => Date } = {}): Router {
   const router = Router();
   const controller = createScoresController(deps);
 

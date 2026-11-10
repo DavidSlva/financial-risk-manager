@@ -10,3 +10,5 @@ Orden TDD en cada tarea: prueba que falla → código mínimo → refactor.
 - [x] T4 — Pruebas HTTP de extremo a extremo con tokens reales (tabla de decisión completa)
 - [x] T5 — Verificación: pruebas, lint, tipos, formato; servidor real con tokens
 - [x] T6 — Converge: spec (estado final), `implement.md`, índice, enlaces desde 011 y 012, `CLAUDE.md` y `backend/README.md`
+- [x] T7 — Respuesta con rut formateado y `consulted_at` (UTC); `formatRut`; reloj inyectable
+- [x] T8 — IR-9 a 0–100 (datos, fixtures, ejemplo) y converge de 006 y 013

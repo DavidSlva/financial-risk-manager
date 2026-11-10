@@ -20,7 +20,7 @@ export function validData(): RawData {
       { name: 'user', description: 'Consulta de su propio score' },
     ],
     users: [userRow('11111111-1', 'admin', true), userRow('22222222-2', 'user', false)],
-    scores: [{ rut: '11111111-1', score: 780 }],
+    scores: [{ rut: '11111111-1', score: 78 }],
     permissions: [
       { role: 'admin', key: 'can_get_score', value: true },
       { role: 'admin', key: 'can_get_all_score', value: true },

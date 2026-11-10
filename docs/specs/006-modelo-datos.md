@@ -76,7 +76,7 @@ Relaciones: `roles 1 — 0..n users`, `users 1 — 0..1 scores`. Un rol puede no
 | Columna | Tipo    | Nulo | Función                                                                                            |
 | ------- | ------- | ---- | -------------------------------------------------------------------------------------------------- |
 | `rut`   | string  | no   | **Clave primaria y foránea** a `users.rut`: a quién pertenece el score (a lo más uno por usuario). |
-| `score` | integer | no   | Score financiero del usuario, entero entre 0 y 1000 (supuesto; ver puntos abiertos).               |
+| `score` | integer | no   | Score financiero del usuario, entero entre 0 y 100 (supuesto; ver puntos abiertos).                |
 
 ### Archivos
 
@@ -118,7 +118,7 @@ En `backend/data/` (ruta configurable con `DATA_DIR`):
 | IR-6 | `scores.rut` único (un score por rut)                                                                | PRIMARY KEY        |
 | IR-7 | `users.role` debe existir en `roles.name`                                                            | FOREIGN KEY        |
 | IR-8 | `scores.rut` debe existir en `users.rut`                                                             | FOREIGN KEY        |
-| IR-9 | `scores.score` es entero entre 0 y 1000                                                              | CHECK              |
+| IR-9 | `scores.score` es entero entre 0 y 100 (antes 0 y 1000; ver [013](013-consulta-score.md))            | CHECK              |
 
 El formato del RUT (dígito verificador, normalización) no se valida aquí: lo cubre [008-validador-rut](008-validador-rut.md). Hasta entonces el rut es un identificador opaco (IR-3).
 
