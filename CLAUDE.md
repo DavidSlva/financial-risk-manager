@@ -45,6 +45,7 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 ## Versionado y promoción
 
 - Cada commit de promoción lleva un tag anotado `x.y`: `x` = id numérico de la spec, `y` = actualizaciones sobre esa spec (primera promoción = `x.0`).
+- Si la promoción incluye varias specs, `x` es el id del **último spec publicado** (definición del usuario; detalle por revisar la primera vez que se aplique).
 - `develop → staging`: tag `rcx.y` (ej. `rc2.0`).
 - `staging → main`: tag `x.y` sin `rc` (ej. `2.0`).
 
@@ -132,6 +133,7 @@ Etapas: constitution → specify → plan → tasks → implement → converge.
 ## Login y contraseñas (spec 009)
 
 - `POST /api/auth/login` con `{ rut, password }`: contrato **estricto** validado en el controlador antes de tocar datos (`isValidRut` + `isValidPassword`, 8 a 128 caracteres; campos extra → 400). Todos los rechazos de credenciales son el **mismo 401** (rut inexistente, contraseña incorrecta, no vigente, bloqueado); nunca revelar cuál ocurrió.
+- **La sesión viaja en cookies `HttpOnly`** (`access_token`, `refresh_token`; `SameSite=Strict`, `Secure` en producción; el refresh con `Path=/api/auth`), definidas en `config/cookies.ts`. El login **no devuelve tokens en el cuerpo**; `authenticate` lee la cookie (alternativa `Bearer`; con ambos vale solo la cookie); `POST /refresh` no lleva cuerpo. Frontend y backend van bajo el mismo dominio. No leer ni escribir cookies a mano: usar `parseCookies` y `cookieOptions`.
 - Las contraseñas **solo existen como hash** (`scrypt` de `node:crypto`, `password.service`); jamás en claro, ni en logs, ni en respuestas, ni en mensajes de error. Para generar un hash: `pnpm --filter @financial-risk-manager/backend run hash-password`. No agregar dependencias de hash.
 - El hash y `failed_attempts` **no salen de la capa de datos**: `req.user` y el contexto de autorización usan `AuthenticatedUser`. No usar `User` fuera de los services de datos y de `auth.service`.
 - Límite de intentos: `LOGIN_MAX_ATTEMPTS` (config, por defecto 5). Se reserva (incrementa) el intento **antes** de verificar; un login exitoso reinicia; bloqueado ⇒ 401 aunque la contraseña sea correcta; el desbloqueo es manual (contador en 0 en `users.json`).

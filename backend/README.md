@@ -120,12 +120,21 @@ Spec [009-emision-tokens](../docs/specs/009-emision-tokens.md).
 
 Estricto: cualquier otro campo → 400. Respuestas:
 
-| Situación                                                                                   | Respuesta                                                                                        |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Contrato inválido (se valida antes de tocar los datos)                                      | `400`                                                                                            |
-| Rut inexistente, contraseña incorrecta, usuario no vigente o **bloqueado** (aunque acierte) | `401` idéntico en los cuatro casos                                                               |
-| Datos no íntegros o no se pudo registrar el intento                                         | `500` genérico                                                                                   |
-| Correcto                                                                                    | `200` `{ accessToken, expiresIn, refreshToken, refreshExpiresIn }` con `Cache-Control: no-store` |
+| Situación                                                                                   | Respuesta                                                                                                                                              |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Contrato inválido (se valida antes de tocar los datos)                                      | `400`                                                                                                                                                  |
+| Rut inexistente, contraseña incorrecta, usuario no vigente o **bloqueado** (aunque acierte) | `401` idéntico en los cuatro casos                                                                                                                     |
+| Datos no íntegros o no se pudo registrar el intento                                         | `500` genérico                                                                                                                                         |
+| Correcto                                                                                    | `200` con `Set-Cookie` `access_token` y `refresh_token` (`HttpOnly`, `SameSite=Strict`) y `{ expiresIn, refreshExpiresIn }`; `Cache-Control: no-store` |
+
+**Sesión por cookies:** el login **no devuelve los tokens en el cuerpo**: los entrega en cookies `HttpOnly` (el JavaScript del frontend no las lee) y el navegador las reenvía solo. Frontend y backend funcionan bajo el mismo dominio.
+
+| Cookie          | `Path`      | `Max-Age`                   | Notas                                                 |
+| --------------- | ----------- | --------------------------- | ----------------------------------------------------- |
+| `access_token`  | `/`         | `ACCESS_TOKEN_TTL_SECONDS`  | `HttpOnly`, `SameSite=Strict`, `Secure` en producción |
+| `refresh_token` | `/api/auth` | `REFRESH_TOKEN_TTL_SECONDS` | Solo viaja a las rutas de autenticación               |
+
+El frontend usa `credentials: 'include'` (con el mismo dominio basta el valor por defecto). Para renovar el access: `POST /api/auth/refresh` **sin cuerpo** (lee la cookie `refresh_token`). No hay cierre de sesión por API todavía (punto abierto de la spec 009).
 
 **Límite de intentos:** `users.failed_attempts` cuenta los intentos fallidos; con `failed_attempts >= LOGIN_MAX_ATTEMPTS` el usuario está bloqueado. Un login exitoso lo reinicia a 0. Para desbloquear a mano, poner `failed_attempts` en 0 en `users.json`. El backend **escribe** `users.json` (solo ese contador) de forma atómica.
 
@@ -162,8 +171,8 @@ router.get(
 
 JWT simétrico (spec [007-auth-jwt](../docs/specs/007-auth-jwt.md)); el algoritmo, la clave y los TTL salen de `config/environment.ts`.
 
-- **Access:** autentica. `Authorization: Bearer <access>` + `authenticate.middleware` → `req.user`.
-- **Refresh:** **no autentica**; solo sirve en `POST /api/auth/refresh` para obtener un access nuevo (no rota el refresh).
+- **Access:** autentica. Se toma de la cookie `access_token` (o, para clientes sin navegador, de `Authorization: Bearer <access>`; con ambos vale solo la cookie) y `authenticate.middleware` deja `req.user`.
+- **Refresh:** **no autentica**; vive en la cookie `refresh_token` y solo sirve en `POST /api/auth/refresh` (sin cuerpo) para obtener un access nuevo (no rota el refresh).
 - **Revocación:** cada validación consulta al usuario en `users.json`. Con `active: false` (o si no existe) el access deja de autenticar y el refresh deja de generar access, sin reiniciar.
 - Los rechazos son `401` genéricos con `WWW-Authenticate: Bearer`. Si los datos no son íntegros, no se autentica (`500`).
 - Pendiente: cómo se obtiene el primer par de tokens ([009-emision-tokens](../docs/specs/009-emision-tokens.md)).
@@ -195,9 +204,9 @@ Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se regis
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
-- `GET /api/score/:rut`: score de un rut → `{ "rut", "score" }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
-- `POST /api/auth/login`: `{ "rut", "password" }` → `{ "accessToken", "expiresIn", "refreshToken", "refreshExpiresIn" }`. Ver _Login y contraseñas_.
-- `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
+- `GET /api/score/:rut`: score de un rut → `{ "rut", "score" }`. Requiere la cookie `access_token` (o `Authorization: Bearer <access>`). `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
+- `POST /api/auth/login`: `{ "rut", "password" }` → cookies `access_token` y `refresh_token` + `{ "expiresIn", "refreshExpiresIn" }`. Ver _Login y contraseñas_.
+- `POST /api/auth/refresh`: sin cuerpo; lee la cookie `refresh_token` → nueva cookie `access_token` + `{ "expiresIn" }`.
 
 ## Pruebas
 

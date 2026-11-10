@@ -31,14 +31,23 @@ describe('app', () => {
     expect(await res.json()).toEqual({ error: 'Not Found' });
   });
 
-  it('POST /api/auth/refresh está registrado y rechaza un token inválido con 401', async () => {
+  it('POST /api/auth/refresh está registrado y rechaza una cookie inválida con 401', async () => {
     const res = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ refreshToken: 'basura' }),
+      headers: { cookie: 'refresh_token=basura' },
     });
 
     expect(res.status).toBe(401);
+  });
+
+  it('POST /api/auth/login está registrado y valida el contrato (400)', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+
+    expect(res.status).toBe(400);
   });
 
   it('un JSON malformado responde 400 genérico (no 500)', async () => {

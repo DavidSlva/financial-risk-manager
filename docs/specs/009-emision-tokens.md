@@ -14,7 +14,7 @@ superseded_by: []
 
 ## Resumen
 
-El usuario incorpora una **contraseña** (guardada como hash) y se habilita `POST /api/auth/login`, que verifica `rut` + `password` y entrega el **primer par de tokens** (access + refresh) con el servicio de [007-auth-jwt](007-auth-jwt.md). Esta spec define el **contrato** de la ruta: entrada, salida y errores.
+El usuario incorpora una **contraseña** (guardada como hash) y se habilita `POST /api/auth/login`, que verifica `rut` + `password` y emite el **primer par de tokens** (access + refresh) con el servicio de [007-auth-jwt](007-auth-jwt.md). **La sesión viaja en cookies:** los JWT se entregan en cookies `HttpOnly`, nunca en el cuerpo de la respuesta; el frontend las envía solo y no ve los tokens. Frontend y backend funcionan bajo el **mismo dominio**. Esta spec define el **contrato** de la ruta: entrada, salida y errores.
 
 ## Alcance
 
@@ -38,20 +38,40 @@ El usuario incorpora una **contraseña** (guardada como hash) y se habilita `POS
 - El `rut` debe llegar tal como se guarda: `12345678-5` (sin puntos, `K` en mayúscula). El frontend es responsable de enviarlo así.
 - No hay reglas de composición (mayúsculas, símbolos): solo largo.
 
-## Contrato de salida
+## Contrato de salida (sesión por cookies)
 
-`200 OK` con `Cache-Control: no-store`:
+`200 OK` con `Cache-Control: no-store`. Los tokens se entregan **solo** en cabeceras `Set-Cookie`; el cuerpo no los incluye:
 
-```json
-{
-  "accessToken": "<jwt>",
-  "expiresIn": 900,
-  "refreshToken": "<jwt>",
-  "refreshExpiresIn": 604800
-}
+```
+Set-Cookie: access_token=<jwt>;  HttpOnly; SameSite=Strict; Path=/;         Max-Age=900     [; Secure]
+Set-Cookie: refresh_token=<jwt>; HttpOnly; SameSite=Strict; Path=/api/auth; Max-Age=604800  [; Secure]
 ```
 
-`expiresIn` y `refreshExpiresIn` son segundos y salen de la configuración ([007](007-auth-jwt.md)). La respuesta **nunca** incluye el hash ni datos del usuario.
+```json
+{ "expiresIn": 900, "refreshExpiresIn": 604800 }
+```
+
+| Atributo   | Valor                                                           | Por qué                                                                                                          |
+| ---------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `HttpOnly` | siempre                                                         | El JavaScript del frontend no puede leer los tokens (limita el robo por XSS).                                    |
+| `SameSite` | `Strict`                                                        | Mismo dominio: el navegador no envía las cookies en peticiones iniciadas desde otro sitio (defensa contra CSRF). |
+| `Secure`   | solo con `NODE_ENV=production`                                  | En producción solo viajan por HTTPS; en desarrollo (`http://localhost`) debe poder funcionar sin TLS.            |
+| `Path`     | access: `/`; refresh: `/api/auth`                               | El refresh solo se envía a las rutas de autenticación, no a cada petición.                                       |
+| `Max-Age`  | igual a la vigencia del token (`expiresIn`, `refreshExpiresIn`) | La cookie caduca junto con su token. Los valores salen de la configuración ([007](007-auth-jwt.md)).             |
+
+`expiresIn` y `refreshExpiresIn` (segundos) son informativos para el frontend. La respuesta **nunca** incluye el hash ni datos del usuario.
+
+### Sesión: cómo se usan las cookies
+
+- **Autenticación:** `authenticate` toma el access de la cookie `access_token`. Como alternativa para clientes que no son un navegador (herramientas, pruebas), acepta `Authorization: Bearer <access>`; si llegan ambos, vale **solo la cookie**. El refresh nunca autentica ([007](007-auth-jwt.md)).
+- **Refresh:** `POST /api/auth/refresh` **no lleva cuerpo**: lee el refresh de la cookie `refresh_token` (el navegador solo la envía a `/api/auth`), valida al usuario vigente y responde con una cookie `access_token` nueva y `{ "expiresIn": 900 }`. Sin cookie o con un refresh inválido, `401`. No hay rotación del refresh.
+- **Frontend:** todas las peticiones con `credentials: 'include'` (con el mismo dominio basta `same-origin`, que es el valor por defecto de `fetch`). En desarrollo el front corre en otro puerto: ver [014-cors-desarrollo](014-cors-desarrollo.md).
+
+### Consideraciones de seguridad
+
+- **CSRF:** `SameSite=Strict` más exigir `Content-Type: application/json` en las rutas que cambian estado (un formulario o una petición simple entre sitios no puede enviarlo sin un permiso previo de CORS). `refresh` solo emite un access para el propio usuario.
+- Un token en una cookie `HttpOnly` no es legible por XSS, pero un XSS aún puede **usar** la sesión (hacer peticiones desde la página). `HttpOnly` reduce el daño; no sustituye la prevención de XSS en el frontend.
+- Las cookies no llevan el atributo `Domain` (solo el host que las emitió) ni el prefijo `__Host-` (exigiría `Secure` también en desarrollo).
 
 ## Errores
 
@@ -114,6 +134,10 @@ ALTER TABLE users ADD COLUMN failed_attempts INTEGER NOT NULL DEFAULT 0 CHECK (f
 - RF-9: Límite de intentos: máximo `LOGIN_MAX_ATTEMPTS` (entero positivo, por defecto 5) en `config/environment.ts`. Reserva atómica del intento antes de verificar; reinicio a 0 con un login exitoso; bloqueado ⇒ `401` idéntico.
 - RF-10: El almacén de datos ofrece `updateUsers(…)`: escritura atómica (temporal + renombrado), serializada, que valida la integridad del resultado **antes** de escribir (si no es íntegro, no escribe y falla cerrado) y reinicia la caché.
 - RF-11: Solo se escribe cuando hay cambio (no se reescribe `users.json` si el contador no cambia).
+- RF-12: **Sesión por cookies:** el login entrega el access en la cookie `access_token` y el refresh en `refresh_token` (atributos de la tabla de arriba), configuradas en `config/cookies.ts`; el cuerpo solo trae `expiresIn` y `refreshExpiresIn`. Los tokens **nunca** van en el cuerpo.
+- RF-13: `authenticate` lee el access de la cookie `access_token` (o, como alternativa, de `Authorization: Bearer`); con ambos presentes, solo la cookie.
+- RF-14: `POST /api/auth/refresh` lee el refresh de la cookie `refresh_token` (sin cuerpo) y entrega una cookie `access_token` nueva; sin cookie o con un token inválido, `401` genérico.
+- RF-15: El parseo de la cabecera `Cookie` es una función pura propia (`cookie.service`), sin dependencias nuevas; ignora cookies mal formadas y, ante nombres repetidos, toma la primera.
 
 ## Diseño
 
@@ -158,7 +182,8 @@ Flujo: `POST /login` → controlador valida contrato (`isValidRut`, `isValidPass
 - **Respuesta al bloqueo:** el usuario bloqueado recibe el mismo `401` (no se revela que existe ni que está bloqueado). Un `423`/`429` explícito mejoraría la experiencia a costa de revelar la cuenta.
 - **Contraseña inicial y su rotación:** solo se puede definir a mano (herramienta `hash-password` + `users.json`); no hay cambio ni recuperación por API.
 - **Parámetros de scrypt:** `N=2^15, r=8, p=3` (~100 ms por verificación en un equipo actual); ajustar si el servidor es limitado.
-- **Cierre de sesión:** el refresh se revoca solo poniendo `active: false` al usuario (spec 007); un logout por token queda fuera.
+- **Cierre de sesión:** con cookies `HttpOnly` el frontend **no puede borrarlas** por sí mismo, así que hace falta un `POST /api/auth/logout` que las expire. No estaba pedido; queda como spec derivada. Mientras tanto, la sesión termina cuando caducan las cookies o se pone `active: false` al usuario ([007](007-auth-jwt.md)).
+- **Cookies obsoletas:** si el refresh falla (usuario revocado), el backend no borra las cookies; el frontend debe tratar el 401 como sesión terminada.
 
 ## Estado final (Converge)
 
@@ -183,6 +208,8 @@ Notas:
 - El backend ahora **escribe** `users.json` (solo `failed_attempts`); la spec [006](006-modelo-datos.md) tiene una nota de evolución.
 - `users.json` contiene secretos (hashes): sigue fuera de git y no debe copiarse a otros entornos.
 - Quedan los puntos abiertos de arriba: bloqueo permanente (negación de servicio dirigida), una sola instancia y respuesta al bloqueo.
+
+**Cambio posterior — sesión por cookies (versión 9.1, 2026-11-09 21:35):** a pedido del usuario el login deja de devolver los tokens en el cuerpo y los entrega en cookies `HttpOnly` (`access_token` y `refresh_token`), porque el frontend esperará cookies y ambos funcionan bajo el mismo dominio. Implementado con TDD (568 pruebas en verde; 30 en rojo antes de implementar): `config/cookies.ts`, `cookie.service.parseCookies` (parseo propio, sin dependencias), `authenticate` con la cookie (alternativa `Bearer`; con ambos vale solo la cookie), `login` con `Set-Cookie` y cuerpo `{ expiresIn, refreshExpiresIn }`, y `refresh` sin cuerpo que lee la cookie `refresh_token`. Verificado con el servidor real y un cookie jar de `curl`: login → cookies con `HttpOnly`, `SameSite=Strict` y `Path` correctos; score propio solo con la cookie; refresh sin cuerpo; sin cookies, 401. **Rompe el contrato anterior**: el refresh en el cuerpo ya no se acepta y el login no devuelve `accessToken`/`refreshToken`.
 
 **Revisión de documentos relacionados:**
 
