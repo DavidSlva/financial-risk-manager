@@ -75,8 +75,8 @@ Los avisos usan `role="alert"`; el resultado exitoso se anuncia con `role="statu
 - RF-7: Una respuesta `200` mal formada (no JSON; `score` que no es número finito; `rut` ausente o que no es texto; `fecha` ausente o que no es una fecha ISO válida) se trata como error temporal (`5xx`). La `fecha` es obligatoria **(supuesto)**. Se muestra el score tal como lo entrega el backend, sin redondear ni inventar escala.
 - RF-8: Mientras hay una consulta en curso, no se envía otra (botón deshabilitado y Enter bloqueado). Si el usuario edita el RUT durante la carga o se cancela la consulta, una respuesta tardía **no** reemplaza lo que se ve ahora (se cancela con `AbortController` y se ignoran respuestas obsoletas).
 - RF-9: El RUT consultado y el score nunca se escriben en `localStorage`, `sessionStorage`, la URL ni los registros de consola. El RUT va solo en la ruta de la API.
-- RF-11: La `fecha` se muestra con `Intl.DateTimeFormat` en español de Chile (`es-CL`), fecha larga y hora corta, en la zona horaria local del usuario **(supuesto)**. El formateador recibe la zona como parámetro para que las pruebas usen una fija (`UTC`). El texto de la etiqueta ("Fecha del score") sale de i18next.
 - RF-10: Accesibilidad: etiqueta asociada al campo, error enlazado con `aria-describedby`/`aria-invalid`, foco al campo con error, orden de tabulación RUT → Consultar.
+- RF-11: La `fecha` se muestra con `Intl.DateTimeFormat` en español de Chile (`es-CL`), fecha larga y hora corta, en la zona horaria local del usuario **(supuesto)**. El formateador recibe la zona como parámetro para que las pruebas usen una fija (`UTC`). El texto de la etiqueta ("Fecha del score") sale de i18next.
 
 ## Pruebas
 
