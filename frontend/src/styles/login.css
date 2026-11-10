@@ -59,6 +59,12 @@ body {
   font-size: var(--typography-size-error);
 }
 
+.login-notice {
+  margin: 0;
+  color: var(--colors-text-muted);
+  font-size: var(--typography-size-error);
+}
+
 /* Campos */
 .login-field {
   display: flex;

@@ -1,4 +1,4 @@
-import type { HTMLInputAutoCompleteAttribute, HTMLInputTypeAttribute, ReactNode } from 'react';
+import type { HTMLInputAutoCompleteAttribute, HTMLInputTypeAttribute, ReactNode, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface TextFieldProps {
@@ -16,6 +16,7 @@ export interface TextFieldProps {
   type?: HTMLInputTypeAttribute;
   /** Contenido dentro del control, al borde derecho del campo (p. ej. Mostrar/Ocultar). */
   endAdornment?: ReactNode;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
 export function TextField({
@@ -32,6 +33,7 @@ export function TextField({
   placeholder,
   type = 'text',
   endAdornment,
+  inputRef,
 }: TextFieldProps) {
   const { t } = useTranslation();
   const hasError = errorKey !== undefined && errorKey !== '';
@@ -49,6 +51,7 @@ export function TextField({
         <input
           className="login-field__input"
           id={id}
+          ref={inputRef}
           type={type}
           value={value}
           readOnly={readOnly}

@@ -111,3 +111,46 @@ describe('LoginForm', () => {
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Continuar' }));
   });
 });
+
+describe('LoginForm (props opcionales de 015)', () => {
+  it('onFieldEdit se dispara al escribir en cada campo', async () => {
+    const onFieldEdit = vi.fn();
+    renderForm({ onFieldEdit });
+    await userEvent.type(screen.getByLabelText('RUT'), '1');
+    expect(onFieldEdit).toHaveBeenLastCalledWith('rut');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'a');
+    expect(onFieldEdit).toHaveBeenLastCalledWith('password');
+  });
+
+  it('resetPasswordSignal limpia la contraseña y la enfoca al cambiar', async () => {
+    const onSubmit = vi.fn();
+    const i18n = initI18n();
+    const ui = (signal: number) => (
+      <I18nextProvider i18n={i18n}>
+        <LoginForm onSubmit={onSubmit} resetPasswordSignal={signal} />
+      </I18nextProvider>
+    );
+    const { rerender } = render(ui(0));
+    await userEvent.type(screen.getByLabelText('RUT'), '123');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'secreto');
+    rerender(ui(1));
+    const password = screen.getByLabelText('Contraseña') as HTMLInputElement;
+    expect(password.value).toBe('');
+    expect((screen.getByLabelText('RUT') as HTMLInputElement).value).toBe('123');
+    expect(document.activeElement).toBe(password);
+  });
+
+  it('focusField enfoca el campo indicado cuando cambia el nonce', () => {
+    const i18n = initI18n();
+    const ui = (nonce: number) => (
+      <I18nextProvider i18n={i18n}>
+        <LoginForm onSubmit={vi.fn()} focusField={{ field: 'password', nonce }} />
+      </I18nextProvider>
+    );
+    const { rerender } = render(ui(1));
+    expect(document.activeElement).toBe(screen.getByLabelText('Contraseña'));
+    (screen.getByLabelText('RUT') as HTMLInputElement).focus();
+    rerender(ui(2));
+    expect(document.activeElement).toBe(screen.getByLabelText('Contraseña'));
+  });
+});
