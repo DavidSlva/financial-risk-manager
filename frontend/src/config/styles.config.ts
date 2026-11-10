@@ -25,6 +25,7 @@ export const styles = {
     sizeButton: 14,
     sizeError: 12,
     sizeFieldMobile: 16,
+    sizeScore: 56,
     weightTitle: 600,
     weightLabel: 500,
     weightRegular: 400,

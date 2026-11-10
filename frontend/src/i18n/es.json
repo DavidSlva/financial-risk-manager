@@ -18,5 +18,26 @@
       "rutInvalid": "Ingresa un RUT válido.",
       "passwordInvalid": "Ingresa tu contraseña."
     }
+  },
+  "score": {
+    "title": "Consulta tu score",
+    "subtitle": "Ingresa un RUT para ver su score.",
+    "rut": {
+      "label": "RUT"
+    },
+    "submit": "Consultar",
+    "submitting": "Consultando…",
+    "date": {
+      "label": "Fecha del score"
+    },
+    "errors": {
+      "invalidRut": "Ingresa un RUT válido.",
+      "sessionExpired": "Tu sesión expiró. Vuelve a iniciar sesión.",
+      "forbidden": "No tienes permiso para ver el score de este RUT.",
+      "notFound": "No encontramos un score para este RUT.",
+      "clientError": "No pudimos procesar la consulta. Revisa los datos e inténtalo de nuevo.",
+      "serverError": "Tenemos un problema de nuestro lado. Inténtalo en unos minutos.",
+      "network": "No pudimos conectar. Revisa tu conexión."
+    }
   }
 }
