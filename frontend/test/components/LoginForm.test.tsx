@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { I18nextProvider } from 'react-i18next';
@@ -60,6 +60,19 @@ describe('LoginForm', () => {
     await userEvent.click(password);
     await userEvent.keyboard('{Enter}');
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('el evento submit del formulario no llama a onSubmit mientras isSubmitting', () => {
+    const onSubmit = renderForm({ isSubmitting: true });
+    const form = document.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('el evento submit del formulario llama a onSubmit cuando no está enviando', () => {
+    const onSubmit = renderForm();
+    fireEvent.submit(document.querySelector('form') as HTMLFormElement);
+    expect(onSubmit).toHaveBeenCalledWith({ rut: '', password: '' });
   });
 
   it('muestra formErrorKey en un elemento role="alert"', () => {

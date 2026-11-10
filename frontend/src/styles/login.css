@@ -72,6 +72,10 @@ body {
   font-weight: var(--typography-weight-label);
 }
 
+.login-field__control {
+  position: relative;
+}
+
 .login-field__input {
   width: 100%;
   min-height: var(--sizes-touch-target);
@@ -96,7 +100,7 @@ body {
 .login-field__input:focus-visible,
 .login-password-toggle:focus-visible,
 .login-button:focus-visible {
-  outline: calc(var(--sizes-border-width) * 2) solid var(--colors-border-focus);
+  outline: var(--sizes-focus-ring-width) solid var(--colors-border-focus);
   outline-offset: var(--sizes-border-width);
 }
 
@@ -126,19 +130,16 @@ body {
   border-color: var(--colors-danger);
 }
 
-/* Contraseña: acción Mostrar/Ocultar */
-.login-password {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--spacing-1);
-}
-
-.login-password > .login-field {
-  width: 100%;
+/* Contraseña: Mostrar/Ocultar dentro del campo, al borde derecho */
+.login-password .login-field__input {
+  padding-inline-end: calc(var(--sizes-touch-target) + var(--spacing-2));
 }
 
 .login-password-toggle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-end: 0;
   min-width: var(--sizes-touch-target);
   min-height: var(--sizes-touch-target);
   padding: 0 var(--spacing-2);
@@ -185,17 +186,17 @@ body {
 .login-button__spinner {
   display: inline-block;
   flex: none;
-  width: var(--spacing-4);
-  height: var(--spacing-4);
-  border: calc(var(--sizes-border-width) * 2) solid var(--colors-text-disabled);
+  width: var(--sizes-spinner-size);
+  height: var(--sizes-spinner-size);
+  border: var(--sizes-spinner-border-width) solid var(--colors-text-disabled);
   border-top-color: var(--colors-text);
-  border-radius: 100%;
-  animation: login-spin calc(var(--motion-transition-duration) * 5) linear infinite;
+  border-radius: var(--sizes-spinner-size);
+  animation: login-spin var(--motion-spinner-duration) linear infinite;
 }
 
 @keyframes login-spin {
   to {
-    transform: rotate(1turn);
+    transform: rotate(var(--motion-spinner-turn));
   }
 }
 

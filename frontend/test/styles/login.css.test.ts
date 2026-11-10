@@ -5,34 +5,100 @@ import { styles } from '../../src/config/styles.config';
 import { applyStyleTokens } from '../../src/styles/apply-tokens';
 
 const css = readFileSync(resolve(import.meta.dirname, '../../src/styles/login.css'), 'utf8');
-const mediaQuery = `@media (min-width: ${styles.sizes.cardBreakpoint}px)`;
 
-// Sin comentarios ni la única media query permitida.
-const body = css
-  .replace(/\/\*[\s\S]*?\*\//g, '')
-  .split('\n')
-  .filter((line) => !line.includes('@media (min-width:'))
-  .join('\n');
+const allowedWidthQuery = `@media (min-width: ${styles.sizes.cardBreakpoint}px)`;
+const allowedMotionQuery = '@media (prefers-reduced-motion: reduce)';
+
+const NAMED_COLORS = [
+  'red',
+  'white',
+  'black',
+  'gray',
+  'grey',
+  'blue',
+  'green',
+  'yellow',
+  'orange',
+  'purple',
+  'pink',
+  'brown',
+  'cyan',
+  'magenta',
+  'silver',
+  'navy',
+  'teal',
+  'maroon',
+  'olive',
+  'lime',
+  'aqua',
+  'fuchsia',
+  'gold',
+  'crimson',
+  'coral',
+  'salmon',
+  'indigo',
+  'violet',
+  'tomato',
+];
+
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+/** Quita únicamente las condiciones de media query permitidas (nada más). */
+function withoutAllowedQueries(source: string): string {
+  return source.replaceAll(allowedWidthQuery, '').replaceAll(allowedMotionQuery, '');
+}
+
+/**
+ * Formas literales permitidas, sin ser medidas de diseño: `0`, `1` sin unidad,
+ * `auto`, palabras clave y `100%` (ancho/alto relativo al contenedor, no un valor
+ * de diseño). Cualquier otro número con unidad se rechaza.
+ */
+function removeAllowedPercent(source: string): string {
+  return source.replace(/(?<![\w.-])100%/g, '');
+}
+
+const UNIT =
+  'px|rem|em|ex|ch|pt|pc|cm|mm|in|vh|vw|vmin|vmax|dvh|dvw|svh|svw|lvh|lvw|deg|rad|grad|turn|ms|s|%';
+
+export function findLiteralViolations(source: string): string[] {
+  const text = removeAllowedPercent(withoutAllowedQueries(stripComments(source)));
+  const found: string[] = [];
+  for (const m of text.matchAll(/#[0-9a-fA-F]{3,8}\b/g)) found.push(m[0]);
+  for (const m of text.matchAll(/\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/gi))
+    found.push(m[0]);
+  const named = new RegExp(String.raw`(?<![\w-])(?:${NAMED_COLORS.join('|')})(?![\w-])`, 'gi');
+  for (const m of text.matchAll(named)) found.push(m[0]);
+  const measure = new RegExp(
+    String.raw`(?<![\w-])[+-]?(?:\d+\.?\d*|\.\d+)(?:${UNIT})(?![\w-])`,
+    'gi',
+  );
+  for (const m of text.matchAll(measure)) found.push(m[0]);
+  return found;
+}
 
 describe('login.css', () => {
-  it('no contiene colores literales', () => {
-    expect(body).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
-    expect(body).not.toMatch(/\b(rgb|rgba|hsl|hsla)\(/i);
+  it('no contiene colores ni medidas literales', () => {
+    expect(findLiteralViolations(css)).toEqual([]);
   });
 
-  it('no contiene medidas literales (px, rem, em, vh, vw, %) salvo 100%', () => {
-    const withoutFull = body.replace(/\b100%/g, '');
-    const matches = withoutFull.match(/(?<![\w-])-?\d*\.?\d+(px|rem|em|vh|vw|vmin|vmax|%)/g);
-    expect(matches).toBeNull();
+  it('el verificador detecta literales (0.15s, red, #fff, 12px, 1turn, 50%)', () => {
+    expect(findLiteralViolations('a { transition: color 0.15s; }')).toEqual(['0.15s']);
+    expect(findLiteralViolations('a { color: red; }')).toEqual(['red']);
+    expect(findLiteralViolations('a { color: #fff; }')).toEqual(['#fff']);
+    expect(findLiteralViolations('a { color: rgb(0 0 0); }')).toEqual(['rgb(']);
+    expect(findLiteralViolations('a { margin: 12px; }')).toEqual(['12px']);
+    expect(findLiteralViolations('a { transform: rotate(1turn); }')).toEqual(['1turn']);
+    expect(findLiteralViolations('a { width: 50%; }')).toEqual(['50%']);
+    expect(findLiteralViolations('a { width: 100%; margin: 0; flex: 1; top: auto; }')).toEqual([]);
+    expect(findLiteralViolations('@media (min-width: 481px) { a { b: c } }')).toEqual(['481px']);
   });
 
-  it('la única media query de ancho usa exactamente sizes.cardBreakpoint', () => {
-    const queries = css.match(/@media \(min-width:[^)]*\)/g) ?? [];
-    expect(queries).toEqual([mediaQuery]);
-  });
-
-  it('declara prefers-reduced-motion', () => {
-    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+  it('las únicas media queries son el breakpoint exacto (sizes.cardBreakpoint) y reduced-motion', () => {
+    const queries = [...stripComments(css).matchAll(/@media[^{]*/g)].map((m) => m[0].trim());
+    expect(queries).toEqual([allowedWidthQuery, allowedMotionQuery]);
+    expect(allowedWidthQuery).toBe('@media (min-width: 480px)');
   });
 
   it('cada var(--…) usada existe entre las variables publicadas por applyStyleTokens', () => {

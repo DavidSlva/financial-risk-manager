@@ -36,6 +36,9 @@ export const styles = {
     mobileGutter: 24,
     cardBreakpoint: 480,
     borderWidth: 1,
+    focusRingWidth: 2,
+    spinnerSize: 16,
+    spinnerBorderWidth: 2,
   },
   spacing: {
     1: 4,
@@ -49,6 +52,8 @@ export const styles = {
   },
   motion: {
     transitionDuration: 150,
+    spinnerDuration: 750,
+    spinnerTurn: '1turn',
   },
 } as const;
 

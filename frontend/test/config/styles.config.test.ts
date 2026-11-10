@@ -30,4 +30,12 @@ describe('styles.config', () => {
     expect(styles.sizes.borderWidth).toBe(1);
     expect(styles.motion.transitionDuration).toBe(150);
   });
+
+  it('define los tokens del indicador de carga y del anillo de foco', () => {
+    expect(styles.sizes.focusRingWidth).toBe(2);
+    expect(styles.sizes.spinnerSize).toBe(16);
+    expect(styles.sizes.spinnerBorderWidth).toBe(2);
+    expect(styles.motion.spinnerDuration).toBe(750);
+    expect(styles.motion.spinnerTurn).toBe('1turn');
+  });
 });
