@@ -30,6 +30,7 @@ Repositorio: https://github.com/DavidSlva/financial-risk-manager
 - RF-3: Cada agente trabaja en un **workspace** (git worktree) con su propia rama. **Nunca** hay dos workspaces para la misma spec.
 - RF-4: Se permiten **workspaces de integración** (rama `integration/<slug>`) para combinar cambios de varias specs antes de promover.
 - RF-5: Cada promoción lleva un tag anotado `x.y`: `x` = id numérico de la spec, `y` = contador de actualizaciones sobre esa spec.
+- RF-5b: En una promoción que incluye varias specs, `x` es el id del **último spec publicado** (definición del usuario; ver puntos abiertos para el detalle pendiente).
 - RF-6: Promoción `develop → staging` usa tag con prefijo `rc` (`rcx.y`). Promoción `staging → main` usa el mismo número sin prefijo (`x.y`).
 - RF-7: `CLAUDE.md` en la raíz contiene estas reglas y la metodología SDD/RPI.
 
@@ -79,7 +80,7 @@ graph LR
 ## Puntos abiertos
 
 - **Primer `y`:** se asume que la primera promoción de una spec es `x.0`.
-- **Promociones con varias specs** (workspace de integración): qué `x` lleva el tag. Pendiente de decidir y **ya aplicable**: `develop` contiene las specs 003–007 y 010, así que la próxima promoción a `staging` abarca varias specs.
+- ~~Promociones con varias specs: qué `x` lleva el tag~~ — **definido por el usuario (2026-11-09):** `x` es siempre el id del **último spec publicado** en la promoción. Pendiente de revisar al aplicarlo por primera vez a `develop → staging` (3 a 13 incluidos): precisar si "último" es el de id más alto o el integrado más recientemente.
 - **Hotfix** sobre `main`: no definido; gitflow clásico usaría `hotfix/*`.
 - **Protección de ramas / CI** en GitHub: el CI existe (spec [004](004-pnpm-ci.md)); la protección de ramas y los checks requeridos siguen fuera de alcance.
 - **Integración a `develop`:** la regla dice "por PR", pero las specs 003–010 entraron por merge directo `--no-ff` sin PR, a pedido del usuario. Definir si es la práctica habitual o una excepción.
