@@ -56,6 +56,7 @@ services/health.service.ts
 Excepciones:
 
 - `routes/index.ts`: enrutador principal.
+- **Rutas HTTP:** los recursos van en **plural** (`/api/users`, `/api/permissions`…). Excepción deliberada: `/api/score/:rut`, que designa el score único de un rut.
 - `config/environment.ts`: no pertenece a un recurso.
 - Los middlewares transversales usan `<nombre>.middleware.ts` (`error-handler.middleware.ts`, `not-found.middleware.ts`).
 
@@ -155,6 +156,7 @@ Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se regis
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
+- `GET /api/score/:rut`: score de un rut → `{ "rut", "score" }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
 - `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
 
 ## Pruebas

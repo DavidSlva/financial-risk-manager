@@ -52,6 +52,12 @@ describe('app', () => {
     expect(await res.json()).toEqual({ error: 'Bad Request' });
   });
 
+  it('GET /api/score/:rut está registrado y exige autenticación (401)', async () => {
+    const res = await fetch(`${baseUrl}/api/score/11111111-1`);
+
+    expect(res.status).toBe(401);
+  });
+
   it('no expone la cabecera x-powered-by', async () => {
     const res = await fetch(`${baseUrl}/api/health`);
 

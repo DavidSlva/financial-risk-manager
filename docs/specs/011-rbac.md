@@ -5,7 +5,7 @@ status: converged
 created: 2026-11-09
 updated: 2026-11-09
 depends_on: [006-modelo-datos, 007-auth-jwt, 010-tdd-vitest, 012-errores-http]
-related: []
+related: [013-consulta-score]
 supersedes: []
 superseded_by: []
 ---
@@ -21,7 +21,7 @@ Control de acceso por rol. Cada rol (`roles`) se relaciona de **0 a n** con **pe
 ## Alcance
 
 **Incluye:** modelo `permissions` y sus reglas de integridad, catálogo de permisos soportados (`can_get_score`, `can_get_all_score`), servicio de permisos, middleware `authorize(callback)`, datos iniciales, pruebas.
-**No incluye:** el recurso `score` y su callback de autorización (spec `013-consulta-score`, siguiente), administración de permisos por API, permisos con alcance o jerarquía de roles.
+**No incluye:** el recurso `score` y su callback de autorización ([013-consulta-score](013-consulta-score.md)), administración de permisos por API, permisos con alcance o jerarquía de roles.
 
 ## Modelo
 
@@ -53,7 +53,7 @@ Relación: `roles 1 — 0..n permissions`. Un rol sin filas no tiene ningún per
 | `can_get_score`     | Puede ver **su propio** score (el del rut con el que está autenticado). |
 | `can_get_all_score` | Puede ver el score de **cualquier** rut.                                |
 
-`can_get_all_score` incluye a `can_get_score`: quien puede ver cualquier score puede ver el propio. Cómo se aplica cada permiso lo decide el callback del recurso (`013`).
+`can_get_all_score` incluye a `can_get_score`: quien puede ver cualquier score puede ver el propio. Cómo se aplica cada permiso lo decide el callback del recurso ([013](013-consulta-score.md)).
 
 ### Datos iniciales (`backend/data/permissions.json`, versionado)
 
@@ -126,6 +126,7 @@ Flujo: `authenticate` (deja `req.user`) → `authorize(check)` → controlador. 
 - depende de: [007-auth-jwt](007-auth-jwt.md) — `authenticate` y el usuario vigente con su rol.
 - depende de: [010-tdd-vitest](010-tdd-vitest.md) — se implementa con TDD.
 - depende de: [012-errores-http](012-errores-http.md) — `FORBIDDEN` y `UNAUTHORIZED` del mapa de errores.
+- relacionada con: [013-consulta-score](013-consulta-score.md) — primer recurso con callback de autorización propio.
 
 ## Puntos abiertos
 
@@ -150,7 +151,7 @@ Implementado:
 Notas:
 
 - **No hay callback permisivo por defecto:** `authorize` exige el callback y solo concede con `true` estricto.
-- El callback de un recurso con regla propia (score) se define en el service de ese recurso: spec `013-consulta-score` (siguiente; enlazará aquí cuando exista).
+- El callback de un recurso con regla propia (score) se define en el service de ese recurso: spec [013-consulta-score](013-consulta-score.md).
 - La spec [006](006-modelo-datos.md) tiene una nota de evolución con el modelo ampliado.
 
 **Revisión de documentos relacionados:**
