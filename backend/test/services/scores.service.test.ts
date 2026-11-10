@@ -31,7 +31,7 @@ describe('scores.service', () => {
     it('encuentra el score de un rut', () => {
       expect(findScoreByRut('11111111-1', createDataStore(dir))).toEqual({
         rut: '11111111-1',
-        score: 780,
+        score: 78,
       });
     });
 

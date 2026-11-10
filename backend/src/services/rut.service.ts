@@ -27,3 +27,9 @@ export function isValidRut(value: unknown): value is string {
   const [body, verifier] = value.split('-') as [string, string];
   return checkDigit(body) === verifier;
 }
+
+/** Formato de presentación `12.345.678-5`. Solo para salidas; recibe un rut canónico ya validado. */
+export function formatRut(rut: string): string {
+  const [body, verifier] = rut.split('-') as [string, string];
+  return `${body.replace(/\B(?=(\d{3})+$)/g, '.')}-${verifier}`;
+}
