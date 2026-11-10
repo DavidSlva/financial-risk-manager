@@ -26,7 +26,7 @@ export function ScoreResult({ outcome }: ScoreResultProps) {
         <p className="score-result__rut">{outcome.rut}</p>
         <p className="score-result__date">
           <span className="score-result__date-label">{t('score.date.label')}</span>{' '}
-          <time dateTime={outcome.fecha}>{safeDate(outcome.fecha)}</time>
+          <time dateTime={outcome.consultedAt}>{safeDate(outcome.consultedAt)}</time>
         </p>
       </section>
     );

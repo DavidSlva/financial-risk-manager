@@ -10,12 +10,12 @@ Spec: [../../specs/016-score-consulta.md](../../specs/016-score-consulta.md) · 
 | 2026-11-09 21:51 | T1     | hecho     | Núcleo: RUT, fecha, errores y cliente (`f5d7188`)                                                          |
 | 2026-11-09 21:55 | T2, T3 | hecho     | Textos, `ScoreResult`, `ScorePage` y estilos (`cc92e21`)                                                   |
 | 2026-11-09 21:57 | docs   | parcial   | Converge parcial; verificaciones: format, lint, typecheck, test (frontend 135, backend 516), policy, build |
+| 2026-11-09 22:07 | T6     | hecho     | `fecha` pasa a `consulted_at` (TS `consultedAt`); la clave antigua es mal formada                          |
 
 ## Diferido
 
 - Playwright e2e (T5).
 - Integración con la sesión: montar `ScorePage` en `App`, `onSessionExpired` real (401 hacia login) e `initialRut`, tras la spec 015 (T4). Hoy la pantalla no es alcanzable desde `App`.
-- Reconciliar la respuesta real del backend con la spec 013: campo `fecha` y formato del `rut` (T6).
 
 ## Hallazgos de la revisión final (veredicto: aprobado)
 

@@ -5,7 +5,7 @@ import { createScoreClient } from '../../src/api/score.client.js';
 const json = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-const okBody = { rut: '12.345.678-9', score: 73, fecha: '2025-06-27T14:35:00Z' };
+const okBody = { rut: '12.345.678-9', score: 73, consulted_at: '2025-06-27T14:35:00Z' };
 
 const clientWith = (impl: () => Promise<Response>) =>
   createScoreClient(vi.fn(impl) as unknown as typeof fetch);
@@ -17,7 +17,7 @@ describe('createScoreClient', () => {
       kind: 'ok',
       rut: '12.345.678-9',
       score: 73,
-      fecha: '2025-06-27T14:35:00Z',
+      consultedAt: '2025-06-27T14:35:00Z',
     });
   });
 
@@ -64,10 +64,14 @@ describe('createScoreClient', () => {
   it.each([
     ['score string', { ...okBody, score: '73' }],
     ['score null (NaN/Infinity)', { ...okBody, score: null }],
-    ['fecha ausente', { rut: okBody.rut, score: 73 }],
-    ['fecha inválida', { ...okBody, fecha: 'ayer' }],
-    ['fecha no string', { ...okBody, fecha: 123 }],
-    ['rut ausente', { score: 73, fecha: okBody.fecha }],
+    ['consulted_at ausente', { rut: okBody.rut, score: 73 }],
+    ['consulted_at inválida', { ...okBody, consulted_at: 'ayer' }],
+    ['consulted_at no string', { ...okBody, consulted_at: 123 }],
+    ['rut ausente', { score: 73, consulted_at: okBody.consulted_at }],
+    [
+      'clave antigua fecha sin consulted_at',
+      { rut: okBody.rut, score: 73, fecha: '2025-06-27T14:35:00Z' },
+    ],
     ['rut vacío', { ...okBody, rut: '' }],
     ['cuerpo null', null],
     ['cuerpo arreglo', [okBody]],

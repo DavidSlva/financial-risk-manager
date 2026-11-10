@@ -24,7 +24,7 @@
 `frontend/src/api/score.types.ts`:
 
 ```ts
-export type ScoreSuccess = { kind: 'ok'; rut: string; score: number; fecha: string };
+export type ScoreSuccess = { kind: 'ok'; rut: string; score: number; consultedAt: string };
 export type ScoreFailureReason =
   | 'invalid-rut'
   | 'unauthorized'
@@ -63,7 +63,7 @@ Otras firmas: `normalizeRut(raw: string): string | null`, `formatScoreDate(iso: 
 
 1. **RUT con `K`/`k` y con ceros:** `1-9`, `11.111.111-1`, `k` minúscula y dígito verificador `0` (módulo 11 da 11, `0`) o `K` (da 10) (Tarea 1).
 2. **Entradas basura al normalizar:** cadena vacía, solo espacios, letras, `--`, más de 9 dígitos, espacios internos (Tarea 1).
-3. **Cuerpo `200` con tipos engañosos:** `score` como cadena `"73"`, `NaN`/`Infinity`, `rut: ''`, `fecha: 'ayer'`, cuerpo `null` o arreglo (Tarea 1).
+3. **Cuerpo `200` con tipos engañosos:** `score` como cadena `"73"`, `NaN`/`Infinity`, `rut: ''`, `consulted_at: 'ayer'` y la clave antigua `fecha`, cuerpo `null` o arreglo (Tarea 1).
 4. **Cuerpo de error con texto del servidor:** el `messageKey` jamás deriva del cuerpo; un `403` con `{"error":"RUT no existe"}` sigue dando `score.errors.forbidden` (Tareas 1 y 3).
 5. **Aborto:** `AbortError` se re-lanza (no se convierte en `network`) y `ScorePage` lo ignora (Tareas 1 y 3).
 6. **Respuesta obsoleta:** consulta A pendiente, el usuario edita el RUT o envía B; la respuesta tardía de A no pinta nada (Tarea 3).
@@ -99,7 +99,7 @@ Otras firmas: `normalizeRut(raw: string): string | null`, `formatScoreDate(iso: 
 
 - Produce: las firmas de "Interfaces fijas". No cambiarlas: otros agentes dependen de estos nombres.
 - `normalizeRut`: acepta `12.345.678-9`, `12345678-9`, `123456789` (con o sin puntos y guion, `k`/`K`); devuelve `12345678-9` (sin puntos, `K` mayúscula) solo si el dígito verificador es válido; si no, `null`.
-- `createScoreClient`: `GET /api/score/${encodeURIComponent(rut)}`, `credentials: 'include'`, `headers: { Accept: 'application/json' }`, `signal` si se pasa. `200`: validar JSON (`rut` texto no vacío, `score` número finito, `fecha` texto que `Date.parse` acepte) o `malformed`. No-200: `reasonForStatus(status)`; el cuerpo no se lee. `fetch` que lanza: `network`, salvo `AbortError`, que se re-lanza. Sin `console` ni almacenamiento.
+- `createScoreClient`: `GET /api/score/${encodeURIComponent(rut)}`, `credentials: 'include'`, `headers: { Accept: 'application/json' }`, `signal` si se pasa. `200`: validar JSON (`rut` texto no vacío, `score` número finito, `consulted_at` texto que `Date.parse` acepte, mapeado a `consultedAt`) o `malformed`. No-200: `reasonForStatus(status)`; el cuerpo no se lee. `fetch` que lanza: `network`, salvo `AbortError`, que se re-lanza. Sin `console` ni almacenamiento.
 
 - [ ] **Paso 1: Pruebas que fallan**
   - `rut.test.ts`: válidos con y sin formato, con `k` minúscula, dígito `0` y `K`; inválidos por dígito verificador, vacío, espacios, letras, demasiado corto o largo; salida canónica.
@@ -175,4 +175,4 @@ Depende de la spec 015 (sesión por cookies, RUT del usuario autenticado como `i
 
 - **Cobertura de la spec:** RF-1, RF-2, RF-4, RF-5, RF-7, RF-8, RF-9, RF-10 y RF-11 (Tareas 1 a 3); RF-3 y RF-6 en su parte de sesión (Tarea 4, diferida; `onSessionExpired` e `initialRut` ya existen como props en la Tarea 3); pruebas Vitest de la spec (Tareas 1 a 3); Playwright (Tarea 4).
 - **Consistencia de nombres:** `ScoreOutcome`, `ScoreClient`, `createScoreClient`, `fetchScore`, `normalizeRut`, `formatScoreDate`, `SCORE_ERROR_KEYS`, `reasonForStatus`, `ScoreResult`, `ScorePage` se definen una vez y se reutilizan igual.
-- **Supuestos a validar:** la `fecha` obligatoria y `role="status"` en éxito son supuestos de la spec; el texto del subtítulo no está fijado por la spec; `normalizeRut` puede duplicar el validador de la 015 hasta integrar.
+- **Supuestos a validar:** `consulted_at` obligatorio y `role="status"` en éxito son supuestos de la spec; el texto del subtítulo no está fijado por la spec; `normalizeRut` puede duplicar el validador de la 015 hasta integrar.

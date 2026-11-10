@@ -1,4 +1,4 @@
-export type ScoreSuccess = { kind: 'ok'; rut: string; score: number; fecha: string };
+export type ScoreSuccess = { kind: 'ok'; rut: string; score: number; consultedAt: string };
 export type ScoreFailureReason =
   | 'invalid-rut'
   | 'unauthorized'

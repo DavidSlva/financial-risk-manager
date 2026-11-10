@@ -19,18 +19,18 @@ function renderResult(outcome: ScoreOutcome) {
 
 describe('ScoreResult', () => {
   it('éxito: role=status con score, rut tal como llega, etiqueta y fecha formateada', () => {
-    const fecha = '2025-06-27T14:35:00Z';
-    renderResult({ kind: 'ok', rut: '12.345.678-9', score: 73, fecha });
+    const consultedAt = '2025-06-27T14:35:00Z';
+    renderResult({ kind: 'ok', rut: '12.345.678-9', score: 73, consultedAt });
     const status = screen.getByRole('status');
     expect(status.textContent).toContain('73');
     expect(status.textContent).toContain('12.345.678-9');
     expect(status.textContent).toContain('Fecha del score');
-    expect(status.textContent).toContain(formatScoreDate(fecha));
+    expect(status.textContent).toContain(formatScoreDate(consultedAt));
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('éxito con fecha inválida no lanza', () => {
-    renderResult({ kind: 'ok', rut: '1-9', score: 5, fecha: 'ayer' });
+    renderResult({ kind: 'ok', rut: '1-9', score: 5, consultedAt: 'ayer' });
     expect(screen.getByRole('status').textContent).toContain('5');
   });
 

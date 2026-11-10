@@ -25,18 +25,18 @@ async function parseSuccess(response: Response): Promise<ScoreOutcome> {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) {
     return failure('malformed', response.status);
   }
-  const { rut, score, fecha } = body as Record<string, unknown>;
+  const { rut, score, consulted_at: consultedAt } = body as Record<string, unknown>;
   if (
     typeof rut !== 'string' ||
     rut === '' ||
     typeof score !== 'number' ||
     !Number.isFinite(score) ||
-    typeof fecha !== 'string' ||
-    Number.isNaN(Date.parse(fecha))
+    typeof consultedAt !== 'string' ||
+    Number.isNaN(Date.parse(consultedAt))
   ) {
     return failure('malformed', response.status);
   }
-  return { kind: 'ok', rut, score, fecha };
+  return { kind: 'ok', rut, score, consultedAt };
 }
 
 export function createScoreClient(fetchImpl?: typeof fetch): ScoreClient {

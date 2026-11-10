@@ -20,7 +20,7 @@ const OK: ScoreOutcome = {
   kind: 'ok',
   rut: '12.345.678-9',
   score: 73,
-  fecha: '2025-06-27T14:35:00Z',
+  consultedAt: '2025-06-27T14:35:00Z',
 };
 
 function fail(reason: ScoreFailureReason, status?: number): ScoreOutcome {
