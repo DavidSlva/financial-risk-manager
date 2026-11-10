@@ -274,9 +274,9 @@ export function validateIntegrity(data: RawData): Violation[] {
 
   scores.rows.forEach((row, index) => {
     const score = row.score as number;
-    if (!Number.isInteger(score) || score < 0 || score > 1000) {
+    if (!Number.isInteger(score) || score < 0 || score > 100) {
       violations.push(
-        violation('scores.json', 'IR-9', `"score" debe ser un entero entre 0 y 1000`, index),
+        violation('scores.json', 'IR-9', `"score" debe ser un entero entre 0 y 100`, index),
       );
     }
   });

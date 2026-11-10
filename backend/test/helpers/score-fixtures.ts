@@ -6,8 +6,8 @@ import { userRow } from './user-fixtures.js';
  *
  * | rut          | rol     | vigente | score | permisos del rol                          |
  * | ------------ | ------- | ------- | ----- | ----------------------------------------- |
- * | 11111111-1   | admin   | sí      | 780   | can_get_score, can_get_all_score          |
- * | 22222222-2   | user    | sí      | 650   | can_get_score                             |
+ * | 11111111-1   | admin   | sí      | 78   | can_get_score, can_get_all_score          |
+ * | 22222222-2   | user    | sí      | 65   | can_get_score                             |
  * | 33333333-3   | user    | sí      | —     | can_get_score                             |
  * | 44444444-4   | guest   | sí      | —     | (ninguno)                                 |
  * | 55555555-5   | auditor | sí      | —     | can_get_all_score                         |
@@ -42,8 +42,8 @@ export function scoreScenario(): RawData {
       userRow(REVOKED_ADMIN, 'admin', false),
     ],
     scores: [
-      { rut: ADMIN, score: 780 },
-      { rut: USER_WITH_SCORE, score: 650 },
+      { rut: ADMIN, score: 78 },
+      { rut: USER_WITH_SCORE, score: 65 },
     ],
     permissions: [
       { role: 'admin', key: 'can_get_score', value: true },

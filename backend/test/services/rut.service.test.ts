@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isValidRut } from '../../src/services/rut.service.js';
+import { formatRut, isValidRut } from '../../src/services/rut.service.js';
 
 describe('rut.service › isValidRut', () => {
   describe('formato canónico con dígito verificador correcto', () => {
@@ -90,5 +90,15 @@ describe('rut.service › isValidRut', () => {
     isValidRut(input);
 
     expect(input).toBe('12345678-5');
+  });
+});
+
+describe('rut.service › formatRut', () => {
+  it.each([
+    ['12345678-5', '12.345.678-5'],
+    ['1000005-K', '1.000.005-K'],
+    ['11111111-1', '11.111.111-1'],
+  ])('%s → %s', (rut, expected) => {
+    expect(formatRut(rut)).toBe(expected);
   });
 });

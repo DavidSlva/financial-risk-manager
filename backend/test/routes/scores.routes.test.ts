@@ -21,6 +21,9 @@ import {
   scoreScenario,
 } from '../helpers/score-fixtures.js';
 
+const NOW = new Date('2025-06-27T14:35:00.123Z');
+const NOW_ISO = '2025-06-27T14:35:00Z';
+
 describe('GET /api/score/:rut', () => {
   let dir: string;
   let deps: AuthDeps;
@@ -33,7 +36,7 @@ describe('GET /api/score/:rut', () => {
 
     const app = express();
     app.use(express.json());
-    app.use('/api/score', createScoresRouter(deps));
+    app.use('/api/score', createScoresRouter({ ...deps, now: () => NOW }));
     app.use(errorHandler);
     server = await startServer(app);
   });
@@ -86,14 +89,14 @@ describe('GET /api/score/:rut', () => {
       const res = await getScore(await accessFor(ADMIN), USER_WITH_SCORE);
 
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ rut: USER_WITH_SCORE, score: 650 });
+      expect(await res.json()).toEqual({ rut: '22.222.222-2', score: 65, consulted_at: NOW_ISO });
     });
 
     it('ve el propio → 200', async () => {
       const res = await getScore(await accessFor(ADMIN), ADMIN);
 
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ rut: ADMIN, score: 780 });
+      expect(await res.json()).toEqual({ rut: '11.111.111-1', score: 78, consulted_at: NOW_ISO });
     });
 
     it('rut inexistente → 404', async () => {
@@ -113,7 +116,7 @@ describe('GET /api/score/:rut', () => {
       const res = await getScore(await accessFor(USER_WITH_SCORE), USER_WITH_SCORE);
 
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ rut: USER_WITH_SCORE, score: 650 });
+      expect(await res.json()).toEqual({ rut: '22.222.222-2', score: 65, consulted_at: NOW_ISO });
     });
 
     it('el score de otro rut existente → 403', async () => {

@@ -97,7 +97,7 @@ Sin base de datos: cuatro archivos JSON en `backend/data/` (spec [006-modelo-dat
 | `roles.json`       | Catálogo de roles (nivel de privilegios), extensible                                          | sí                                  |
 | `permissions.json` | Permisos por rol: `role` (FK a roles), `key` (catálogo), `value`                              | sí                                  |
 | `users.json`       | Usuarios: `rut`, `role` (FK a roles), `active` (vigencia), `password_hash`, `failed_attempts` | no (ejemplo: `users.example.json`)  |
-| `scores.json`      | Score por rut: `rut` (PK y FK a users), `score` (0–1000)                                      | no (ejemplo: `scores.example.json`) |
+| `scores.json`      | Score por rut: `rut` (PK y FK a users), `score` (0–100)                                       | no (ejemplo: `scores.example.json`) |
 
 Para empezar: copiar `users.example.json` a `users.json` y `scores.example.json` a `scores.json`.
 
@@ -195,7 +195,7 @@ Cuerpo siempre `{ "error": "<mensaje>" }`. Un error desconocido es 500 (se regis
 ## Endpoints
 
 - `GET /api/health`: estado del servicio.
-- `GET /api/score/:rut`: score de un rut → `{ "rut", "score" }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
+- `GET /api/score/:rut`: score de un rut → `{ "rut" (formato 12.345.678-9), "score" (0–100), "consulted_at" (UTC) }`. Requiere `Authorization: Bearer <access>`. `can_get_all_score` ve cualquier rut; `can_get_score`, solo el propio (403 en otro caso; 404 si no hay score). Spec [013-consulta-score](../docs/specs/013-consulta-score.md).
 - `POST /api/auth/login`: `{ "rut", "password" }` → `{ "accessToken", "expiresIn", "refreshToken", "refreshExpiresIn" }`. Ver _Login y contraseñas_.
 - `POST /api/auth/refresh`: `{ "refreshToken": "..." }` → `{ "accessToken", "expiresIn" }`.
 

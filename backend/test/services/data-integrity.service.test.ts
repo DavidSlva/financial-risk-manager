@@ -67,7 +67,7 @@ describe('data-integrity.service', () => {
     it.each([
       ['active como texto', 'users', [{ rut: '1-9', role: 'admin', active: 'true' }]],
       ['active nulo', 'users', [{ rut: '1-9', role: 'admin', active: null }]],
-      ['score como texto', 'scores', [{ rut: '11111111-1', score: '780' }]],
+      ['score como texto', 'scores', [{ rut: '11111111-1', score: '78' }]],
       ['description numérica', 'roles', [{ name: 'admin', description: 5 }]],
       ['rut numérico', 'users', [userRow(111, 'admin', true)]],
     ] as const)('tipo incorrecto: %s', (_label, file, rows) => {
@@ -151,8 +151,8 @@ describe('data-integrity.service', () => {
     });
   });
 
-  describe('IR-9: score entero entre 0 y 1000', () => {
-    it.each([-1, 1001, 7.5, Number.NaN])('rechaza %s', (score) => {
+  describe('IR-9: score entero entre 0 y 100', () => {
+    it.each([-1, 101, 1000, 780, 7.5, Number.NaN])('rechaza %s', (score) => {
       const data = validData();
       data.scores = [{ rut: '11111111-1', score }];
 
@@ -161,7 +161,7 @@ describe('data-integrity.service', () => {
       );
     });
 
-    it.each([0, 1000, 650])('acepta %s', (score) => {
+    it.each([0, 100, 65])('acepta %s', (score) => {
       const data = validData();
       data.scores = [{ rut: '11111111-1', score }];
 
@@ -282,7 +282,7 @@ describe('data-integrity.service', () => {
     it('acepta RUT con DV K y DV 0', () => {
       const data = validData();
       data.users = [userRow('1000005-K', 'admin', true), userRow('1000030-0', 'user', true)];
-      data.scores = [{ rut: '1000005-K', score: 700 }];
+      data.scores = [{ rut: '1000005-K', score: 70 }];
 
       expect(validateIntegrity(data)).toEqual([]);
     });
